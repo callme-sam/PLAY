@@ -4,3 +4,4 @@ BUILD/
 
 # IDEs
 .vscode/
+*.code-workspace
