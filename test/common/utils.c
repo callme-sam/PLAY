@@ -38,3 +38,10 @@ void vector_print(const float *vec, const int len, const char *str)
     printf("%.4f ]\n", vec[len - 1]);
 #endif  /* PRINT_DATA */
 }
+
+void scalar_print(const float val, const char *str)
+{
+#ifdef PRINT_DATA
+    printf("Scalar %s\t= %.4f\n", str, val);
+#endif  /* PRINT_DATA */
+}

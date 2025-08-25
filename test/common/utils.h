@@ -47,4 +47,15 @@ bool vector_compare(const float *vec_a, const float *vec_b, const int len);
  */
 void vector_print(const float *vec, const int len, const char *str);
 
+/**
+ * @brief Prints a scalar float value to standard output
+ *
+ * @param[in] val The float scalar to print
+ * @param[in] str Descriptive string to identify the scalar in output
+ *
+ * @note This function only produces output when PRINT_DATA macro is defined.
+ * In other configurations, this function has no effect.
+ */
+void scalar_print(const float val, const char *str);
+
 #endif  /* UTILS_H_ */
