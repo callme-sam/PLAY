@@ -57,7 +57,7 @@ int vector_add(const float *src_a, const float *src_b, float *dst, const int len
  *
  * This function performs an element-wise addition of a constant scalar value (`offset`)
  * to a source vector (`src`) and stores the result in a destination vector (`dst`).
- * The execution mode (cluster or fabric controller)is determined by the `CLUSTER` macro. If `CLUSTER`
+ * The execution mode (cluster or fabric controller) is determined by the `CLUSTER` macro. If `CLUSTER`
  * is defined, a parallel version of the function is used; otherwise, a serial version is executed.
  *
  * @param [in] src A pointer to the source vector.
@@ -68,5 +68,22 @@ int vector_add(const float *src_a, const float *src_b, float *dst, const int len
  * @return int Returns 0 on success, or a non-zero value on failure.
  */
 int vector_offset(const float *src, const float offset, float *dst, const int len);
+
+/**
+ * @brief Performs element-wise scaling of a vector.
+ *
+ * This function multiplies each element of a source vector (`src`) by a constant
+ * scalar value (`val`) and stores the result in a destination vector (`dst`).
+ * The execution mode (cluster or fabric controller) is determined by the `CLUSTER` macro. If `CLUSTER`
+ * is defined, a parallel version of the function is used; otherwise, a serial version is executed.
+ *
+ * @param [in] src A pointer to the source vector.
+ * @param [in] val The scalar value to multiply each element by.
+ * @param [out] dst A pointer to the destination vector where the results will be stored.
+ * @param [in] len The length of the vectors.
+ *
+ * @return int Returns 0 on success, or a non-zero value on failure.
+ */
+int vector_scale(const float *src, const float val, float *dst, const int len);
 
 #endif  /* PLAY_H_ */
