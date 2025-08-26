@@ -86,4 +86,20 @@ int vector_offset(const float *src, const float offset, float *dst, const int le
  */
 int vector_scale(const float *src, const float val, float *dst, const int len);
 
+/**
+ * @brief Finds the minimum value in a vector.
+ *
+ * This function iterates through a vector of floating-point numbers (`src`) to find
+ * and return its minimum value.
+ * The execution mode (cluster or fabric controller) is determined by the `CLUSTER` macro. If `CLUSTER`
+ * is defined, a parallel version of the function is used; otherwise, a serial version is executed.
+ *
+ * @param [in] src A pointer to the source vector.
+ * @param [out] min A pointer to the memory location where the minimum value will be stored.
+ * @param [in] len The length of the vector.
+ *
+ * @return int Returns 0 on success, or a non-zero value on failure.
+ */
+int vector_min(const float *src, float *min, const int len);
+
 #endif  /* PLAY_H_ */
