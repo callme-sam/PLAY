@@ -39,6 +39,17 @@ void vector_print(const float *vec, const int len, const char *str)
 #endif  /* PRINT_DATA */
 }
 
+bool scalar_compare(const float val_a, const float val_b)
+{
+    float abs_diff;
+
+    abs_diff = fabs(val_a - val_b);
+    if (abs_diff > TOLL)
+        return false;
+
+    return true;
+}
+
 void scalar_print(const float val, const char *str)
 {
 #ifdef PRINT_DATA

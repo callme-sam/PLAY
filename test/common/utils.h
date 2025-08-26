@@ -48,6 +48,17 @@ bool vector_compare(const float *vec_a, const float *vec_b, const int len);
 void vector_print(const float *vec, const int len, const char *str);
 
 /**
+ * @brief Compares two floating-point values with a tollerance check
+ *
+ * @param[in] val_a First float value
+ * @param[in] val_b Second float value
+ *
+ * @return true if all elements differ by less than TOLL
+ * @return false if any element difference exceeds TOLL
+ */
+bool scalar_compare(const float val_a, const float val_b);
+
+/**
  * @brief Prints a scalar float value to standard output
  *
  * @param[in] val The float scalar to print
