@@ -102,4 +102,23 @@ int vector_scale(const float *src, const float val, float *dst, const int len);
  */
 int vector_min(const float *src, float *min, const int len);
 
+/**
+ * @brief Computes the dot product of two vectors.
+ *
+ * This function calculates the dot product of two vectors, `src_a` and `src_b`, by
+ * summing the products of their corresponding elements. The result is
+ * a single scalar value which is stored in the memory location pointed to by `dst`.
+ * The execution mode (cluster or fabric controller) is determined by the `CLUSTER` macro. If `CLUSTER`
+ * is defined, a parallel version of the function is used; otherwise, a serial version is executed.
+ *
+ *
+ * @param [in] src_a A pointer to the first source vector.
+ * @param [in] src_b A pointer to the second source vector.
+ * @param [out] dst A pointer to the memory location where the scalar result will be stored.
+ * @param [in] len The length of the vectors.
+ *
+ * @return int Returns 0 on success, non-zero on failure.
+ */
+int vector_dot(const float *src_a, const float *src_b, float *dst, const int len);
+
 #endif  /* PLAY_H_ */
