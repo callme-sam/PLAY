@@ -121,4 +121,22 @@ int vector_min(const float *src, float *min, const int len);
  */
 int vector_dot(const float *src_a, const float *src_b, float *dst, const int len);
 
+/**
+ * @brief Computes the AXPY operation: dst = α·src_a + src_b.
+ *
+ * This function performs an element-wise multiplication of the source vector `src_a` by
+ * a scalar `alpha`, and then adds the corresponding elements of the vector `src_b`.
+ * The result is stored in a separate destination vector `dst`. The original source
+ * vectors `src_a` and `src_b` are not modified.
+ *
+ * @param [in] src_a A pointer to the first source vector.
+ * @param [in] src_b A pointer to the second source vector.
+ * @param [in] alpha The scalar value (α) to multiply with each element of `src_a`.
+ * @param [out] dst A pointer to the destination vector where the final result is stored.
+ * @param [in] len The length of the vectors.
+ *
+ * @return int Returns 0 on success, non-zero on failure.
+ */
+int vector_axpy(const float *src_a, const float *src_b, const float alpha, float *dst, const int len);
+
 #endif  /* PLAY_H_ */
