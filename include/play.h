@@ -157,4 +157,20 @@ int vector_axpy(const float *src_a, const float *src_b, const float alpha, float
  */
 int matrix_mul(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P);
 
+/**
+ * @brief Performs matrix transposition.
+ *
+ * This function computes the transpose of a matrix `src` and stores the result
+ * in a destination matrix `dst`. The transpose operation swaps the rows and
+ * columns of the source matrix.
+ *
+ * @param [in] src A pointer to the source matrix with dimensions dim_M x dim_N.
+ * @param [out] dst A pointer to the destination matrix, which will have dimensions dim_N x dim_M.
+ * @param [in] dim_M The number of rows in the source matrix.
+ * @param [in] dim_N The number of columns in the source matrix.
+ *
+ * @return int Returns 0 on success.
+ */
+int matrix_trans(const float *src, float *dst, const int dim_M, const int dim_N);
+
 #endif  /* PLAY_H_ */
