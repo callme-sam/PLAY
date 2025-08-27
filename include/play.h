@@ -139,4 +139,22 @@ int vector_dot(const float *src_a, const float *src_b, float *dst, const int len
  */
 int vector_axpy(const float *src_a, const float *src_b, const float alpha, float *dst, const int len);
 
+/**
+ * @brief Performs matrix multiplication: dst = src_a * src_b.
+ *
+ * This function multiplies the matrix `src_a` by the matrix `src_b` and stores the
+ * resulting matrix in `dst`. This operation is valid only if the number of columns
+ * of `src_a` is equal to the number of rows of `src_b`.
+ *
+ * @param [in] src_a A pointer to the first source matrix, with dimensions dim_M x dim_N.
+ * @param [in] src_b A pointer to the second source matrix, with dimensions dim_N x dim_P.
+ * @param [out] dst A pointer to the destination matrix, with dimensions dim_M x dim_P.
+ * @param [in] dim_M The number of rows in the `src_a` and `dst` matrices.
+ * @param [in] dim_N The number of columns in the `src_a` matrix and the number of rows in the `src_b` matrix.
+ * @param [in] dim_P The number of columns in the `src_b` and `dst` matrices.
+ *
+ * @return int Returns 0 on success.
+ */
+int matrix_mul(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P);
+
 #endif  /* PLAY_H_ */
