@@ -22,6 +22,28 @@ void barrier();
 bool is_master_core();
 
 /**
+ * @brief Compares two floating-point values with a tollerance check
+ *
+ * @param[in] val_a First float value
+ * @param[in] val_b Second float value
+ *
+ * @return true if all elements differ by less than TOLL
+ * @return false if any element difference exceeds TOLL
+ */
+bool scalar_compare(const float val_a, const float val_b);
+
+/**
+ * @brief Prints a scalar float value to standard output
+ *
+ * @param[in] val The float scalar to print
+ * @param[in] str Descriptive string to identify the scalar in output
+ *
+ * @note This function only produces output when PRINT_DATA macro is defined.
+ * In other configurations, this function has no effect.
+ */
+void scalar_print(const float val, const char *str);
+
+/**
  * @brief Compares two floating-point vectors with a tolerance check
  *
  * @param[in] vec_a Pointer to the first float vector
@@ -48,25 +70,30 @@ bool vector_compare(const float *vec_a, const float *vec_b, const int len);
 void vector_print(const float *vec, const int len, const char *str);
 
 /**
- * @brief Compares two floating-point values with a tollerance check
+ * @brief Compares two floating-point matrices with a tollerance check
  *
- * @param[in] val_a First float value
- * @param[in] val_b Second float value
+ * @param[in] mat_a Pointer to the first matrix
+ * @param[in] mat_b Pointer to the second matrix
+ * @param[in] rows Number of rows for the two matrices
+ * @param[in] cols Number of columts for the two matrices
+ *
  *
  * @return true if all elements differ by less than TOLL
- * @return false if any element difference exceeds TOLL
+ * @return false if any alement difference exceeds TOLL
  */
-bool scalar_compare(const float val_a, const float val_b);
+bool matrix_compare(const float *mat_a, const float *mat_b, const int rows, const int cols);
 
 /**
- * @brief Prints a scalar float value to standard output
+ * @brief Printa a matrix to standard output
  *
- * @param[in] val The float scalar to print
- * @param[in] str Descriptive string to identify the scalar in output
+ * @param[in] mat Pointer to the float matrix to print
+ * @param[in] rows Number of rows of the matrix
+ * @param[in] cols Number of cols of the matrix
+ * @param[in] str Descriptive string to identify the matrix in output
  *
  * @note This function only produces output when PRINT_DATA macro is defined.
  * In other configurations, this function has no effect.
  */
-void scalar_print(const float val, const char *str);
+void matrix_print(const float *mat, const int rows, const int cols, const char *str);
 
 #endif  /* UTILS_H_ */

@@ -6,14 +6,32 @@
 
 void barrier()
 {
-#ifdef CLUSTER
+#ifdef  CLUSTER
     pi_cl_team_barrier();
-#endif
+#endif  /* CLUSTER */
 }
 
 bool is_master_core()
 {
     return pi_core_id() == 0;
+}
+
+bool scalar_compare(const float val_a, const float val_b)
+{
+    float abs_diff;
+
+    abs_diff = fabs(val_a - val_b);
+    if (abs_diff > TOLL)
+        return false;
+
+    return true;
+}
+
+void scalar_print(const float val, const char *str)
+{
+#ifdef  PRINT_DATA
+    printf("Scalar %s\t= %.4f\n", str, val);
+#endif  /* PRINT_DATA */
 }
 
 bool vector_compare(const float *vec_a, const float *vec_b, const int len)
@@ -31,7 +49,7 @@ bool vector_compare(const float *vec_a, const float *vec_b, const int len)
 
 void vector_print(const float *vec, const int len, const char *str)
 {
-#ifdef PRINT_DATA
+#ifdef  PRINT_DATA
     printf("Vector %s\t= [ ", str);
     for (int i = 0; i < (len - 1); i++)
         printf("%.4f, ", vec[i]);
@@ -39,20 +57,31 @@ void vector_print(const float *vec, const int len, const char *str)
 #endif  /* PRINT_DATA */
 }
 
-bool scalar_compare(const float val_a, const float val_b)
+bool matrix_compare(const float *mat_a, const float *mat_b, const int rows, const int cols)
 {
     float abs_diff;
 
-    abs_diff = fabs(val_a - val_b);
-    if (abs_diff > TOLL)
-        return false;
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            abs_diff = fabs(mat_a[r * cols + c] - mat_b[r * cols + c]);
+            if (abs_diff > TOLL)
+                return false;
+        }
+    }
 
     return true;
 }
 
-void scalar_print(const float val, const char *str)
+void matrix_print(const float *mat, const int rows, const int cols, const char *str)
 {
-#ifdef PRINT_DATA
-    printf("Scalar %s\t= %.4f\n", str, val);
+#ifdef  PRINT_DATA
+    printf("Matrix %s:\n", str);
+    printf("[\n");
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < (cols - 1); c++)
+            printf("%.4f,  ", mat[r * cols + c]);
+        printf("%.4f;\n", mat[r * cols + (cols - 1)]);
+    }
+    printf("]\n");
 #endif  /* PRINT_DATA */
 }
