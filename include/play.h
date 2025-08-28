@@ -140,6 +140,20 @@ int vector_dot(const float *src_a, const float *src_b, float *dst, const int len
 int vector_axpy(const float *src_a, const float *src_b, const float alpha, float *dst, const int len);
 
 /**
+ * @brief Copies elements from a source vector to a destination vector.
+ *
+ * This function performs an element-by-element copy of floating-point values
+ * from the source vector `src` to the destination vector `dst`.
+ *
+ * @param [in] src A pointer to the source vector.
+ * @param [out] dst A pointer to the destination vector.
+ * @param [in] len The number of elements to copy.
+ *
+ * @return int Returns 0 on success, non-zero on failure
+ */
+int vector_memcpy(const float *src, float *dst, const int len);
+
+/**
  * @brief Performs matrix multiplication: dst = src_a * src_b.
  *
  * This function multiplies the matrix `src_a` by the matrix `src_b` and stores the
