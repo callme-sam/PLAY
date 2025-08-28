@@ -218,4 +218,20 @@ int matrix_trans(const float *src, float *dst, const int dim_M, const int dim_N)
  */
 int matrix_mul_trans(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P);
 
+/**
+ * @brief Copies elements from a source matrix to a destination matrix.
+ *
+ * This function performs an element-by-element copy of floating-point values
+ * from the source matrix `src` to the destination matrix `dst`. The matrices
+ * are treated as one-dimensional arrays in row-major order.
+ *
+ * @param [in] src A pointer to the source matrix.
+ * @param [out] dst A pointer to the destination matrix.
+ * @param [in] dim_M The number of rows in the matrices.
+ * @param [in] dim_N The number of columns in the matrices.
+ *
+ * @return int Returns 0 on success, non-zero on error.
+ */
+int matrix_memcpy(const float *src, float *dst, const int dim_M, const int dim_N);
+
 #endif  /* PLAY_H_ */
