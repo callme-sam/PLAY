@@ -154,6 +154,20 @@ int vector_axpy(const float *src_a, const float *src_b, const float alpha, float
 int vector_memcpy(const float *src, float *dst, const int len);
 
 /**
+ * @brief Fills a vector with a value.
+ *
+ * This function iterates through each element of a vector and sets it to the
+ * specified constant value `val`.
+ *
+ * @param [out] vec A pointer to the destination vector to be modified.
+ * @param [in] val The constant value to set each element to.
+ * @param [in] len The number of elements in the vector.
+ *
+ * @return int Returns 0 on success, non-zero on failure
+ */
+int vector_set_all(float *vec, const float val, const int len);
+
+/**
  * @brief Performs matrix multiplication: dst = src_a * src_b.
  *
  * This function multiplies the matrix `src_a` by the matrix `src_b` and stores the
