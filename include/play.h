@@ -173,4 +173,21 @@ int matrix_mul(const float *src_a, const float *src_b, float *dst, const int dim
  */
 int matrix_trans(const float *src, float *dst, const int dim_M, const int dim_N);
 
+/**
+ * @brief Performs matrix multiplication with a transposed second matrix: dst = src_a * src_b^T.
+ *
+ * This function multiplies a matrix `src_a` by the transpose of a matrix `src_b`.
+ * The result is stored in `dst`.
+ *
+ * @param [in] src_a A pointer to the first source matrix, with dimensions dim_M x dim_N.
+ * @param [in] src_b A pointer to the second source matrix, with dimensions dim_P x dim_N.
+ * @param [out] dst A pointer to the destination matrix, which will have dimensions dim_M x dim_P.
+ * @param [in] dim_M The number of rows in the `src_a` and `dst` matrices.
+ * @param [in] dim_N The number of columns in the `src_a` and `src_b` matrices.
+ * @param [in] dim_P The number of rows in the `src_b` matrix and the number of columns in the `dst` matrix.
+ *
+ * @return int Returns 0 on success.
+ */
+int matrix_mul_trans(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P);
+
 #endif  /* PLAY_H_ */
