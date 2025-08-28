@@ -234,4 +234,20 @@ int matrix_mul_trans(const float *src_a, const float *src_b, float *dst, const i
  */
 int matrix_memcpy(const float *src, float *dst, const int dim_M, const int dim_N);
 
+/**
+ * @brief Fills a matrix with a constant value.
+ *
+ * This function iterates through each element of a matrix and sets it to the
+ * specified constant value `val`. The matrix is treated as a one-dimensional
+ * array in row-major order.
+ *
+ * @param [out] mat A pointer to the destination matrix to be modified.
+ * @param [in] val The constant value to set each element to.
+ * @param [in] dim_M The number of rows in the matrix.
+ * @param [in] dim_N The number of columns in the matrix.
+ *
+ * @return int Returns 0 on success, non-zero on error
+ */
+int matrix_set_all(float *mat, const float val, const int dim_M, const int dim_N);
+
 #endif  /* PLAY_H_ */
