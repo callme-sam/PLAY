@@ -266,4 +266,23 @@ int matrix_set_all(float *mat, const float val, const int dim_M, const int dim_N
  */
 int matrix_swap_rows(float *mat, const int row_a, const int row_b, const int dim_M, const int dim_N);
 
+/**
+ * @brief Performs a generalized matrix-vector multiplication and addition: dst = α·mat·vec_x + β·vec_y.
+ *
+ * This function computes the product of a matrix and a vector, scales the result,
+ * and adds it to another scaled vector.
+ *
+ * @param [in] mat A pointer to the input matrix.
+ * @param [in] vec_x A pointer to the first input vector.
+ * @param [in] vec_y A pointer to the second input vector.
+ * @param [in] alpha A scalar multiplier for the matrix-vector product.
+ * @param [in] beta A scalar multiplier for the vector vec_y.
+ * @param [out] dst A pointer to the destination vector where the result is stored.
+ * @param [in] dim_M The number of rows in the matrix.
+ * @param [in] dim_N The number of columns in the matrix.
+ *
+ * @return int Returns 0 on success, non-zero on error.
+ */
+int linalg_gemv(const float *mat, const float *vec_x, const float *vec_y, const float alpha, const float beta, float *dst, const int dim_M, const int dim_N);
+
 #endif  /* PLAY_H_ */
