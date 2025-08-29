@@ -1,5 +1,7 @@
 #include "stats.h"
 
+#include "utils.h"
+
 #include <stdio.h>
 
 void print_stats(unsigned long _cycles, unsigned long _active, unsigned long _instr,
@@ -12,6 +14,10 @@ void print_stats(unsigned long _cycles, unsigned long _active, unsigned long _in
     int id;
 
     id = pi_core_id();
+    if (id == 0)
+        printf("INFO | Printing statistics:\n");
+
+    barrier();
 
     printf("[%d] cycles:\t\t\t%lu\n", id, _cycles/REPEAT);
     printf("[%d] act cycles:\t\t\t%lu\n", id, _active/REPEAT);
