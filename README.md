@@ -78,58 +78,9 @@ To regenerate data:
 $ python3 generator.py <LEN>
 ```
 
-## Benchmarks
+### Benchmarks
 
-| Kernel              | #Cores   | Dim.      | Cycles | Instr. | ld-stall | I-miss | CPI |
-|---------------------|----------|-----------|--------|--------|---------|-------|-----|
-| matrix_memcpy       | 1        | 64x32     | 13035  | 8793   | 1       | 5     | 1.48|
-| matrix_memcpy       | 8        | 64x32     | 1719   | 1127   | 1       | 5     | 1.53|
-| matrix_mul          | 1        | 64x32 <br> 32x64| 963446 | 696862 | 0       | 14    | 1.38|
-| matrix_mul          | 8        | 64x32 <br> 32x64| 120209 | 87140  | 0       | 13    | 1.38|
-| matrix_mul_trans    | 1        | 64x32 <br> 32x48| 728753 | 522847 | 0       | 8     | 1.39|
-| matrix_mul_trans    | 8        | 64x32 <br> 32x48| 91267  | 65389  | 0       | 6     | 1.40|
-| matrix_set_all      | 1        | 64x32     | 11040  | 6676   | 0       | 4     | 1.65|
-| matrix_set_all      | 8        | 64x32     | 1474   | 858    | 0       | 4     | 1.72|
-| matrix_trans        | 1        | 64x32     | 13089  | 8852   | 0       | 2     | 1.48|
-| matrix_trans        | 8        | 64x32     | 1760   | 1130   | 0       | 4     | 1.56|
-| vector_add          | 1        | 2048      | 20517  | 14362  | 1       | 2     | 1.43|
-| vector_add          | 8        | 2048      | 2641   | 1824   | 0       | 4     | 1.45|
-| vector_axpy         | 1        | 2048      | 20521  | 14365  | 1       | 3     | 1.43|
-| vector_axpy         | 8        | 2048      | 2642   | 1827   | 0       | 2     | 1.45|
-| vector_dot          | 1        | 2048      | 22591  | 16424  | 0       | 6     | 1.38|
-| vector_dot          | 8        | 2048      | 3026   | 2089   | 8       | 9     | 1.45|
-| vector_memcpy       | 1        | 2048      | 16420  | 10263  | 1       | 4     | 1.60|
-| vector_memcpy       | 8        | 2048      | 2127   | 1309   | 0       | 5     | 1.63|
-| vector_min          | 1        | 2048      | 26658  | 14372  | 2049    | 4     | 1.85|
-| vector_min          | 8        | 2048      | 3452   | 1828   | 255     | 6     | 1.89|
-| vector_mul          | 1        | 2048      | 20517  | 14362  | 1       | 2     | 1.43|
-| vector_mul          | 8        | 2048      | 2641   | 1824   | 0       | 4     | 1.45|
-| vector_offset       | 1        | 2048      | 18466  | 12313  | 1       | 0     | 1.50|
-| vector_offset       | 8        | 2048      | 2401   | 1567   | 0       | 2     | 1.53|
-| vector_scale        | 1        | 2048      | 18466  | 12313  | 1       | 0     | 1.50|
-| vector_scale        | 8        | 2048      | 2401   | 1567   | 0       | 2     | 1.53|
-| vector_sub          | 1        | 2048      | 20517  | 14362  | 1       | 2     | 1.43|
-| vector_sub          | 8        | 2048      | 2641   | 1824   | 0       | 4     | 1.45|
-
-
-## Speedup and Efficiency Comparison
-
-| Kernel           | Speedup | Efficiency |
-|------------------|---------|------------|
-| matrix_memcpy    | 7.59    | 0.95       |
-| matrix_mul       | 7.99    | 1.00       |
-| matrix_mul_trans | 7.99    | 1.00       |
-| matrix_set_all   | 7.49    | 0.94       |
-| matrix_trans     | 7.44    | 0.93       |
-| vector_add       | 7.77    | 0.97       |
-| vector_axpy      | 7.77    | 0.97       |
-| vector_dot       | 7.47    | 0.93       |
-| vector_memcpy    | 7.72    | 0.97       |
-| vector_min       | 7.72    | 0.97       |
-| vector_mul       | 7.77    | 0.97       |
-| vector_offset    | 7.69    | 0.96       |
-| vector_scale     | 7.69    | 0.96       |
-| vector_sub       | 7.77    | 0.97       |
+The `runner.py` script, located in the `test/runner` directory, automates the execution of all test cases within the main `test` folder. For each test, it performs two separate runs: one utilizing a single core on the cluster and a second using eight cores. The results of each run are saved as a `.csv` file in the `test/runner/results` directory. Upon completion of all tests, the script processes these data files to generate the [benchmarks.md](test/runner/benchmarks.md) file, presenting the performance statistics in a comparative table format.
 
 
 ## Roadmap
