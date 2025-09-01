@@ -288,17 +288,34 @@ int linalg_gemv(const float *mat, const float *vec_x, const float *vec_y, const 
 /**
  * @brief Performs a transposed general matrix-vector multiplication and addition: dst = α·matᵀ·vec_x + β·vec_y.
  *
- * @param mat A pointer to the input matrix.
- * @param vec_x A pointer to the input vector.
- * @param vec_y A pointer to the input vector.
- * @param alpha A scalar multiplier for the matrix-vector product.
- * @param beta A scalar multiplier for the vector `vec_y`.
- * @param dst A pointer to the destination vector where the result will be stored.
- * @param dim_M The number of rows of the matrix `mat`.
- * @param dim_N The number of columns of the matrix `mat`.
+ * @param [in] mat A pointer to the input matrix.
+ * @param [in] vec_x A pointer to the input vector.
+ * @param [in] vec_y A pointer to the input vector.
+ * @param [in] alpha A scalar multiplier for the matrix-vector product.
+ * @param [in] beta A scalar multiplier for the vector `vec_y`.
+ * @param [out] dst A pointer to the destination vector where the result will be stored.
+ * @param [in] dim_M The number of rows of the matrix `mat`.
+ * @param [in] dim_N The number of columns of the matrix `mat`.
  *
  * @return int Returns 0 on success, or a non-zero value if an error occurs.
  */
 int linalg_gemv_trans(const float *mat, const float *vec_x, const float *vec_y, const float alpha, const float beta, float *dst, const int dim_M, const int dim_N);
+
+/**
+ * @brief Performs LU decomposition on a matrix without modifying the input.
+ *
+ * This function factorizes an input matrix into its L and U components, storing the
+ * result in a separate destination matrix. It also tracks row permutations
+ * resulting from partial pivoting.
+ *
+ * @param [in] mat A pointer to the input matrix to be decomposed.
+ * @param [out] dst A pointer to the destination matrix where the L and U factors will be stored.
+ * @param [out] perm A pointer to an array that will store the permutation vector.
+ * @param [in] dim_M The number of rows of the matrix.
+ * @param [in] dim_N The number of columns of matrix.
+ *
+ * @return int Returns 0 on success, or -1 if the matrix is singular and cannot be decomposed.
+ */
+int linalg_lu_decomp(const float *mat, float *dst, int *perm, const int dim_M, const int dim_N);
 
 #endif  /* PLAY_H_ */
