@@ -97,11 +97,11 @@ exit:
     return ret;
 }
 
-static int test_linalg_gemv()
+static int test_linalg_lu_decomp()
 {
     int ret;
 
-    printf("INFO | Running 'linalg_gemv' test on PULP Cluster with %d cores\n", NUM_CORES);
+    printf("INFO | Running 'linalg_lu_decomp' test on PULP Cluster with %d cores\n", NUM_CORES);
 
     ret = run_test_on_cluster();
     if (ret)
@@ -118,11 +118,11 @@ static int run_test_on_fabric()
     return 0;
 }
 
-static int test_linalg_gemv()
+static int test_linalg_lu_decomp()
 {
     int ret;
 
-    printf("INFO | Running 'linalg_gemv' test on Fabric Controller\n");
+    printf("INFO | Running 'linalg_lu_decomp' test on Fabric Controller\n");
 
     ret = run_test_on_fabric();
     if (ret)
@@ -137,8 +137,8 @@ static void test_kickoff()
 {
     int ret;
 
-    printf("\n##################################### LINALG_GEMV TEST ####################################\n\n");
-    ret = test_linalg_gemv();
+    printf("\n##################################### LINALG_LU_DECOMP TEST ####################################\n\n");
+    ret = test_linalg_lu_decomp();
     printf("\n##########################################################################################\n\n");
     pmsis_exit(ret);
 }
