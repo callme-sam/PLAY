@@ -285,4 +285,20 @@ int matrix_swap_rows(float *mat, const int row_a, const int row_b, const int dim
  */
 int linalg_gemv(const float *mat, const float *vec_x, const float *vec_y, const float alpha, const float beta, float *dst, const int dim_M, const int dim_N);
 
+/**
+ * @brief Performs a transposed general matrix-vector multiplication and addition: dst = α·matᵀ·vec_x + β·vec_y.
+ *
+ * @param mat A pointer to the input matrix.
+ * @param vec_x A pointer to the input vector.
+ * @param vec_y A pointer to the input vector.
+ * @param alpha A scalar multiplier for the matrix-vector product.
+ * @param beta A scalar multiplier for the vector `vec_y`.
+ * @param dst A pointer to the destination vector where the result will be stored.
+ * @param dim_M The number of rows of the matrix `mat`.
+ * @param dim_N The number of columns of the matrix `mat`.
+ *
+ * @return int Returns 0 on success, or a non-zero value if an error occurs.
+ */
+int linalg_gemv_trans(const float *mat, const float *vec_x, const float *vec_y, const float alpha, const float beta, float *dst, const int dim_M, const int dim_N);
+
 #endif  /* PLAY_H_ */
