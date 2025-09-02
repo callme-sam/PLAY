@@ -2,10 +2,10 @@
 
 #include "pmsis.h"
 
-PI_L1 float local_sum[NUM_CORES];
 PI_L1 float *y;
 
 #ifdef  CLUSTER
+PI_L1 float local_sum[NUM_CORES];
 
 int linalg_lu_solve_parallel(const float *mat, const float *vec, const int *perm, float *result, const int dim_M, const int dim_N)
 {
