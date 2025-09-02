@@ -318,4 +318,23 @@ int linalg_gemv_trans(const float *mat, const float *vec_x, const float *vec_y, 
  */
 int linalg_lu_decomp(const float *mat, float *dst, int *perm, const int dim_M, const int dim_N);
 
+/**
+ * @brief Solves a linear system Ax = b using a precomputed LU factorization.
+ *
+ * This function solves the system by performing two sequential steps:
+ * 1. Forward substitution to solve Ly = Pb.
+ * 2. Backward substitution to solve Ux = y.
+ * The LU factors, the permutation vector, and the right-hand side vector are required as input.
+ *
+ * @param[in] mat A pointer to the matrix containing the combined L/U factors from a previous LU decomposition.
+ * @param[in] vec A pointer to the right-hand side vector `b`.
+ * @param[in] perm A pointer to the permutation vector `p`.
+ * @param[out] result A pointer to the destination vector where the solution `x` will be stored.
+ * @param[in] dim_M The number of rows of the matrix.
+ * @param[in] dim_N The number of columns of the matrix.
+ *
+ * @return int Returns 0 on success, or a non-zero value if an error occurs.
+ */
+int linalg_lu_solve(const float *mat, const float *vec, const int *perm, float *result, const int dim_M, const int dim_N);
+
 #endif  /* PLAY_H_ */
