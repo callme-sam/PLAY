@@ -58,6 +58,20 @@ void scalar_print(const float val, const char *str);
 bool vector_compare(const float *vec_a, const float *vec_b, const int len);
 
 /**
+ * @brief Compares the absolute values of two floating-point vectors with a tolerance check
+ *
+ * @param[in] vec_a Pointer to the first float vector
+ * @param[in] vec_b Pointer to the second float vector
+ * @param[in] len Length of the vectors to compare
+ *
+ * @return true if all elements differ by less than TOLL
+ * @return false if any element difference exceeds TOLL
+ *
+ * @warning Both vectors must have at least 'len' elements allocated
+ */
+bool vector_compare_abs(const float *vec_a, const float *vec_b, const int len);
+
+/**
  * @brief Prints a vector to standard output
  *
  * @param[in] vec Pointer to the float vector to print
@@ -82,6 +96,20 @@ void vector_print(const float *vec, const int len, const char *str);
  * @return false if any alement difference exceeds TOLL
  */
 bool matrix_compare(const float *mat_a, const float *mat_b, const int rows, const int cols);
+
+/**
+ * @brief Compares the absolute value of two floating-point matrices with a tollerance check
+ *
+ * @param[in] mat_a Pointer to the first matrix
+ * @param[in] mat_b Pointer to the second matrix
+ * @param[in] rows Number of rows for the two matrices
+ * @param[in] cols Number of columts for the two matrices
+ *
+ *
+ * @return true if all elements differ by less than TOLL
+ * @return false if any alement difference exceeds TOLL
+ */
+bool matrix_compare_abs(const float *mat_a, const float *mat_b, const int rows, const int cols);
 
 /**
  * @brief Printa a matrix to standard output

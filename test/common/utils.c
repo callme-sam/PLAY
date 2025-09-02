@@ -47,6 +47,19 @@ bool vector_compare(const float *vec_a, const float *vec_b, const int len)
     return true;
 }
 
+bool vector_compare_abs(const float *vec_a, const float *vec_b, const int len)
+{
+    float abs_diff;
+
+    for (int i = 0; i < len; i++) {
+        abs_diff = fabs(fabs(vec_a[i]) - fabs(vec_b[i]));
+        if (abs_diff > TOLL)
+            return false;
+    }
+
+    return true;
+}
+
 void vector_print(const float *vec, const int len, const char *str)
 {
 #ifdef  PRINT_DATA
@@ -64,6 +77,21 @@ bool matrix_compare(const float *mat_a, const float *mat_b, const int rows, cons
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < cols; c++) {
             abs_diff = fabs(mat_a[r * cols + c] - mat_b[r * cols + c]);
+            if (abs_diff > TOLL)
+                return false;
+        }
+    }
+
+    return true;
+}
+
+bool matrix_compare_abs(const float *mat_a, const float *mat_b, const int rows, const int cols)
+{
+    float abs_diff;
+
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            abs_diff = fabs(fabs(mat_a[r * cols + c]) - fabs(mat_b[r * cols + c]));
             if (abs_diff > TOLL)
                 return false;
         }
