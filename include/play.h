@@ -337,4 +337,21 @@ int linalg_lu_decomp(const float *mat, float *dst, int *perm, const int dim_M, c
  */
 int linalg_lu_solve(const float *mat, const float *vec, const int *perm, float *result, const int dim_M, const int dim_N);
 
+/**
+ * @brief Computes the Singular Value Decomposition (SVD) of a symmetric matrix using the Jacobi algorithm.
+ *
+ * This function diagonalizes the input matrix 'src' in-place, transforming it into a diagonal matrix.
+ * The diagonal elements of the resulting matrix are the singular values squared, and the accumulated rotations form
+ * the matrix of right singular vectors. The singular values are then extracted and stored in a separate vector.
+ *
+ * @param[in] src A pointer to the input symmetric square matrix (M x M) to be decomposed.
+ * @param[out] dst A pointer to the destination matrix where the diagonalized result will be stored. The diagonal elements are the singular values squared.
+ * @param[out] mat_V A pointer to the destination matrix where the right singular vectors will be stored as columns.
+ * @param[out] vec_S A pointer to the destination vector where the singular values (square roots of eigenvalues) will be stored.
+ * @param[in] dim_M The dimension of the square matrix.
+ *
+ * @return int Returns 0 on success, or a non-zero value if an error occurs.
+ */
+int linalg_svd_jacobi(const float *src, float *dst, float *mat_V, float *vec_S, const int dim_M);
+
 #endif  /* PLAY_H_ */
