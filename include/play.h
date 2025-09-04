@@ -387,4 +387,22 @@ int linalg_svd_jacobi(const float *src, float *dst, float *mat_V, float *vec_S, 
  */
 int linalg_svd_lsv(const float *src, float *mat_V, float *vec_S, float *dst, const int dim_M, const int dim_N);
 
+/**
+ * @brief Computes Singular Value Decomposition (SVD) of a matrix
+ *
+ * Decomposes an input matrix `src` into its SVD components:
+ * U (left singular vectors), S (singular values), and V (right singular vectors).
+ * The decomposition follows the formula: A = UΣVᵀ.
+ *
+ * @param[in] src Input matrix A (M x N).
+ * @param[out] dst Output matrix for the left singular vectors U (M x N).
+ * @param[out] mat_V Output matrix for the right singular vectors V (N x N).
+ * @param[out] vec_S Output vector for the singular values (length N).
+ * @param[in] dim_M The number of rows (M) of the input matrix.
+ * @param[in] dim_N The number of columns (N) of the input matrix.
+ *
+ * @return int Returns 0 on success. A non-zero value indicates an error.
+ */
+int linalg_svd(const float *src, float *dst, float *mat_V, float *vec_S, const int dim_M, const int dim_N);
+
 #endif  /* PLAY_H_ */
