@@ -91,10 +91,17 @@ def generate_markdown_report(results_dir):
     print("\n--- Generating Markdown Report ---")
 
     dimensions = {
-        'linalg_gemv': '2048',
+        'linalg_gemv': '64x32',
+        'linalg_gemv_trans': '64x32',
+        'linalg_lu_decomp': '64x32',
+        'linalg_lu_solve': '64x64',
+        'linalg_svd': '64x32',
+        'linalg_svd_jacobi': '64',
+        'linalg_svd_lsv': '64x32',
         'matrix_memcpy': '64x32',
         'matrix_mul': '64x32 <br> 32x64',
-        'matrix_mul_trans': '64x32 <br> 32x48',
+        'matrix_mul_trans_A': '64x32 <br> 48x32',
+        'matrix_mul_trans_B': '32x64 <br> 32x48',
         'matrix_set_all': '64x32',
         'matrix_swap_rows': '4x256',
         'matrix_trans': '64x32',
