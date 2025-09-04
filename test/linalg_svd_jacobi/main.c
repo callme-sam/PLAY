@@ -1,10 +1,11 @@
-#include <stdbool.h>
-#include <math.h>
-
 #include "data.h"
 #include "play.h"
 #include "stats.h"
 #include "utils.h"
+
+#include <stdbool.h>
+#include <stdlib.h>
+#include <math.h>
 
 #include "pmsis.h"
 
@@ -12,9 +13,6 @@ PI_L1 float src[DIM_M * DIM_M];
 PI_L1 float mat_V[DIM_M * DIM_M];
 PI_L1 float vec_S[DIM_M];
 PI_L1 float result[DIM_M * DIM_M];
-
-#include <math.h>
-#include <stdlib.h>
 
 static void sort_results_descending(float *result, float *mat_V, float *vec_S, const int dim_M) {
     float tmp;
