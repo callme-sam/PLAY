@@ -56,7 +56,7 @@ static void run_test()
 
     INIT_STATS();
     START_STATS();
-    matrix_mul_trans(src_a, src_b, result, DIM_M, DIM_N, DIM_P);
+    matrix_mul_trans_B(src_a, src_b, result, DIM_M, DIM_N, DIM_P);
     STOP_STATS();
 
     barrier();
@@ -99,11 +99,11 @@ exit:
     return ret;
 }
 
-static int test_matrix_mul_trans()
+static int test_matrix_mul_trans_B()
 {
     int ret;
 
-    printf("INFO | Running 'matrix_mul_trans' test on PULP Cluster with %d cores\n", NUM_CORES);
+    printf("INFO | Running 'matrix_mul_trans_B' test on PULP Cluster with %d cores\n", NUM_CORES);
 
     ret = run_test_on_cluster();
     if (ret)
@@ -120,11 +120,11 @@ static int run_test_on_fabric()
     return 0;
 }
 
-static int test_matrix_mul_trans()
+static int test_matrix_mul_trans_B()
 {
     int ret;
 
-    printf("INFO | Running 'matrix_mul_trans' test on Fabric Controller\n");
+    printf("INFO | Running 'matrix_mul_trans_B' test on Fabric Controller\n");
 
     ret = run_test_on_fabric();
     if (ret)
@@ -139,8 +139,8 @@ static void test_kickoff()
 {
     int ret;
 
-    printf("\n##################################### MATRIX_MUL_TRANS TEST ####################################\n\n");
-    ret = test_matrix_mul_trans();
+    printf("\n##################################### MATRIX_MUL_TRANS_B TEST ####################################\n\n");
+    ret = test_matrix_mul_trans_B();
     printf("\n##########################################################################################\n\n");
     pmsis_exit(ret);
 }

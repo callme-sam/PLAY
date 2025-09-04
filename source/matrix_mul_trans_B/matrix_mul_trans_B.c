@@ -4,7 +4,7 @@
 
 #ifdef  CLUSTER
 
-static int matrix_mul_trans_parallel(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P)
+static int matrix_mul_trans_B_parallel(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P)
 {
     int row_start;
     int row_end;
@@ -33,7 +33,7 @@ static int matrix_mul_trans_parallel(const float *src_a, const float *src_b, flo
 
 #else   /* CLUSTER */
 
-static int matrix_mul_trans_serial(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P)
+static int matrix_mul_trans_B_serial(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P)
 {
     float sum;
 
@@ -51,14 +51,14 @@ static int matrix_mul_trans_serial(const float *src_a, const float *src_b, float
 
 #endif  /* CLUSTER */
 
-int matrix_mul_trans(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P)
+int matrix_mul_trans_B(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P)
 {
     int ret;
 
 #ifdef  CLUSTER
-    ret = matrix_mul_trans_parallel(src_a, src_b, dst, dim_M, dim_N, dim_P);
+    ret = matrix_mul_trans_B_parallel(src_a, src_b, dst, dim_M, dim_N, dim_P);
 #else   /* CLUSTER */
-    ret = matrix_mul_trans_serial(src_a, src_b, dst, dim_M, dim_N, dim_P);
+    ret = matrix_mul_trans_B_serial(src_a, src_b, dst, dim_M, dim_N, dim_P);
 #endif  /* CLUSTER */
 
     return ret;

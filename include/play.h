@@ -216,7 +216,7 @@ int matrix_trans(const float *src, float *dst, const int dim_M, const int dim_N)
  *
  * @return int Returns 0 on success.
  */
-int matrix_mul_trans(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P);
+int matrix_mul_trans_B(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P);
 
 /**
  * @brief Copies elements from a source matrix to a destination matrix.

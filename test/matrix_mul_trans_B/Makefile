@@ -1,9 +1,9 @@
-SRC_DIR = ../../source/matrix_mul_trans/
+SRC_DIR = ../../source/matrix_mul_trans_B/
 INC_DIR = ../../include/
 DATA_DIR = test_data/
 COMMON_DIR = ../common
 
-APP = matrix-mul-trans-test
+APP = matrix-mul-trans-B-test
 APP_SRCS += main.c $(wildcard $(SRC_DIR)/*.c) $(wildcard $(COMMON_DIR)/*.c)
 
 ifdef USE_CLUSTER
