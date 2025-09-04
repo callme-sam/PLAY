@@ -354,4 +354,23 @@ int linalg_lu_solve(const float *mat, const float *vec, const int *perm, float *
  */
 int linalg_svd_jacobi(const float *src, float *dst, float *mat_V, float *vec_S, const int dim_M);
 
+/**
+ * @brief Computes left singular vectors U from A, V, and S
+ *
+ * This function calculates the left singular vectors (U) of a matrix A using
+ * the right singular vectors (V) and the singular values (S). The computation
+ * is based on the formula U = AVΣ⁻¹, where Σ is the diagonal matrix of
+ * singular values and Σ⁻¹ is its pseudo-inverse.
+ *
+ * @param[in] src Original input matrix A (M x N).
+ * @param[in] mat_V Right singular vectors V (N x N).
+ * @param[in] vec_S Singular values S (length N).
+ * @param[out] dst Output matrix for the left singular vectors U (M x N).
+ * @param[in] dim_M The number of rows (M) in the input matrices.
+ * @param[in] dim_N The number of columns (N) in the input matrices.
+ *
+ * @return int Returns 0 on success. A non-zero value indicates an error.
+ */
+int linalg_svd_lsv(const float *src, float *mat_V, float *vec_S, float *dst, const int dim_M, const int dim_N);
+
 #endif  /* PLAY_H_ */
