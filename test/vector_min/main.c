@@ -7,7 +7,7 @@
 
 #include "pmsis.h"
 
-PI_L1 float src[LEN];
+PI_L1 float src[LEN] __attribute__((aligned(4)));
 PI_L1 float result;
 
 static void initialize_vectors()
@@ -38,12 +38,13 @@ static void check_result()
 
 static void run_test()
 {
+    volatile int len = LEN;
     initialize_vectors();
     barrier();
 
     INIT_STATS();
     START_STATS();
-    vector_min(src, &result, LEN);
+    vector_min(src, &result, len);
     STOP_STATS();
 
     barrier();
