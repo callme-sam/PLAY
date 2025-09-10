@@ -1,0 +1,25 @@
+##################################### VECTOR_SUB TEST ####################################
+
+for=0 - while =1 - interleave=0 - unroll=1 - both=0
+INFO | Running 'vector_sub' test on PULP Cluster with 1 cores
+INFO | Printing statistics:
+[0] cycles:                     8247
+[0] act cycles:                 8246
+[0] instr execd:                8234
+[0] load stall:                 3
+[0] jump reg stall:             0
+[0] instr miss:                 3
+[0] loads execd:                4102
+[0] stores execd:               2051
+[0] jump:                       2
+[0] branches:                   4
+[0] taken branches:             1
+[0] comprssd inst execd:        21
+[0] ext loads execd:            0
+[0] ext loads cycles:           0
+[0] ext stores execd:           1
+[0] ext stores cycles:          1
+[0] TDCM contentions:           0
+[0] IPC:                        0.998327
+INFO | Test SUCCESS
+##########################################################################################

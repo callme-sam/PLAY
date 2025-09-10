@@ -7,9 +7,9 @@
 
 #include "pmsis.h"
 
-PI_L1 float src_a[LEN];
-PI_L1 float src_b[LEN];
-PI_L1 float result[LEN];
+PI_L1 float src_a[LEN] __attribute__((aligned(4)));
+PI_L1 float src_b[LEN] __attribute__((aligned(4)));
+PI_L1 float result[LEN] __attribute__((aligned(4)));
 
 static void initialize_vectors()
 {
@@ -41,12 +41,13 @@ static void check_result()
 
 static void run_test()
 {
+    volatile int len = LEN;
     initialize_vectors();
     barrier();
 
     INIT_STATS();
     START_STATS();
-    vector_sub(src_a, src_b, result, LEN);
+    vector_sub(src_a, src_b, result, len);
     STOP_STATS();
 
     barrier();
@@ -129,7 +130,26 @@ static void test_kickoff()
 {
     int ret;
 
+    int _FOR = 0, _WHILE = 0, _INTERLEAVE = 0, _UNROLL = 0, _BOTH = 0;
+#ifdef FOR
+    _FOR = 1;
+#endif
+#ifdef WHILE
+    _WHILE = 1;
+#endif
+#ifdef INTERLEAVE
+    _INTERLEAVE = 1;
+#endif
+#ifdef UNROLL
+    _UNROLL = 1;
+#endif
+#ifdef BOTH
+    _BOTH = 1;
+#endif
+
+
     printf("\n##################################### VECTOR_SUB TEST ####################################\n\n");
+    printf("for=%d - while =%d - interleave=%d - unroll=%d - both=%d\n", _FOR, _WHILE, _INTERLEAVE, _UNROLL, _BOTH);
     ret = test_vector_sub();
     printf("\n##########################################################################################\n\n");
     pmsis_exit(ret);

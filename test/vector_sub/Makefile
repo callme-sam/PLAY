@@ -8,12 +8,35 @@ APP_SRCS += main.c $(wildcard $(SRC_DIR)/*.c) $(wildcard $(COMMON_DIR)/*.c)
 
 ifdef USE_CLUSTER
 APP_CFLAGS += -DCLUSTER -DNUM_CLUSTER=$(USE_CLUSTER)
+
 ifdef NUM_CORES
 APP_CFLAGS += -DNUM_CORES=$(NUM_CORES)
 else	# NUM_CORES
 APP_CFLAGS += -DNUM_CORES=1
 endif	# NUM_CORES
+
+ifdef	FOR
+APP_CFLAGS += -DFOR
+else ifdef  WHILE
+APP_CFLAGS += -DWHILE
+else
+$(error No kernel version selected. Use make WHILELOOP=1 or FORLOOP=1)
+endif	#FORLOOP-WHILELOOP
+
+ifdef	UNROLL
+APP_CFLAGS += -DUNROLL
+endif	#UNROLL
+
+ifdef	INTERLEAVE
+APP_CFLAGS += -DINTERLEAVE
+endif	#INTERLEAVE
+
+ifdef	BOTH
+APP_CFLAGS += -DBOTH
+endif	#BOTH
+
 endif	# USE_CLUSTER
+
 
 ifdef PRINT_DATA
 APP_CFLAGS += -DPRINT_DATA
@@ -23,8 +46,8 @@ ifdef STATS
 APP_CFLAGS += -DSTATS
 endif	#STATS
 
-APP_CFLAGS += -Os -g -I$(INC_DIR) -I$(DATA_DIR) -I$(COMMON_DIR)
-APP_LDFLAGS += -Os -g
+APP_CFLAGS += -O3 -g -I$(INC_DIR) -I$(DATA_DIR) -I$(COMMON_DIR)
+APP_LDFLAGS += -O3 -g
 
 
 include $(RULES_DIR)/pmsis_rules.mk

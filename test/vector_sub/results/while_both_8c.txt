@@ -1,0 +1,154 @@
+##################################### VECTOR_SUB TEST ####################################
+
+for=0 - while =1 - interleave=0 - unroll=0 - both=1
+INFO | Running 'vector_sub' test on PULP Cluster with 8 cores
+INFO | Printing statistics:
+[7] cycles:                     1068
+[1] cycles:                     1068
+[2] cycles:                     1068
+[3] cycles:                     1068
+[0] cycles:                     1068
+[4] cycles:                     1068
+[5] cycles:                     1068
+[6] cycles:                     1068
+[3] act cycles:                 1078
+[4] act cycles:                 1079
+[0] act cycles:                 1081
+[5] act cycles:                 1078
+[6] act cycles:                 1078
+[7] act cycles:                 1078
+[1] act cycles:                 1078
+[2] act cycles:                 1078
+[0] instr execd:                1069
+[5] instr execd:                1069
+[6] instr execd:                1069
+[7] instr execd:                1069
+[1] instr execd:                1069
+[2] instr execd:                1069
+[3] instr execd:                1069
+[4] instr execd:                1069
+[5] load stall:                 2
+[6] load stall:                 2
+[7] load stall:                 2
+[1] load stall:                 2
+[2] load stall:                 2
+[3] load stall:                 2
+[0] load stall:                 2
+[4] load stall:                 2
+[0] jump reg stall:             0
+[2] jump reg stall:             0
+[3] jump reg stall:             0
+[4] jump reg stall:             0
+[5] jump reg stall:             0
+[6] jump reg stall:             0
+[7] jump reg stall:             0
+[1] jump reg stall:             0
+[0] instr miss:                 3
+[7] instr miss:                 1
+[1] instr miss:                 1
+[2] instr miss:                 1
+[3] instr miss:                 1
+[4] instr miss:                 1
+[5] instr miss:                 1
+[6] instr miss:                 1
+[2] loads execd:                518
+[3] loads execd:                518
+[4] loads execd:                518
+[5] loads execd:                518
+[6] loads execd:                518
+[7] loads execd:                518
+[0] loads execd:                518
+[1] loads execd:                518
+[5] stores execd:               259
+[2] stores execd:               259
+[3] stores execd:               259
+[0] stores execd:               259
+[4] stores execd:               259
+[6] stores execd:               259
+[7] stores execd:               259
+[1] stores execd:               259
+[2] jump:                       2
+[3] jump:                       2
+[4] jump:                       2
+[0] jump:                       2
+[5] jump:                       2
+[6] jump:                       2
+[7] jump:                       2
+[1] jump:                       2
+[0] branches:                   4
+[1] branches:                   4
+[3] branches:                   4
+[4] branches:                   4
+[5] branches:                   4
+[6] branches:                   4
+[2] branches:                   4
+[7] branches:                   4
+[1] taken branches:             1
+[2] taken branches:             1
+[0] taken branches:             1
+[3] taken branches:             1
+[4] taken branches:             1
+[5] taken branches:             1
+[6] taken branches:             1
+[7] taken branches:             1
+[4] comprssd inst execd:        23
+[5] comprssd inst execd:        23
+[0] comprssd inst execd:        23
+[6] comprssd inst execd:        23
+[7] comprssd inst execd:        23
+[1] comprssd inst execd:        23
+[2] comprssd inst execd:        23
+[3] comprssd inst execd:        23
+[4] ext loads execd:            0
+[0] ext loads execd:            0
+[5] ext loads execd:            0
+[6] ext loads execd:            0
+[7] ext loads execd:            0
+[1] ext loads execd:            0
+[2] ext loads execd:            0
+[3] ext loads execd:            0
+[4] ext loads cycles:           0
+[5] ext loads cycles:           0
+[6] ext loads cycles:           0
+[7] ext loads cycles:           0
+[1] ext loads cycles:           0
+[2] ext loads cycles:           0
+[3] ext loads cycles:           0
+[0] ext loads cycles:           0
+[6] ext stores execd:           1
+[7] ext stores execd:           1
+[1] ext stores execd:           1
+[0] ext stores execd:           1
+[2] ext stores execd:           1
+[3] ext stores execd:           1
+[4] ext stores execd:           1
+[5] ext stores execd:           1
+[7] ext stores cycles:          1
+[1] ext stores cycles:          1
+[0] ext stores cycles:          1
+[2] ext stores cycles:          1
+[3] ext stores cycles:          1
+[4] ext stores cycles:          1
+[5] ext stores cycles:          1
+[6] ext stores cycles:          1
+[1] TDCM contentions:           0
+[2] TDCM contentions:           0
+[3] TDCM contentions:           0
+[4] TDCM contentions:           0
+[0] TDCM contentions:           0
+[5] TDCM contentions:           0
+[6] TDCM contentions:           0
+[7] TDCM contentions:           0
+[3] IPC:                        1.000187
+[4] IPC:                        1.000187
+[5] IPC:                        1.000187
+[6] IPC:                        1.000187
+[7] IPC:                        1.000187
+[0] IPC:                        1.000187
+[1] IPC:                        1.000187
+[2] IPC:                        1.000187
+INFO | Test SUCCESS
+
+##########################################################################################
+
+Speedup: 7,72003745318352
