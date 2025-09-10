@@ -19,7 +19,7 @@ static int vector_sub_parallel(const float *src_a, const float *src_b, float *ds
     start = id * block + (id < left ? id : left);
     end = start + block + (id < left ? 1 : 0);
 
-    for (int i = start; (i + 1) < end; i += 2) {
+    for (i = start; (i + 1) < end; i += 2) {
         int idx1, idx2;
         float a1, a2;
         float b1, b2;

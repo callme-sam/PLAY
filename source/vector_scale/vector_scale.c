@@ -19,7 +19,7 @@ static int vector_scale_parallel(const float *src, const float val, float *dst, 
     start = id * block + (id < left ? id : left);
     end = start + block + (id < left ? 1 : 0);
 
-    for (int i = start; (i + 1) < end; i += 2) {
+    for (i = start; (i + 1) < end; i += 2) {
         int idx1, idx2;
         float src1, src2;
 

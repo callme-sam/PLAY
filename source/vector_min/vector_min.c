@@ -27,7 +27,7 @@ static int vector_min_parallel(const float *src, float *min, const int len)
     /* unroll with step-2 */
     /* 1C -- cycl: 12314 - stall: 1027 - ipc: 0.66 */
     /* 8C -- cycl: 1602  - stall: 129  - ipc: 0.66 */
-    for (int i = start + 1; (i + 1) < end; i += 2) {
+    for (i = start + 1; (i + 1) < end; i += 2) {
         int idx1, idx2;
         float src1, src2;
 
