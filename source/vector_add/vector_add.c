@@ -11,6 +11,7 @@ static int vector_add_parallel(const float *src_a, const float *src_b, float *ds
     int left;
     int end;
     int id;
+    int i;
 
     id = pi_core_id();
     block = len / NUM_CORES;
@@ -18,7 +19,23 @@ static int vector_add_parallel(const float *src_a, const float *src_b, float *ds
     start = id * block + (id < left ? id : left);
     end = start + block + (id < left ? 1 : 0);
 
-    for (int i = start; i < end; i++)
+    for (i = start; (i + 1) < end; i += 2) {
+        int idx1, idx2;
+        float a1, a2;
+        float b1, b2;
+
+        idx1 = i;
+        idx2 = i + 1;
+        a1 = src_a[idx1];
+        b1 = src_b[idx1];
+        a2 = src_a[idx2];
+        b2 = src_b[idx2];
+
+        dst[idx1] = a1 + b1;
+        dst[idx2] = a2 + b2;
+    }
+
+    if (i < end)
         dst[i] = src_a[i] + src_b[i];
 
     return 0;
@@ -36,7 +53,7 @@ static int vector_add_serial(const float *src_a, const float *src_b, float *dst,
 
 #endif  /* CLUSTER */
 
-int vector_add(const float *src_a, const float *src_b, float *dst, const int len)
+__attribute__((noinline)) int vector_add(const float *src_a, const float *src_b, float *dst, const int len)
 {
     int ret;
 
