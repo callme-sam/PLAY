@@ -11,6 +11,7 @@ static int vector_scale_parallel(const float *src, const float val, float *dst, 
     int left;
     int end;
     int id;
+    int i;
 
     id = pi_core_id();
     block = len / NUM_CORES;
@@ -18,7 +19,21 @@ static int vector_scale_parallel(const float *src, const float val, float *dst, 
     start = id * block + (id < left ? id : left);
     end = start + block + (id < left ? 1 : 0);
 
-    for (int i = start; i < end; i++)
+    for (int i = start; (i + 1) < end; i += 2) {
+        int idx1, idx2;
+        float src1, src2;
+
+        idx1 = i;
+        idx2 = i + 1;
+
+        src1 = src[idx1];
+        src2 = src[idx2];
+
+        dst[idx1] = src1 * val;
+        dst[idx2] = src2 * val;
+    }
+
+    if (i < end)
         dst[i] = src[i] * val;
 
     return 0;
@@ -36,7 +51,7 @@ static int vector_scale_serial(const float *src, const float val, float *dst, co
 
 #endif  /* CLUSTER */
 
-int vector_scale(const float *src, const float val, float *dst, const int len)
+__attribute__((noinline)) int vector_scale(const float *src, const float val, float *dst, const int len)
 {
     int ret;
 
