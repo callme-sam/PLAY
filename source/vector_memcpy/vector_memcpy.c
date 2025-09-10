@@ -11,6 +11,7 @@ int vector_memcpy_parallel(const float *src, float *dst, const int len)
     int left;
     int end;
     int id;
+    int i;
 
     id = pi_core_id();
     block = len / NUM_CORES;
@@ -18,7 +19,20 @@ int vector_memcpy_parallel(const float *src, float *dst, const int len)
     start = id * block + (id < left ? id : left);
     end = start + block + (id < left ? 1 : 0);
 
-    for (int i = start; i < end; i++)
+    for (i = start; (i + 1) < end; i += 2) {
+        int idx1, idx2;
+        float src1, src2;
+
+        idx1 = i;
+        idx2 = i + 1;
+        src1 = src[idx1];
+        src2 = src[idx2];
+
+        dst[idx1] = src1;
+        dst[idx2] = src2;
+    }
+
+    if (i < end)
         dst[i] = src[i];
 
     return 0;
@@ -36,7 +50,7 @@ int vector_memcpy_serial(const float *src, float *dst, const int len)
 
 #endif  /* CLUSTER */
 
-int vector_memcpy(const float *src, float *dst, const int len)
+__attribute__((noinline)) int vector_memcpy(const float *src, float *dst, const int len)
 {
     int ret;
 
