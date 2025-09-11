@@ -36,6 +36,10 @@ static int vector_offset_parallel(const float *src, const float offset, float *d
     if (i < end)
         dst[i] = src[i] + offset;
 
+#if NUM_CORES > 1
+    pi_cl_team_barrier();
+#endif
+
     return 0;
 }
 

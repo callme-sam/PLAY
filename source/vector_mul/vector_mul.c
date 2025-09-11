@@ -38,6 +38,10 @@ static int vector_mul_parallel(const float *src_a, const float *src_b, float *ds
     if (i < end)
         dst[i] = src_a[i] * src_b[i];
 
+#if NUM_CORES > 1
+    pi_cl_team_barrier();
+#endif
+
     return 0;
 }
 

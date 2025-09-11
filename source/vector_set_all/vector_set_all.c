@@ -33,6 +33,10 @@ int vector_set_all_parallel(float *vec, const float val, const int len)
     if (i < end)
         vec[i] = val;
 
+#if NUM_CORES > 1
+    pi_cl_team_barrier();
+#endif
+
     return 0;
 }
 

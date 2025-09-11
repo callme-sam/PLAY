@@ -35,6 +35,10 @@ int vector_memcpy_parallel(const float *src, float *dst, const int len)
     if (i < end)
         dst[i] = src[i];
 
+#if NUM_CORES > 1
+    pi_cl_team_barrier();
+#endif
+
     return 0;
 }
 

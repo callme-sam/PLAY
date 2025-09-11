@@ -36,6 +36,10 @@ static int vector_scale_parallel(const float *src, const float val, float *dst, 
     if (i < end)
         dst[i] = src[i] * val;
 
+#if NUM_CORES > 1
+    pi_cl_team_barrier();
+#endif
+
     return 0;
 }
 

@@ -142,7 +142,10 @@ static int vector_min_parallel(const float *src, float *min, const int len)
 
     local_min[id] = min_tmp;
 
+#if NUM_CORES > 1
     pi_cl_team_barrier();
+#endif
+
     if (id != 0) {
         /* Only master core finds absolute minimum */
         goto exit;
@@ -155,6 +158,11 @@ static int vector_min_parallel(const float *src, float *min, const int len)
     }
 
 exit:
+
+#if NUM_CORES > 1
+    pi_cl_team_barrier();
+#endif
+
     return 0;
 }
 

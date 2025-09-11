@@ -6,9 +6,9 @@
 
 void barrier()
 {
-#ifdef  CLUSTER
+#if NUM_CORES > 1
     pi_cl_team_barrier();
-#endif  /* CLUSTER */
+#endif
 }
 
 bool is_master_core()

@@ -46,7 +46,11 @@ int vector_dot_parallel(const float *src_a, const float *src_b, float *dst, cons
 
     /* Only master core computes final dot prod */
     local_dot[id] = dot_tmp1 + dot_tmp2;
+
+#if NUM_CORES > 1
     pi_cl_team_barrier();
+#endif
+
     if (id != 0)
         goto exit;
 
@@ -55,6 +59,11 @@ int vector_dot_parallel(const float *src_a, const float *src_b, float *dst, cons
         *dst += local_dot[i];
 
 exit:
+
+#if NUM_CORES > 1
+    pi_cl_team_barrier();
+#endif
+
     return 0;
 }
 
