@@ -1,0 +1,200 @@
+make: Entering directory '/home/sam/repos/PLAY/test/matrix_mul'
+RM  /home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV/
+RM  BUILD/PULP/source
+CC  main.c
+CC  ../../source/matrix_mul//matrix_mul.c
+CC  ../common/stats.c
+CC  ../common/utils.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/fll-v1.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/freq-domains.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/pulp/kernel/chips/pulp/soc.c
+CC  /home/sam/repos/pulp-sdk/rtos/pmsis/pmsis_bsp/fs/read_fs/read_fs.c
+CC  /home/sam/repos/pulp-sdk/rtos/pmsis/pmsis_bsp/fs/host_fs/semihost.c
+CC  /home/sam/repos/pulp-sdk/rtos/pmsis/pmsis_bsp/fs/host_fs/host_fs.c
+CC  /home/sam/repos/pulp-sdk/rtos/pmsis/pmsis_bsp/fs/fs.c
+CC  /home/sam/repos/pulp-sdk/rtos/pmsis/pmsis_bsp/bsp/pulp.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/lib/libc/minimal/io.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/lib/libc/minimal/fprintf.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/lib/libc/minimal/prf.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/lib/libc/minimal/sprintf.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/lib/libc/minimal/semihost.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/init.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/kernel.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/device.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/task.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/alloc.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/alloc_pool.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/irq.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/soc_event.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/log.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/time.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/pulp/drivers/uart/uart-v1.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/pulp/drivers/udma/udma-v3.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/pulp/drivers/cluster/cluster.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/crt0.S
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/irq_asm.S
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/task_asm.S
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/time_asm.S
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/soc_event_v2_itc.S
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/pulp/drivers/cluster/pe-eu-v3.S
+LD  /home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV//matrix-mul-test/matrix-mul-test
+gvsoc --target=pulp-open --work-dir=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV/ --binary=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV//matrix-mul-test/matrix-mul-test --config-opt=cluster/nb_pe=8      image
+gapy --platform=gvsoc --target-dir=/home/sam/repos/pulp-sdk/install/workstation/generators --model-dir=/home/sam/repos/pulp-sdk/install/workstation/models --target=pulp-open --work-dir=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV/ --binary=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV//matrix-mul-test/matrix-mul-test --config-opt=cluster/nb_pe=8 image
+gvsoc --target=pulp-open --work-dir=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV/ --binary=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV//matrix-mul-test/matrix-mul-test --config-opt=cluster/nb_pe=8      flash
+gapy --platform=gvsoc --target-dir=/home/sam/repos/pulp-sdk/install/workstation/generators --model-dir=/home/sam/repos/pulp-sdk/install/workstation/models --target=pulp-open --work-dir=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV/ --binary=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV//matrix-mul-test/matrix-mul-test --config-opt=cluster/nb_pe=8 flash
+gvsoc --target=pulp-open --work-dir=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV/ --binary=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV//matrix-mul-test/matrix-mul-test --config-opt=cluster/nb_pe=8      image flash run
+gapy --platform=gvsoc --target-dir=/home/sam/repos/pulp-sdk/install/workstation/generators --model-dir=/home/sam/repos/pulp-sdk/install/workstation/models --target=pulp-open --work-dir=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV/ --binary=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV//matrix-mul-test/matrix-mul-test --config-opt=cluster/nb_pe=8 image flash run
+
+##################################### MATRIX_MUL TEST ####################################
+
+INFO | Running 'matrix_mul' test on PULP Cluster with 8 cores
+INFO | Printing statistics:
+[6] cycles:			64322
+[0] cycles:			64322
+[7] cycles:			64322
+[4] cycles:			64322
+[5] cycles:			64322
+[3] cycles:			64322
+[2] cycles:			64322
+[1] cycles:			64322
+[0] act cycles:			63572
+[5] act cycles:			64038
+[6] act cycles:			63730
+[7] act cycles:			63470
+[1] act cycles:			63747
+[2] act cycles:			63857
+[3] act cycles:			63735
+[4] act cycles:			63886
+[0] instr execd:		58546
+[2] instr execd:		58546
+[3] instr execd:		58546
+[4] instr execd:		58546
+[5] instr execd:		58546
+[6] instr execd:		58546
+[7] instr execd:		58546
+[1] instr execd:		58546
+[0] load stall:			2
+[5] load stall:			2
+[6] load stall:			2
+[2] load stall:			2
+[3] load stall:			2
+[4] load stall:			2
+[7] load stall:			2
+[1] load stall:			2
+[1] jump reg stall:		0
+[2] jump reg stall:		0
+[3] jump reg stall:		0
+[4] jump reg stall:		0
+[5] jump reg stall:		0
+[0] jump reg stall:		0
+[6] jump reg stall:		0
+[7] jump reg stall:		0
+[0] instr miss:			20
+[6] instr miss:			20
+[7] instr miss:			25
+[1] instr miss:			20
+[2] instr miss:			20
+[3] instr miss:			22
+[4] instr miss:			22
+[5] instr miss:			21
+[2] loads execd:		32788
+[3] loads execd:		32788
+[6] loads execd:		32788
+[7] loads execd:		32788
+[0] loads execd:		32788
+[1] loads execd:		32788
+[4] loads execd:		32788
+[5] loads execd:		32788
+[3] stores execd:		530
+[6] stores execd:		530
+[2] stores execd:		530
+[7] stores execd:		530
+[1] stores execd:		530
+[4] stores execd:		530
+[5] stores execd:		530
+[0] stores execd:		530
+[0] jump:			3
+[6] jump:			3
+[7] jump:			3
+[1] jump:			3
+[2] jump:			3
+[3] jump:			3
+[4] jump:			3
+[5] jump:			3
+[0] branches:			1036
+[7] branches:			1036
+[1] branches:			1036
+[2] branches:			1036
+[3] branches:			1036
+[4] branches:			1036
+[5] branches:			1036
+[6] branches:			1036
+[0] taken branches:		8
+[7] taken branches:		8
+[1] taken branches:		8
+[2] taken branches:		8
+[3] taken branches:		8
+[4] taken branches:		8
+[5] taken branches:		8
+[6] taken branches:		8
+[0] comprssd inst execd:	4211
+[5] comprssd inst execd:	4211
+[6] comprssd inst execd:	4211
+[7] comprssd inst execd:	4211
+[1] comprssd inst execd:	4211
+[2] comprssd inst execd:	4211
+[3] comprssd inst execd:	4211
+[4] comprssd inst execd:	4211
+[5] ext loads execd:		1
+[6] ext loads execd:		1
+[7] ext loads execd:		1
+[0] ext loads execd:		1
+[1] ext loads execd:		1
+[2] ext loads execd:		1
+[3] ext loads execd:		1
+[4] ext loads execd:		1
+[0] ext loads cycles:		6
+[4] ext loads cycles:		6
+[5] ext loads cycles:		6
+[6] ext loads cycles:		6
+[7] ext loads cycles:		6
+[1] ext loads cycles:		6
+[2] ext loads cycles:		6
+[3] ext loads cycles:		6
+[6] ext stores execd:		1
+[7] ext stores execd:		1
+[0] ext stores execd:		1
+[1] ext stores execd:		1
+[2] ext stores execd:		1
+[3] ext stores execd:		1
+[4] ext stores execd:		1
+[5] ext stores execd:		1
+[0] ext stores cycles:		1
+[6] ext stores cycles:		1
+[7] ext stores cycles:		1
+[1] ext stores cycles:		1
+[2] ext stores cycles:		1
+[3] ext stores cycles:		1
+[4] ext stores cycles:		1
+[5] ext stores cycles:		1
+[0] TDCM contentions:		3429
+[1] TDCM contentions:		3589
+[2] TDCM contentions:		3572
+[3] TDCM contentions:		3636
+[4] TDCM contentions:		3692
+[5] TDCM contentions:		3823
+[6] TDCM contentions:		3633
+[7] TDCM contentions:		3262
+[0] IPC:			0.910202
+[2] IPC:			0.910202
+[3] IPC:			0.910202
+[4] IPC:			0.910202
+[5] IPC:			0.910202
+[6] IPC:			0.910202
+[7] IPC:			0.910202
+[1] IPC:			0.910202
+INFO | Test SUCCESS
+
+##########################################################################################
+
+make: Leaving directory '/home/sam/repos/PLAY/test/matrix_mul'

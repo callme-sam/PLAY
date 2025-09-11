@@ -1,0 +1,74 @@
+make: Entering directory '/home/sam/repos/PLAY/test/matrix_mul'
+RM  /home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV/
+RM  BUILD/PULP/source
+CC  main.c
+CC  ../../source/matrix_mul//matrix_mul.c
+CC  ../common/stats.c
+CC  ../common/utils.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/fll-v1.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/freq-domains.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/pulp/kernel/chips/pulp/soc.c
+CC  /home/sam/repos/pulp-sdk/rtos/pmsis/pmsis_bsp/fs/read_fs/read_fs.c
+CC  /home/sam/repos/pulp-sdk/rtos/pmsis/pmsis_bsp/fs/host_fs/semihost.c
+CC  /home/sam/repos/pulp-sdk/rtos/pmsis/pmsis_bsp/fs/host_fs/host_fs.c
+CC  /home/sam/repos/pulp-sdk/rtos/pmsis/pmsis_bsp/fs/fs.c
+CC  /home/sam/repos/pulp-sdk/rtos/pmsis/pmsis_bsp/bsp/pulp.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/lib/libc/minimal/io.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/lib/libc/minimal/fprintf.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/lib/libc/minimal/prf.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/lib/libc/minimal/sprintf.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/lib/libc/minimal/semihost.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/init.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/kernel.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/device.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/task.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/alloc.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/alloc_pool.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/irq.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/soc_event.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/log.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/time.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/pulp/drivers/uart/uart-v1.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/pulp/drivers/udma/udma-v3.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/pulp/drivers/cluster/cluster.c
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/crt0.S
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/irq_asm.S
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/task_asm.S
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/time_asm.S
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/common/kernel/soc_event_v2_itc.S
+CC  /home/sam/repos/pulp-sdk/rtos/pulpos/pulp/drivers/cluster/pe-eu-v3.S
+LD  /home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV//matrix-mul-test/matrix-mul-test
+gvsoc --target=pulp-open --work-dir=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV/ --binary=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV//matrix-mul-test/matrix-mul-test --config-opt=cluster/nb_pe=8      image
+gapy --platform=gvsoc --target-dir=/home/sam/repos/pulp-sdk/install/workstation/generators --model-dir=/home/sam/repos/pulp-sdk/install/workstation/models --target=pulp-open --work-dir=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV/ --binary=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV//matrix-mul-test/matrix-mul-test --config-opt=cluster/nb_pe=8 image
+gvsoc --target=pulp-open --work-dir=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV/ --binary=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV//matrix-mul-test/matrix-mul-test --config-opt=cluster/nb_pe=8      flash
+gapy --platform=gvsoc --target-dir=/home/sam/repos/pulp-sdk/install/workstation/generators --model-dir=/home/sam/repos/pulp-sdk/install/workstation/models --target=pulp-open --work-dir=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV/ --binary=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV//matrix-mul-test/matrix-mul-test --config-opt=cluster/nb_pe=8 flash
+gvsoc --target=pulp-open --work-dir=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV/ --binary=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV//matrix-mul-test/matrix-mul-test --config-opt=cluster/nb_pe=8      image flash run
+gapy --platform=gvsoc --target-dir=/home/sam/repos/pulp-sdk/install/workstation/generators --model-dir=/home/sam/repos/pulp-sdk/install/workstation/models --target=pulp-open --work-dir=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV/ --binary=/home/sam/repos/PLAY/test/matrix_mul/BUILD/PULP/GCC_RISCV//matrix-mul-test/matrix-mul-test --config-opt=cluster/nb_pe=8 image flash run
+
+##################################### MATRIX_MUL TEST ####################################
+
+INFO | Running 'matrix_mul' test on PULP Cluster with 1 cores
+INFO | Printing statistics:
+[0] cycles:			447332
+[0] act cycles:			447330
+[0] instr execd:		447176
+[0] load stall:			3
+[0] jump reg stall:		0
+[0] instr miss:			18
+[0] loads execd:		262165
+[0] stores execd:		4113
+[0] jump:			3
+[0] branches:			4162
+[0] taken branches:		64
+[0] comprssd inst execd:	25075
+[0] ext loads execd:		0
+[0] ext loads cycles:		0
+[0] ext stores execd:		1
+[0] ext stores cycles:		1
+[0] TDCM contentions:		0
+[0] IPC:			0.999651
+INFO | Test SUCCESS
+
+##########################################################################################
+
+make: Leaving directory '/home/sam/repos/PLAY/test/matrix_mul'
