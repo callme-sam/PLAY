@@ -23,8 +23,11 @@ ifdef STATS
 APP_CFLAGS += -DSTATS
 endif	#STATS
 
-APP_CFLAGS += -Os -g -I$(INC_DIR) -I$(DATA_DIR) -I$(COMMON_DIR)
-APP_LDFLAGS += -Os -g
+APP_CFLAGS += -O3 -g -I$(INC_DIR) -I$(DATA_DIR) -I$(COMMON_DIR)
+APP_LDFLAGS += -O3 -g
+
+# APP_CFLAGS += -mno-memcpy -ftree-loop-distribution -ftree-loop-distribute-patterns -fno-tree-loop-im -fno-tree-ch
+# APP_LDFLAGS += -mno-memcpy -ftree-loop-distribution -ftree-loop-distribute-patterns -fno-tree-loop-im -fno-tree-ch
 
 
 include $(RULES_DIR)/pmsis_rules.mk
