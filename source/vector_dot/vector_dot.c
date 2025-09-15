@@ -10,22 +10,29 @@ int vector_dot_parallel(const float *src_a, const float *src_b, float *dst, cons
 {
     float dot_tmp1;
     float dot_tmp2;
+    int rem_ops;
+    int tot_ops;
     int block;
     int start;
     int left;
     int end;
     int id;
+    int op;
     int i;
 
     id = pi_core_id();
     block = len / NUM_CORES;
     left = len % NUM_CORES;
     start = id * block + (id < left ? id : left);
-    dot_tmp1 = 0;
     end = start + block + (id < left ? 1 : 0);
+    tot_ops = (end - start) / 2;
+    rem_ops = tot_ops % 2;
+    dot_tmp1 = 0;
     dot_tmp2 = 0;
+    i = start;
+    op = 0;
 
-    for (i = start; (i + 1) < end; i += 2) {
+    do {
         int idx1, idx2;
         float a1, a2;
         float b1, b2;
@@ -39,10 +46,12 @@ int vector_dot_parallel(const float *src_a, const float *src_b, float *dst, cons
 
         dot_tmp1 += a1 * b1;
         dot_tmp2 += a2 * b2;
-    }
+        i += 2;
+        op++;
+    } while (op < tot_ops);
 
-    if (i < end)
-        dot_tmp1 += src_a[i] * src_b[i];
+    if (rem_ops)
+        dot_tmp1 += src_a[end - 1] * src_b[end - 1];
 
     /* Only master core computes final dot prod */
     local_dot[id] = dot_tmp1 + dot_tmp2;
@@ -55,7 +64,7 @@ int vector_dot_parallel(const float *src_a, const float *src_b, float *dst, cons
         goto exit;
 
     *dst = 0.0f;
-    for (int i = 0; i < NUM_CORES; i++)
+    for (i = 0; i < NUM_CORES; i++)
         *dst += local_dot[i];
 
 exit:

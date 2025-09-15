@@ -7,11 +7,14 @@
 
 int vector_set_all_parallel(float *vec, const float val, const int len)
 {
+    int tot_ops;
+    int rem_ops;
     int block;
     int start;
     int left;
     int end;
     int id;
+    int op;
     int i;
 
     id = pi_core_id();
@@ -19,8 +22,12 @@ int vector_set_all_parallel(float *vec, const float val, const int len)
     left = len % NUM_CORES;
     start = id * block + (id < left ? id : left);
     end = start + block + (id < left ? 1 : 0);
+    tot_ops = (end - start) / 2;
+    rem_ops = tot_ops % 2;
+    i = start;
+    op = 0;
 
-    for (i = start; (i + 1) < end; i += 2) {
+    do {
         int idx1, idx2;
 
         idx1 = i;
@@ -28,10 +35,13 @@ int vector_set_all_parallel(float *vec, const float val, const int len)
 
         vec[idx1] = val;
         vec[idx2] = val;
-    }
 
-    if (i < end)
-        vec[i] = val;
+        i += 2;
+        op++;
+    } while (op < tot_ops);
+
+    if (rem_ops)
+        vec[end - 1] = val;
 
 #if NUM_CORES > 1
     pi_cl_team_barrier();

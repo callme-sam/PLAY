@@ -6,11 +6,14 @@
 
 static int vector_mul_parallel(const float *src_a, const float *src_b, float *dst, const int len)
 {
+    int tot_ops;
+    int rem_ops;
     int block;
     int start;
     int left;
     int end;
     int id;
+    int op;
     int i;
 
     id = pi_core_id();
@@ -18,8 +21,12 @@ static int vector_mul_parallel(const float *src_a, const float *src_b, float *ds
     left = len % NUM_CORES;
     start = id * block + (id < left ? id : left);
     end = start + block + (id < left ? 1 : 0);
+    tot_ops = (end - start) / 2;
+    rem_ops = tot_ops % 2;
+    i = start;
+    op = 0;
 
-    for (i = start; (i + 1) < end; i += 2) {
+    do {
         int idx1, idx2;
         float a1, a2;
         float b1, b2;
@@ -33,10 +40,13 @@ static int vector_mul_parallel(const float *src_a, const float *src_b, float *ds
 
         dst[idx1] = a1 * b1;
         dst[idx2] = a2 * b2;
-    }
 
-    if (i < end)
-        dst[i] = src_a[i] * src_b[i];
+        i += 2;
+        op++;
+    } while (op < tot_ops);
+
+    if (rem_ops)
+        dst[end - 1] = src_a[end - 1] * src_b[end - 1];
 
 #if NUM_CORES > 1
     pi_cl_team_barrier();

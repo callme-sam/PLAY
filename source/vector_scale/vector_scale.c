@@ -6,11 +6,14 @@
 
 static int vector_scale_parallel(const float *src, const float val, float *dst, const int len)
 {
+    int tot_ops;
+    int rem_ops;
     int block;
     int start;
     int left;
     int end;
     int id;
+    int op;
     int i;
 
     id = pi_core_id();
@@ -18,8 +21,12 @@ static int vector_scale_parallel(const float *src, const float val, float *dst, 
     left = len % NUM_CORES;
     start = id * block + (id < left ? id : left);
     end = start + block + (id < left ? 1 : 0);
+    tot_ops = (end - start) / 2;
+    rem_ops = tot_ops % 2;
+    i = start;
+    op = 0;
 
-    for (i = start; (i + 1) < end; i += 2) {
+    do {
         int idx1, idx2;
         float src1, src2;
 
@@ -31,10 +38,13 @@ static int vector_scale_parallel(const float *src, const float val, float *dst, 
 
         dst[idx1] = src1 * val;
         dst[idx2] = src2 * val;
-    }
 
-    if (i < end)
-        dst[i] = src[i] * val;
+        i += 2;
+        op++;
+    } while (op < tot_ops);
+
+    if (rem_ops)
+        dst[end - 1] = src[end - 1] * val;
 
 #if NUM_CORES > 1
     pi_cl_team_barrier();
