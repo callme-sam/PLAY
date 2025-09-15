@@ -9,10 +9,10 @@
 
 PI_L1 float beta;
 PI_L1 float alpha;
-PI_L1 float vec_x[DIM_N];
-PI_L1 float vec_y[DIM_M];
-PI_L1 float result[DIM_M];
-PI_L1 float mat[DIM_M * DIM_N];
+PI_L1 float vec_x[DIM_N] __attribute__((aligned(4)));
+PI_L1 float vec_y[DIM_M] __attribute__((aligned(4)));
+PI_L1 float result[DIM_M] __attribute__((aligned(4)));
+PI_L1 float mat[DIM_M * DIM_N] __attribute__((aligned(4)));
 
 static void initialize_data()
 {
@@ -56,12 +56,14 @@ static void check_result()
 
 static void run_test()
 {
+    volatile int m = DIM_M;
+    volatile int n = DIM_N;
     initialize_data();
     barrier();
 
     INIT_STATS();
     START_STATS();
-    linalg_gemv(mat, vec_x, vec_y, alpha, beta, result, DIM_M, DIM_N);
+    linalg_gemv(mat, vec_x, vec_y, alpha, beta, result, m, n);
     STOP_STATS();
 
     barrier();

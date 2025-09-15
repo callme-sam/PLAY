@@ -8,9 +8,14 @@ int linalg_gemv_parallel(const float *mat, const float *vec_x, const float *vec_
 {
     int row_start;
     int row_end;
-    float sum;
+    int num_ops;
+    int rem_ops;
+    float sum1;
+    float sum2;
     int block;
     int left;
+    int m, n;
+    int ops;
     int id;
 
     if (alpha == 0.0f) {
@@ -28,13 +33,67 @@ int linalg_gemv_parallel(const float *mat, const float *vec_x, const float *vec_
     left = dim_M % NUM_CORES;
     row_start = id * block + (id < left ? id : left);
     row_end = row_start + block + (id < left ? 1 : 0);
+    num_ops = dim_N / 2;
+    rem_ops = dim_N % 2;
 
-    for (int m = row_start; m < row_end; m++) {
-        sum = 0;
-        for (int n = 0; n < dim_N; n++)
-            sum += mat[m * dim_N + n] * vec_x[n];
-        dst[m] = alpha * sum + beta * vec_y[m];
+    m = row_start;
+    if (rem_ops) {
+        /* loop unroll will have leftovers */
+        do {
+            n = 0;
+            ops = 0;
+            sum1 = 0;
+            sum2 = 0;
+            do {
+                float mat1, mat2;
+                float vec1, vec2;
+
+                mat1 = mat[m * dim_N + n];
+                mat2 = mat[m * dim_N + (n + 1)];
+                vec1 = vec_x[n];
+                vec2 = vec_x[n + 1];
+
+                sum1 += mat1 * vec1;
+                sum2 += mat2 * vec2;
+
+                n += 2;
+                ops++;
+            } while (ops < num_ops);
+            /* Compute unroll leftovers */
+            sum1 += mat[m * dim_N + (dim_N - 1)] * vec_x[dim_N - 1];
+            dst[m] = alpha * (sum1 + sum2) + beta * vec_y[m];
+            m++;
+        } while (m < row_end);
+    } else {
+        /* loop unroll will NOT have leftovers */
+        do {
+            n = 0;
+            ops = 0;
+            sum1 = 0;
+            sum2 = 0;
+            do {
+                float mat1, mat2;
+                float vec1, vec2;
+
+                mat1 = mat[m * dim_N + n];
+                mat2 = mat[m * dim_N + (n + 1)];
+                vec1 = vec_x[n];
+                vec2 = vec_x[n + 1];
+
+                sum1 += mat1 * vec1;
+                sum2 += mat2 * vec2;
+
+                n += 2;
+                ops++;
+            } while (ops < num_ops);
+            dst[m] = alpha * (sum1 + sum2) + beta * vec_y[m];
+            m++;
+        } while (m < row_end);
     }
+
+#if NUM_CORES > 1
+    pi_cl_team_barrier();
+#endif
 
     return 0;
 }
@@ -67,7 +126,7 @@ int linalg_gemv_serial(const float *mat, const float *vec_x, const float *vec_y,
 
 #endif  /* CLUSTER */
 
-int linalg_gemv(const float *mat, const float *vec_x, const float *vec_y, const float alpha, const float beta, float *dst, const int dim_M, const int dim_N)
+__attribute__((noinline)) int linalg_gemv(const float *mat, const float *vec_x, const float *vec_y, const float alpha, const float beta, float *dst, const int dim_M, const int dim_N)
 {
     int ret;
 
