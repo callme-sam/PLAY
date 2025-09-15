@@ -7,7 +7,7 @@
 
 #include "pmsis.h"
 
-PI_L1 float src[DIM_M * DIM_N];
+PI_L1 float src[DIM_M * DIM_N] __attribute__((aligned(4)));
 PI_L1 float val;
 
 static void initialize_matrices()
@@ -40,12 +40,14 @@ static void check_result()
 
 static void run_test()
 {
+    volatile int m = DIM_M;
+    volatile int n = DIM_N;
     initialize_matrices();
     barrier();
 
     INIT_STATS();
     START_STATS();
-    matrix_set_all(src, val, DIM_M, DIM_N);
+    matrix_set_all(src, val, m, n);
     STOP_STATS();
 
     barrier();
