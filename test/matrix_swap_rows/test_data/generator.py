@@ -70,6 +70,8 @@ def main():
     mat = generate_matrix(M, N)
     rowA = get_random_in_range(0, M-1)
     rowB = get_random_in_range(0, M-1)
+    if rowA == rowB:
+        rowB = rowB / 2
     expected = swap_rows(mat, rowA, rowB)
 
     generate_header_file(M, N, mat, expected, rowA, rowB)
