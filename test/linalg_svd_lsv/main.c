@@ -8,10 +8,10 @@
 
 #include "pmsis.h"
 
-PI_L1 float src[DIM_M * DIM_N];
-PI_L1 float mat_V[DIM_N * DIM_N];
-PI_L1 float vec_S[DIM_N];
-PI_L1 float result[DIM_M * DIM_N];
+PI_L1 float src[DIM_M * DIM_N] __attribute__((aligned(4)));
+PI_L1 float mat_V[DIM_N * DIM_N] __attribute__((aligned(4)));
+PI_L1 float vec_S[DIM_N] __attribute__((aligned(4)));
+PI_L1 float result[DIM_M * DIM_N] __attribute__((aligned(4)));
 
 static void initialize_data()
 {
@@ -55,12 +55,14 @@ static void check_result()
 
 static void run_test()
 {
+    volatile int m = DIM_M;
+    volatile int n = DIM_N;
     initialize_data();
     barrier();
 
     INIT_STATS();
     START_STATS();
-    linalg_svd_lsv(src, mat_V, vec_S, result, DIM_M, DIM_N);
+    linalg_svd_lsv(src, mat_V, vec_S, result, m, n);
     STOP_STATS();
     barrier();
     check_result();
