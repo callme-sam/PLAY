@@ -9,10 +9,10 @@
 
 #include "pmsis.h"
 
-PI_L1 float src[DIM_M * DIM_M];
-PI_L1 float mat_V[DIM_M * DIM_M];
-PI_L1 float vec_S[DIM_M];
-PI_L1 float result[DIM_M * DIM_M];
+PI_L1 float src[DIM_M * DIM_M] __attribute__((aligned(4)));
+PI_L1 float mat_V[DIM_M * DIM_M] __attribute__((aligned(4)));
+PI_L1 float vec_S[DIM_M] __attribute__((aligned(4)));
+PI_L1 float result[DIM_M * DIM_M] __attribute__((aligned(4)));
 
 static void sort_results_descending(float *result, float *mat_V, float *vec_S, const int dim_M) {
     float tmp;
@@ -101,12 +101,13 @@ static void check_result()
 
 static void run_test()
 {
+    volatile int m = DIM_M;
     initialize_data();
     barrier();
 
     INIT_STATS();
     START_STATS();
-    linalg_svd_jacobi(src, result, mat_V, vec_S, DIM_M);
+    linalg_svd_jacobi(src, result, mat_V, vec_S, m);
     STOP_STATS();
     barrier();
     sort_results_descending(result, mat_V, vec_S, DIM_M);

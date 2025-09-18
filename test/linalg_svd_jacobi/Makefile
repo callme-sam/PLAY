@@ -23,8 +23,8 @@ ifdef STATS
 APP_CFLAGS += -DSTATS
 endif	#STATS
 
-APP_CFLAGS += -Os -g -I$(INC_DIR) -I$(DATA_DIR) -I$(COMMON_DIR) -lm
-APP_LDFLAGS += -Os -g -lm
+APP_CFLAGS += -O3 -g -I$(INC_DIR) -I$(DATA_DIR) -I$(COMMON_DIR) -lm
+APP_LDFLAGS += -O3 -g -lm
 
 
 include $(RULES_DIR)/pmsis_rules.mk
