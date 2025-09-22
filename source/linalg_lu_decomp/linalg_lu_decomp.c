@@ -129,6 +129,7 @@ static inline int set_permutation_identity(int *vec, const int len)
 
 int linalg_lu_decomp_parallel(const float *mat, float *dst, int *perm, const int dim_M, const int dim_N)
 {
+    volatile float one_f = 1;
     int dim_min;
     int id;
 
@@ -166,7 +167,7 @@ int linalg_lu_decomp_parallel(const float *mat, float *dst, int *perm, const int
                 printf("ERROR | Zero pivot found at position %d during LU decomposition - Matrix is singular\n", k);
                 return -1;
             } else {
-                p_inv = 1 / pivot;
+                p_inv = one_f / pivot;
             }
         }   /* id 0 */
 
