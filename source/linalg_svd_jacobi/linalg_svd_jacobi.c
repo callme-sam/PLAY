@@ -4,8 +4,10 @@
 
 #include "pmsis.h"
 
-#define MAX_ITER    (100)
-#define EPSILON     (1e-12)
+static PI_L1 float ONE_f = 1;
+static PI_L1 float TWO_f = 2;
+static PI_L1 int MAX_ITER = 100;
+static PI_L1 float EPSILON = 1e-12;
 
 #ifdef  CLUSTER
 
@@ -47,7 +49,6 @@ int matrix_set_identity(float *mat, const int dim_M)
 int linalg_svd_jacobi_parallel(const float *src, float *dst, float *mat_V, float *vec_S, const int dim_M)
 {
     int pairs_per_round;
-    // float max_offdiag;
     int even_dim;
     int iter;
     int id;
@@ -96,13 +97,13 @@ int linalg_svd_jacobi_parallel(const float *src, float *dst, float *mat_V, float
                 if (fabs(dst[i * dim_M + j]) < EPSILON)
                     continue;
 
-                tau = (dst[j * dim_M + j] - dst[i * dim_M + i]) / (2.0 * dst[i * dim_M + j]);
+                tau = (dst[j * dim_M + j] - dst[i * dim_M + i]) / (TWO_f * dst[i * dim_M + j]);
                 if (tau >= 0.0)
-                    t = 1.0 / (tau + sqrt(1.0 + tau * tau));
+                    t = ONE_f / (tau + sqrt(ONE_f + tau * tau));
                 else
-                    t = 1.0 / (tau - sqrt(1.0 + tau * tau));
+                    t = ONE_f / (tau - sqrt(ONE_f + tau * tau));
 
-                cos = 1.0 / sqrt(1.0 + t * t);
+                cos = ONE_f / sqrt(ONE_f + t * t);
                 sin = t * cos;
 
                 /* Update rows i and j of DST */
