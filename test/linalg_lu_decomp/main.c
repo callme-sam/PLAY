@@ -56,7 +56,7 @@ static void run_test()
 
     INIT_STATS();
     START_STATS();
-    linalg_lu_decomp(mat, result, perm, m, n);
+    linalg_lu_decomp(src, result, perm, m, n);
     STOP_STATS();
 
     barrier();
