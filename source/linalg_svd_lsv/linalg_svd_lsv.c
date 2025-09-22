@@ -2,7 +2,8 @@
 
 #include "pmsis.h"
 
-#define EPSILON     (1e-12)
+static PI_L1 float ONE_f = 1;
+static PI_L1 float EPSILON = 1e-12;
 
 #ifdef  CLUSTER
 
@@ -171,7 +172,7 @@ int linalg_svd_lsv_parallel(const float *src, float *mat_V, float *vec_S, float 
 
             continue;
         } else {
-            s_inv = 1.0f / s;
+            s_inv = ONE_f / s;
         }
 
         m = 0;
