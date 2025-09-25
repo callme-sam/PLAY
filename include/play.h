@@ -2,6 +2,13 @@
 #define PLAY_H_
 
 /**
+ * @brief Prints hello world message
+ *
+ * @return int Returns 0 on success, non-zero otherwise.
+ */
+int hello_world();
+
+/**
  * @brief Performs element-wise multiplication of two vectors.
  *
  * This function computes the element-wise product of two floating-point vectors (`src_a` and `src_b`)

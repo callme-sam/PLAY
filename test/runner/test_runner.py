@@ -208,7 +208,7 @@ def main():
     test_directories = [
         d for d in os.listdir(test_root)
         if os.path.isdir(os.path.join(test_root, d))
-        and d not in ["common", "runner"]
+        and d not in ["common", "runner", "hello"]
     ]
     test_directories.sort()
 

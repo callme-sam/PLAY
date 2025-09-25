@@ -1,0 +1,27 @@
+SRC_DIR = ../../source/hello/
+INC_DIR = ../../include/
+DATA_DIR = test_data/
+COMMON_DIR = ../common
+
+APP = hello-test
+APP_SRCS += main.c $(wildcard $(SRC_DIR)/*.c) $(wildcard $(COMMON_DIR)/*.c)
+
+ifdef USE_CLUSTER
+APP_CFLAGS += -DCLUSTER -DNUM_CLUSTER=$(USE_CLUSTER)
+ifdef NUM_CORES
+APP_CFLAGS += -DNUM_CORES=$(NUM_CORES)
+else	# NUM_CORES
+APP_CFLAGS += -DNUM_CORES=1
+endif	# NUM_CORES
+endif	# USE_CLUSTER
+
+APP_CFLAGS += -O3 -g -I$(INC_DIR) -I$(DATA_DIR) -I$(COMMON_DIR)
+APP_LDFLAGS += -O3 -g
+
+
+include $(RULES_DIR)/pmsis_rules.mk
+
+# Extend "clean" rule to cleanup also test objects
+clean::
+	@echo "RM  BUILD/PULP/source"
+	$(V)rm -rf BUILD/PULP/source
