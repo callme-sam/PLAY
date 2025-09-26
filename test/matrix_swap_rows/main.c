@@ -53,9 +53,11 @@ static void run_test()
     barrier();
 
     INIT_STATS();
+    START_LOOP_STATS();
     START_STATS();
     matrix_swap_rows(result, row_a, row_b, m, n);
     STOP_STATS();
+    END_LOOP_STATS();
 
     barrier();
     check_result();

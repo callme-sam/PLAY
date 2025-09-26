@@ -12,7 +12,6 @@
 PI_L1 float src[DIM_M * DIM_M] __attribute__((aligned(4)));
 PI_L1 float mat_V[DIM_M * DIM_M] __attribute__((aligned(4)));
 PI_L1 float vec_S[DIM_M] __attribute__((aligned(4)));
-PI_L1 float result[DIM_M * DIM_M] __attribute__((aligned(4)));
 
 static void sort_results_descending(float *result, float *mat_V, float *vec_S, const int dim_M) {
     float tmp;
@@ -56,7 +55,6 @@ static void initialize_data()
         for (int n = 0; n < DIM_M; n++) {
             src[m * DIM_M + n] = mat[m * DIM_M + n];
             mat_V[m * DIM_M + n] = 0;
-            result[m * DIM_M + n] = 0;
         }
     }
 
@@ -75,7 +73,7 @@ static void check_result()
     if (!is_master_core())
         return;
 
-    res_cmp = matrix_compare_abs(result, expected, DIM_M, DIM_M);
+    res_cmp = matrix_compare_abs(src, expected, DIM_M, DIM_M);
     if (!res_cmp)
         printf("INFO | Result matrix is wrong\n");
 
@@ -89,12 +87,11 @@ static void check_result()
 
     test_result = res_cmp && v_cmp && s_cmp;
 
-    matrix_print(src, DIM_M, DIM_M, "mat");
     matrix_print(mat_V, DIM_M, DIM_M, "computed V");
     matrix_print(V, DIM_M, DIM_M, "expected V");
     vector_print(vec_S, DIM_M, "computed S");
     vector_print(S, DIM_M, "expected S");
-    matrix_print(result, DIM_M, DIM_M, "result");
+    matrix_print(src, DIM_M, DIM_M, "result");
     matrix_print(expected, DIM_M, DIM_M, "expected");
     printf("INFO | Test %s\n", test_result ? "SUCCESS" : "FAILED");
 }
@@ -102,15 +99,19 @@ static void check_result()
 static void run_test()
 {
     volatile int m = DIM_M;
-    initialize_data();
-    barrier();
 
     INIT_STATS();
-    START_STATS();
-    linalg_svd_jacobi(src, result, mat_V, vec_S, m);
-    STOP_STATS();
+    START_LOOP_STATS();
+    initialize_data();
     barrier();
-    sort_results_descending(result, mat_V, vec_S, DIM_M);
+    START_STATS();
+    linalg_svd_jacobi(src, mat_V, vec_S, m);
+    STOP_STATS();
+    END_LOOP_STATS();
+
+    barrier();
+    sort_results_descending(src, mat_V, vec_S, DIM_M);
+
     barrier();
     check_result();
 }

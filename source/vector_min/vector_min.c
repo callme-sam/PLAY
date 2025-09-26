@@ -23,39 +23,6 @@ static int vector_min_parallel(const float *src, float *min, const int len)
     end = start + block + (id < left ? 1 : 0);
     min_tmp = src[start];
 
-#if 0
-    /* unroll with step-2 */
-    /* 1C -- cycl: 12314 - stall: 1027 - ipc: 0.66 */
-    /* 8C -- cycl: 1602  - stall: 129  - ipc: 0.66 */
-    for (i = start + 1; (i + 1) < end; i += 2) {
-        int idx1, idx2;
-        float src1, src2;
-
-        idx1 = i;
-        idx2 = i + 1;
-        src1 = src[idx1];
-        src2 = src[idx2];
-
-        if (src1 < src2) {
-            if (src1 < min_tmp)
-                min_tmp = src1;
-        } else if (src2 < min_tmp) {
-            min_tmp = src2;
-        }
-    }
-
-
-    if (i < end) {
-        if (src[i] < min_tmp)
-        min_tmp = src[i];
-    }
-
-#endif
-
-#if 1
-    /* unroll with step-4 */
-    /* cycl: 11819 - stall: 6 - ipc: 0.65 */
-    /* cycl: 1567  - stall: 4 - ipc: 0.65 */
     for (i = (start + 1); (i + 3) < end; i += 4) {
         int idx1, idx2, idx3, idx4;
         float src1, src2, src3, src4;
@@ -89,56 +56,6 @@ static int vector_min_parallel(const float *src, float *min, const int len)
         if (src[i] < min_tmp)
             min_tmp = src[i];
     }
-#endif
-
-
-#if 0
-    /* sw pipelining */
-    /* cycl: 20508 - stall: 3 - ipc: 0.60 */
-    /* cycl: 2609  - stall: 1 - ipc: 0.60 */
-    float cur_src, next_src;
-    min_tmp = src[start];
-    cur_src = src[start];
-    for (i = start; (i + 1) < end; i++) {
-        next_src = src[i + 1];
-        if (cur_src < min_tmp)
-            min_tmp = cur_src;
-
-        cur_src = next_src;
-    }
-#endif
-
-#if 0
-    /* sw pipelining + unroll step-2 */
-    /* cycl: 13397 - stall: 5 - ipc: 0.76 */
-    /* cycl: 1798  - stall: 3 - ipc: 0.75 */
-    float src1, src2;
-    float nxt_src1, nxt_src2;
-
-    src1 = src[start];
-    src2 = src[start + 1];
-    min_tmp = src[start];
-
-    for (i = start; (i + 3) < end; i += 2) {
-        nxt_src1 = src[i + 2];
-        nxt_src2 = src[i + 3];
-
-        if (src1 < src2) {
-            if (src1 < min_tmp)
-                min_tmp = src1;
-        } else if (src2 < min_tmp) {
-            min_tmp = src2;
-        }
-
-        src1 = nxt_src1;
-        src2 = nxt_src2;
-    }
-
-    for(; i < end; i++) {
-        if (src[i] < min_tmp)
-            min_tmp = src[i];
-    }
-#endif
 
     local_min[id] = min_tmp;
 

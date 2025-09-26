@@ -4,64 +4,6 @@
 
 #ifdef  CLUSTER
 
-#if 0
-/* m , n */
-int matrix_trans_parallel(const float *src, float *dst, const int dim_M, const int dim_N)
-{
-    int row_start;
-    int row_end;
-    int num_ops;
-    int rem_ops;
-    int block;
-    int left;
-    int m, n;
-    int ops;
-    int id;
-
-    id = pi_core_id();
-    block = dim_M / NUM_CORES;
-    left = dim_M % NUM_CORES;
-    row_start = id * block + (id < left ? id : left);
-    row_end = row_start + block + (id < left ? 1 : 0);
-    num_ops = dim_N / 2;
-    rem_ops = dim_N % 2;
-
-    m = row_start;
-    do {
-        n = 0;
-        ops = 0;
-        do {
-            float src1, src2;
-
-            src1 = src[m * dim_N + n];
-            src2 = src[m * dim_N + (n + 1)];
-            dst[n * dim_M + m] = src1;
-            dst[(n + 1) * dim_M + m] = src2;
-
-            n += 2;
-            ops ++;
-        } while (ops < num_ops);
-        m++;
-    } while (m < row_end);
-
-    if (rem_ops) {
-        m = row_start;
-        do {
-            dst[(dim_N - 1) * dim_M + m] = src[m * dim_N + (dim_N - 1)];
-            m++;
-        } while (m < row_end);
-    }
-
-#if NUM_CORES > 1
-    pi_cl_team_barrier();
-#endif
-
-    return 0;
-}
-#endif
-
-#if 1
-/* n, m  */
 int matrix_trans_parallel(const float *src, float *dst, const int dim_M, const int dim_N)
 {
     int col_start;
@@ -114,7 +56,6 @@ int matrix_trans_parallel(const float *src, float *dst, const int dim_M, const i
 
     return 0;
 }
-#endif
 
 #else   /* CLUSTER */
 

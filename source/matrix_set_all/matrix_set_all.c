@@ -2,7 +2,6 @@
 
 #include "pmsis.h"
 
-
 #ifdef  CLUSTER
 
 int matrix_set_all_parallel(float *mat, const float val, const int dim_M, const int dim_N)

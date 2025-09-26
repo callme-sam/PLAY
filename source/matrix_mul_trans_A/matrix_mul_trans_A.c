@@ -4,91 +4,6 @@
 
 #ifdef  CLUSTER
 
-#if 0
-/* n, p, m */
-/* 1C - cycl: 315k - instr: 315k - ipc: 0.99 */
-/* 8C - cycl: 51k  - instr: 39k  - ipc: 0.76 */
-int matrix_mul_trans_A_parallel(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P)
-{
-    int m, n, p;
-    int num_ops;
-    int rem_ops;
-    float sum1;
-    float sum2;
-    int start;
-    int block;
-    int left;
-    int end;
-    int id;
-
-    id = pi_core_id();
-    block = dim_N / NUM_CORES;
-    left = dim_N % NUM_CORES;
-    start = id * block + (id < left ? id : left);
-    end = start + block + (id < left ? 1 : 0);
-    rem_ops = dim_M % 2;
-
-    n = start;
-    do {
-        p = 0;
-        do {
-            num_ops = dim_M / 2;
-            sum1 = 0;
-            sum2 = 0;
-            m = 0;
-            do {
-                float src_a1, src_a2;
-                float src_b1, src_b2;
-
-                src_a1 = src_a[m * dim_N + n];
-                src_a2 = src_a[(m + 1) * dim_N + n];
-                src_b1 = src_b[m * dim_P + p];
-                src_b2 = src_b[(m + 1) * dim_P + p];
-
-                sum1 += src_a1 * src_b1;
-                sum2 += src_a2 * src_b2;
-
-                m += 2;
-                num_ops--;
-            } while (num_ops > 0);
-
-            dst[n * dim_P + p] = sum1 + sum2;
-            p++;
-        } while (p < dim_P);
-
-        n++;
-    } while (n < end);
-
-    if (rem_ops) {
-        n = start;
-        do {
-            p = 0;
-            do {
-                float a;
-                float b;
-
-                a = src_a[(dim_M - 1) * dim_N + n];
-                b = src_b[(dim_M - 1) * dim_P + p];
-
-                dst[n * dim_P + p] = a * b;
-                p++;
-            } while (p < dim_P);
-            n++;
-        } while (n < end);
-    }
-
-#if NUM_CORES > 1
-    pi_cl_team_barrier();
-#endif
-
-    return 0;
-}
-#endif
-
-#if 1
-/* p, n, m */
-/* 1C - cycl: 315k - instr: 315k - ipc: 0.99 */
-/* 8C - cycl: 47k  - instr: 39k  - ipc: 0.82 */
 int matrix_mul_trans_A_parallel(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P)
 {
     int m, n, p;
@@ -164,7 +79,6 @@ int matrix_mul_trans_A_parallel(const float *src_a, const float *src_b, float *d
 
     return 0;
 }
-#endif
 
 #else   /* CLUSTER */
 

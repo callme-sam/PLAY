@@ -323,21 +323,19 @@ int linalg_gemv(const float *mat, const float *vec_x, const float *vec_y, const 
 int linalg_gemv_trans(const float *mat, const float *vec_x, const float *vec_y, const float alpha, const float beta, float *dst, const int dim_M, const int dim_N);
 
 /**
- * @brief Performs LU decomposition on a matrix without modifying the input.
+ * @brief Performs LU decomposition.
  *
  * This function factorizes an input matrix into its L and U components, storing the
- * result in a separate destination matrix. It also tracks row permutations
- * resulting from partial pivoting.
+ * result in-place. It also tracks row permutations resulting from partial pivoting.
  *
- * @param [in] mat A pointer to the input matrix to be decomposed.
- * @param [out] dst A pointer to the destination matrix where the L and U factors will be stored.
+ * @param [in, out] mat A pointer to the input matrix to be decomposed.
  * @param [out] perm A pointer to an array that will store the permutation vector.
  * @param [in] dim_M The number of rows of the matrix.
  * @param [in] dim_N The number of columns of matrix.
  *
  * @return int Returns 0 on success, or -1 if the matrix is singular and cannot be decomposed.
  */
-int linalg_lu_decomp(const float *mat, float *dst, int *perm, const int dim_M, const int dim_N);
+int linalg_lu_decomp(float *mat, int *perm, const int dim_M, const int dim_N);
 
 /**
  * @brief Solves a linear system Ax = b using a precomputed LU factorization.
@@ -365,15 +363,14 @@ int linalg_lu_solve(const float *mat, const float *vec, const int *perm, float *
  * The diagonal elements of the resulting matrix are the singular values squared, and the accumulated rotations form
  * the matrix of right singular vectors. The singular values are then extracted and stored in a separate vector.
  *
- * @param[in] src A pointer to the input symmetric square matrix (M x M) to be decomposed.
- * @param[out] dst A pointer to the destination matrix where the diagonalized result will be stored. The diagonal elements are the singular values squared.
+ * @param[in, out] src A pointer to the input symmetric square matrix (M x M) to be decomposed.
  * @param[out] mat_V A pointer to the destination matrix where the right singular vectors will be stored as columns.
  * @param[out] vec_S A pointer to the destination vector where the singular values (square roots of eigenvalues) will be stored.
  * @param[in] dim_M The dimension of the square matrix.
  *
  * @return int Returns 0 on success, or a non-zero value if an error occurs.
  */
-int linalg_svd_jacobi(const float *src, float *dst, float *mat_V, float *vec_S, const int dim_M);
+int linalg_svd_jacobi(float *mat, float *mat_V, float *vec_S, const int dim_M);
 
 /**
  * @brief Computes left singular vectors U from A, V, and S

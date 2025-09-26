@@ -61,9 +61,12 @@ static void run_test()
     barrier();
 
     INIT_STATS();
+    START_LOOP_STATS();
     START_STATS();
     linalg_svd_lsv(src, mat_V, vec_S, result, m, n);
     STOP_STATS();
+    END_LOOP_STATS();
+
     barrier();
     check_result();
 }

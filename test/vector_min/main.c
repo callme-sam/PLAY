@@ -43,9 +43,11 @@ static void run_test()
     barrier();
 
     INIT_STATS();
+    START_LOOP_STATS();
     START_STATS();
     vector_min(src, &result, len);
     STOP_STATS();
+    END_LOOP_STATS();
 
     barrier();
     check_result();

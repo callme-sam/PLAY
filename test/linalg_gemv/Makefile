@@ -1,10 +1,11 @@
-SRC_DIR = ../../source
+SRC_DIR = ../../source/
+SRC_SUB_DIRS = linalg_gemv vector_memcpy vector_scale vector_set_all
 INC_DIR = ../../include
 DATA_DIR = test_data
 COMMON_DIR = ../common
 
 APP = linalg-gemv-test
-APP_SRCS += main.c $(wildcard $(SRC_DIR)/*/*.c) $(wildcard $(COMMON_DIR)/*.c)
+APP_SRCS += main.c $(foreach dir, $(SRC_SUB_DIRS), $(wildcard $(SRC_DIR)/$(dir)/*.c)) $(wildcard $(COMMON_DIR)/*.c)
 
 ifdef USE_CLUSTER
 APP_CFLAGS += -DCLUSTER -DNUM_CLUSTER=$(USE_CLUSTER)

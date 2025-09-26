@@ -49,9 +49,11 @@ static void run_test()
     barrier();
 
     INIT_STATS();
+    START_LOOP_STATS();
     START_STATS();
     vector_axpy(src_a, src_b, alpha, result, len);
     STOP_STATS();
+    END_LOOP_STATS();
 
     barrier();
     check_result();

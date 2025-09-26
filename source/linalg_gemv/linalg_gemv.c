@@ -46,11 +46,11 @@ int linalg_gemv_parallel(const float *mat, const float *vec_x, const float *vec_
 
     if (alpha == 0.0f) {
         if (beta == 0.0f)
-        vector_set_all(dst, 0.0, dim_M);
+            vector_set_all(dst, 0.0, dim_M);
         else if (beta == 1.0f)
-        vector_memcpy(vec_y, dst, dim_M);
+            vector_memcpy(vec_y, dst, dim_M);
         else
-        vector_scale(vec_y, beta, dst, dim_M);
+            vector_scale(vec_y, beta, dst, dim_M);
         return 0;
     }
 

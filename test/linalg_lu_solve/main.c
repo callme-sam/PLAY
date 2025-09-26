@@ -53,9 +53,11 @@ static void run_test()
     barrier();
 
     INIT_STATS();
+    START_LOOP_STATS();
     START_STATS();
     linalg_lu_solve(mat, vec, perm, result, m, m);
     STOP_STATS();
+    END_LOOP_STATS();
 
     barrier();
     check_result();

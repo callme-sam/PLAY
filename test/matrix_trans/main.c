@@ -50,9 +50,11 @@ static void run_test()
     barrier();
 
     INIT_STATS();
+    START_LOOP_STATS();
     START_STATS();
     matrix_trans(src, result, m, n);
     STOP_STATS();
+    END_LOOP_STATS();
 
     barrier();
     check_result();

@@ -16,7 +16,7 @@ int linalg_svd_parallel(const float *src, float *dst, float *mat_V, float *vec_S
 #endif
 
     matrix_mul_trans_A(src, src, tmp, dim_M, dim_N, dim_N);
-    linalg_svd_jacobi(tmp, tmp, mat_V, vec_S, dim_N);
+    linalg_svd_jacobi(tmp, mat_V, vec_S, dim_N);
     linalg_svd_lsv(src, mat_V, vec_S, dst, dim_M, dim_N);
 
     if (pi_core_id() == 0)
@@ -36,7 +36,7 @@ int linalg_svd_serial(const float *src, float *dst, float *mat_V, float *vec_S, 
 {
     tmp = pmsis_l1_malloc(dim_N * dim_N * sizeof(float));
     matrix_mul_trans_A(src, src, tmp, dim_M, dim_N, dim_N);
-    linalg_svd_jacobi(tmp, tmp, mat_V, vec_S, dim_N);
+    linalg_svd_jacobi(tmp, mat_V, vec_S, dim_N);
     linalg_svd_lsv(src, mat_V, vec_S, dst, dim_M, dim_N);
     pmsis_l1_malloc_free(tmp, dim_N * dim_N * sizeof(float));
     return 0;

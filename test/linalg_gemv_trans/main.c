@@ -62,9 +62,11 @@ static void run_test()
     barrier();
 
     INIT_STATS();
+    START_LOOP_STATS();
     START_STATS();
     linalg_gemv_trans(mat, vec_x, vec_y, alpha, beta, result, m, n);
     STOP_STATS();
+    END_LOOP_STATS();
 
     barrier();
     check_result();

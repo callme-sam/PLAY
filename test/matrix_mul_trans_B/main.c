@@ -58,9 +58,11 @@ static void run_test()
     barrier();
 
     INIT_STATS();
+    START_LOOP_STATS();
     START_STATS();
     matrix_mul_trans_B(src_a, src_b, result, m, n, p);
     STOP_STATS();
+    END_LOOP_STATS();
 
     barrier();
     check_result();

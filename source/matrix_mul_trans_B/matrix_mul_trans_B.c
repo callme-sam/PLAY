@@ -4,88 +4,6 @@
 
 #ifdef  CLUSTER
 
-#if 0
-/* m, p, n */
-static int matrix_mul_trans_B_parallel(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P)
-{
-    int row_start;
-    int row_end;
-    int m, n, p;
-    int num_ops;
-    int rem_ops;
-    float sum1;
-    float sum2;
-    int block;
-    int left;
-    int id;
-
-    id = pi_core_id();
-    block = dim_M / NUM_CORES;
-    left = dim_M % NUM_CORES;
-    row_start = id * block + (id < left ? id : left);
-    row_end = row_start + block + (id < left ? 1 : 0);
-
-    rem_ops = dim_N % 2;
-    m = row_start;
-    do {
-        p = 0;
-        do {
-            num_ops = dim_N / 2;
-            sum1 = 0;
-            sum2 = 0;
-            n = 0;
-            do {
-                float src_a1, src_a2;
-                float src_b1, src_b2;
-
-                src_a1 = src_a[m * dim_N + n];
-                src_a2 = src_a[m * dim_N + (n + 1)];
-                src_b1 = src_b[p * dim_N + n];
-                src_b2 = src_b[p * dim_N + (n + 1)];
-
-                sum1 += src_a1 * src_b1;
-                sum2 += src_a2 * src_b2;
-
-                n += 2;
-                num_ops--;
-            } while (num_ops > 0);
-
-            dst[m * dim_P + p] = sum1 + sum2;
-            p++;
-        } while (p < dim_P);
-
-        m++;
-    } while (m < row_end);
-
-    if (rem_ops) {
-        m = row_start;
-        do {
-            p = 0;
-            do {
-                float a;
-                float b;
-
-                a = src_a[m * dim_N + (dim_N - 1)];
-                b = src_b[p * dim_N + (dim_N - 1)];
-
-                dst[m * dim_P + p] += a * b;
-                p++;
-            } while (p < dim_P);
-            m++;
-        } while (m < row_end);
-    }
-
-#if NUM_CORES > 1
-    pi_cl_team_barrier();
-#endif
-
-    return 0;
-}
-#endif
-
-
-#if 1
-/* p, m, n */
 static int matrix_mul_trans_B_parallel(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P)
 {
     int row_start;
@@ -161,7 +79,6 @@ static int matrix_mul_trans_B_parallel(const float *src_a, const float *src_b, f
 
     return 0;
 }
-#endif
 
 #else   /* CLUSTER */
 

@@ -107,15 +107,19 @@ static void run_test()
 {
     volatile int m = DIM_M;
     volatile int n = DIM_N;
-    initialize_data();
-    barrier();
 
     INIT_STATS();
+    START_LOOP_STATS();
+    initialize_data();
+    barrier();
     START_STATS();
     linalg_svd(src, result, mat_V, vec_S, m, n);
     STOP_STATS();
+    END_LOOP_STATS();
+
     barrier();
     sort_results_descending(result, mat_V, vec_S, DIM_M, DIM_N);
+
     barrier();
     check_result();
 }

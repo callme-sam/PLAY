@@ -9,7 +9,6 @@
 
 PI_L1 int perm[DIM_M] __attribute__((aligned(4)));
 PI_L1 float src[DIM_M * DIM_N] __attribute__((aligned(4)));
-PI_L1 float result[DIM_M * DIM_N] __attribute__((aligned(4)));
 
 static void initialize_data()
 {
@@ -17,10 +16,8 @@ static void initialize_data()
         return;
 
     for (int m = 0; m < DIM_M; m++){
-        for (int n = 0; n < DIM_N; n++) {
+        for (int n = 0; n < DIM_N; n++)
             src[m * DIM_N + n] = mat[m * DIM_N + n];
-            result[m * DIM_N + n] = 0;
-        }
     }
 
     for (int m = 0; m < DIM_M; m++) {
@@ -35,12 +32,11 @@ static void check_result()
     if (!is_master_core())
         return;
 
-    test_result = matrix_compare(result, expected_mat, DIM_M, DIM_N);
+    test_result = matrix_compare(src, expected_mat, DIM_M, DIM_N);
     if (test_result)
         test_result = vector_compare((float *) perm, (float *) expected_perm, DIM_M);
 
-    matrix_print(src, DIM_M, DIM_N, "src");
-    matrix_print(result, DIM_M, DIM_N, "result");
+    matrix_print(src, DIM_M, DIM_N, "result");
     matrix_print(expected_mat, DIM_M, DIM_N, "expected mat");
     vector_print((float *)perm, DIM_M, "computed permutation");
     vector_print((float *)expected_perm, DIM_M, "expected permutation");
@@ -51,13 +47,15 @@ static void run_test()
 {
     volatile int m = DIM_M;
     volatile int n = DIM_N;
-    initialize_data();
-    barrier();
 
     INIT_STATS();
+    START_LOOP_STATS();
+    initialize_data();
+    barrier();
     START_STATS();
-    linalg_lu_decomp(src, result, perm, m, n);
+    linalg_lu_decomp(src, perm, m, n);
     STOP_STATS();
+    END_LOOP_STATS();
 
     barrier();
     check_result();
