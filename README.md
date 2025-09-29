@@ -66,7 +66,8 @@ $ make clean all run
 You can pass several flags to `make`:
 - `USE_CLUSTER=1` — Run the test on the Cluster. If not specified, the test runs on the Fabric Controller (default: `USE_CLUSTER` not set).
 - `NUM_CORES=8` — If `USE_CLUSTER` is set, specifies the number of cluster cores (default: `NUM_CORES=1`).
-- `STATS=1` — Enable collection of various statistics.
+- `STATS=1` — Enable collection and prints of various performance counters.
+- `ENABLE_LOGGING=1` - Enable logs
 - `PRINT_DATA=1` — Print input data, computed values, and reference values to stdout.
 
 ### Generating Input Data and Reference Values
