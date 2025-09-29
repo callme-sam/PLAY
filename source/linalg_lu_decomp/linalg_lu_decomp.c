@@ -113,7 +113,9 @@ int linalg_lu_decomp_parallel(float *mat, int *perm, const int dim_M, const int 
 
             pivot = mat[k * dim_N + k];
             if (pivot == 0) {
+#ifdef  ENABLE_LOGGING
                 printf("ERROR | Zero pivot found at position %d during LU decomposition - Matrix is singular\n", k);
+#endif  /* ENABLE_LOGGING */
                 return -1;
             } else {
                 p_inv = ONE_f / pivot;
@@ -195,7 +197,9 @@ int linalg_lu_decomp_serial(float *mat, int *perm, const int dim_M, const int di
         /* Gaussian Elimination */
         pivot = mat[k * dim_N + k];
         if (pivot == 0) {
+#ifdef  ENABLE_LOGGING
             printf("ERROR | Zero pivot found at position %d during LU decomposition - Matrix is singular\n", k);
+#endif  /* ENABLE_LOGGING */
             return -1;
         }
 

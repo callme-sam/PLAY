@@ -36,10 +36,13 @@ static void check_result()
     if (test_result)
         test_result = vector_compare((float *) perm, (float *) expected_perm, DIM_M);
 
+#ifdef  PRINT_DATA
     matrix_print(src, DIM_M, DIM_N, "result");
     matrix_print(expected_mat, DIM_M, DIM_N, "expected mat");
     vector_print((float *)perm, DIM_M, "computed permutation");
     vector_print((float *)expected_perm, DIM_M, "expected permutation");
+#endif  /* PRINT_DATA */
+
     printf("INFO | Test %s\n", test_result ? "SUCCESS" : "FAILED");
 }
 
@@ -80,14 +83,18 @@ static int run_test_on_cluster()
 
     ret = pi_cluster_open(&cluster_dev);
     if (ret) {
+#ifdef  ENABLE_LOGGING
         printf("ERROR | Unable to open cluster device\n");
+#endif  /* ENABLE_LOGGING */
         goto exit;
     }
 
     pi_cluster_task(&cl_task, cluster_entry, NULL);
     ret = pi_cluster_send_task_to_cl(&cluster_dev, &cl_task);
     if (ret) {
+#ifdef  ENABLE_LOGGING
         printf("ERROR | Unable to send task to cluster controller\n");
+#endif  /* ENABLE_LOGGING */
         goto exit;
     }
 
@@ -101,11 +108,16 @@ static int test_linalg_lu_decomp()
 {
     int ret;
 
+#ifdef  ENABLE_LOGGING
     printf("INFO | Running 'linalg_lu_decomp' test on PULP Cluster with %d cores\n", NUM_CORES);
+#endif  /* ENABLE_LOGGING */
 
     ret = run_test_on_cluster();
+
+#ifdef  ENABLE_LOGGING
     if (ret)
         printf("ERROR | Unable to run test on cluster\n");
+#endif  /* ENABLE_LOGGING */
 
     return ret;
 }
@@ -122,11 +134,16 @@ static int test_linalg_lu_decomp()
 {
     int ret;
 
+#ifdef  ENABLE_LOGGING
     printf("INFO | Running 'linalg_lu_decomp' test on Fabric Controller\n");
+#endif  /* ENABLE_LOGGING */
 
     ret = run_test_on_fabric();
+
+#ifdef  ENABLE_LOGGING
     if (ret)
         printf("ERROR | Unable to run test on FC\n");
+#endif  /* ENABLE_LOGGING */
 
     return ret;
 }
@@ -137,9 +154,16 @@ static void test_kickoff()
 {
     int ret;
 
+#ifdef  ENABLE_LOGGING
     printf("\n##################################### LINALG_LU_DECOMP TEST ####################################\n\n");
+#endif  /* ENABLE_LOGGING */
+
     ret = test_linalg_lu_decomp();
+
+#ifdef  ENABLE_LOGGING
     printf("\n##########################################################################################\n\n");
+#endif  /* ENABLE_LOGGING */
+
     pmsis_exit(ret);
 }
 

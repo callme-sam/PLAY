@@ -37,11 +37,14 @@ static void check_result()
 
     test_result = matrix_compare(result, expected, DIM_M, DIM_N);
 
+#ifdef  PRINT_DATA
     scalar_print(row_a, "row_a");
     scalar_print(row_b, "row_b");
     matrix_print(src, DIM_M, DIM_N, "src");
     matrix_print(result, DIM_M, DIM_N, "result");
     matrix_print(expected, DIM_M, DIM_N,  "expected");
+#endif  /* PRINT_DATA */
+
     printf("INFO | Test %s\n", test_result ? "SUCCESS" : "FAILED");
 }
 
@@ -82,14 +85,18 @@ static int run_test_on_cluster()
 
     ret = pi_cluster_open(&cluster_dev);
     if (ret) {
+#ifdef  ENABLE_LOGGING
         printf("ERROR | Unable to open cluster device\n");
+#endif  /* ENABLE_LOGGING */
         goto exit;
     }
 
     pi_cluster_task(&cl_task, cluster_entry, NULL);
     ret = pi_cluster_send_task_to_cl(&cluster_dev, &cl_task);
     if (ret) {
+#ifdef  ENABLE_LOGGING
         printf("ERROR | Unable to send task to cluster controller\n");
+#endif  /* ENABLE_LOGGING */
         goto exit;
     }
 
@@ -103,11 +110,16 @@ static int test_matrix_swap_rows()
 {
     int ret;
 
+#ifdef  ENABLE_LOGGING
     printf("INFO | Running 'matrix_swap_rows' test on PULP Cluster with %d cores\n", NUM_CORES);
+#endif  /* ENABLE_LOGGING */
 
     ret = run_test_on_cluster();
+
+#ifdef  ENABLE_LOGGING
     if (ret)
         printf("ERROR | Unable to run test on cluster\n");
+#endif  /* ENABLE_LOGGING */
 
     return ret;
 }
@@ -124,11 +136,16 @@ static int test_matrix_swap_rows()
 {
     int ret;
 
+#ifdef  ENABLE_LOGGING
     printf("INFO | Running 'matrix_swap_rows' test on Fabric Controller\n");
+#endif  /* ENABLE_LOGGING */
 
     ret = run_test_on_fabric();
+
+#ifdef  ENABLE_LOGGING
     if (ret)
         printf("ERROR | Unable to run test on FC\n");
+#endif  /* ENABLE_LOGGING */
 
     return ret;
 }
@@ -139,9 +156,16 @@ static void test_kickoff()
 {
     int ret;
 
+#ifdef  ENABLE_LOGGING
     printf("\n##################################### MATRIX_SWAP_ROWS TEST ####################################\n\n");
+#endif  /* ENABLE_LOGGING */
+
     ret = test_matrix_swap_rows();
+
+#ifdef  ENABLE_LOGGING
     printf("\n##########################################################################################\n\n");
+#endif  /* ENABLE_LOGGING */
+
     pmsis_exit(ret);
 }
 

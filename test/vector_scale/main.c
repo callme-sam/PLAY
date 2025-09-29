@@ -31,11 +31,13 @@ static void check_result()
         return;
 
     test_result = vector_compare(result, expected, LEN);
-
+#ifdef  PRINT_DATA
     scalar_print(val, "value");
     vector_print(src, LEN, "src");
     vector_print(result, LEN, "result");
     vector_print(expected, LEN, "expected");
+#endif  /* PRINT_DATA */
+
     printf("INFO | Test %s\n", test_result ? "SUCCESS" : "FAILED");
 }
 
@@ -75,14 +77,18 @@ static int run_test_on_cluster()
 
     ret = pi_cluster_open(&cluster_dev);
     if (ret) {
+#ifdef  ENABLE_LOGGING
         printf("ERROR | Unable to open cluster device\n");
+#endif  /* ENABLE_LOGGING */
         goto exit;
     }
 
     pi_cluster_task(&cl_task, cluster_entry, NULL);
     ret = pi_cluster_send_task_to_cl(&cluster_dev, &cl_task);
     if (ret) {
+#ifdef  ENABLE_LOGGING
         printf("ERROR | Unable to send task to cluster controller\n");
+#endif  /* ENABLE_LOGGING */
         goto exit;
     }
 
@@ -96,11 +102,16 @@ static int test_vector_scale()
 {
     int ret;
 
+#ifdef  ENABLE_LOGGING
     printf("INFO | Running 'vector_scale' test on PULP Cluster with %d cores\n", NUM_CORES);
+#endif  /* ENABLE_LOGGING */
 
     ret = run_test_on_cluster();
+
+#ifdef  ENABLE_LOGGING
     if (ret)
         printf("ERROR | Unable to run test on cluster\n");
+#endif  /* ENABLE_LOGGING */
 
     return ret;
 }
@@ -117,11 +128,16 @@ static int test_vector_scale()
 {
     int ret;
 
+#ifdef  ENABLE_LOGGING
     printf("INFO | Running 'vector_scale' test on Fabric Controller\n");
+#endif  /* ENABLE_LOGGING */
 
     ret = run_test_on_fabric();
+
+#ifdef  ENABLE_LOGGING
     if (ret)
         printf("ERROR | Unable to run test on FC\n");
+#endif  /* ENABLE_LOGGING */
 
     return ret;
 }
@@ -132,9 +148,16 @@ static void test_kickoff()
 {
     int ret;
 
+#ifdef  ENABLE_LOGGING
     printf("\n##################################### VECTOR_SCALE TEST ####################################\n\n");
+#endif  /* ENABLE_LOGGING */
+
     ret = test_vector_scale();
+
+#ifdef  ENABLE_LOGGING
     printf("\n##########################################################################################\n\n");
+#endif  /* ENABLE_LOGGING */
+
     pmsis_exit(ret);
 }
 

@@ -45,11 +45,14 @@ static void check_result()
 
     test_result = matrix_compare_abs(result, expected, DIM_M, DIM_N);
 
+#ifdef PRINT_DATA
     matrix_print(src, DIM_M, DIM_N, "mat");
     matrix_print(mat_V, DIM_N, DIM_N, "V");
     vector_print(vec_S, DIM_N, "S");
     matrix_print(result, DIM_M, DIM_N, "result");
     matrix_print(expected, DIM_M, DIM_N, "expected");
+#endif  /* PRINT_DATA */
+
     printf("INFO | Test %s\n", test_result ? "SUCCESS" : "FAILED");
 }
 
@@ -90,14 +93,18 @@ static int run_test_on_cluster()
 
     ret = pi_cluster_open(&cluster_dev);
     if (ret) {
+#ifdef  ENABLE_LOGGING
         printf("ERROR | Unable to open cluster device\n");
+#endif  /* ENABLE_LOGGING */
         goto exit;
     }
 
     pi_cluster_task(&cl_task, cluster_entry, NULL);
     ret = pi_cluster_send_task_to_cl(&cluster_dev, &cl_task);
     if (ret) {
+#ifdef  ENABLE_LOGGING
         printf("ERROR | Unable to send task to cluster controller\n");
+#endif  /* ENABLE_LOGGING */
         goto exit;
     }
 
@@ -111,11 +118,16 @@ static int test_linalg_svd_lsv()
 {
     int ret;
 
+#ifdef  ENABLE_LOGGING
     printf("INFO | Running 'linalg_svd_lsv' test on PULP Cluster with %d cores\n", NUM_CORES);
+#endif  /* ENABLE_LOGGING */
 
     ret = run_test_on_cluster();
+
+#ifdef  ENABLE_LOGGING
     if (ret)
         printf("ERROR | Unable to run test on cluster\n");
+#endif  /* ENABLE_LOGGING */
 
     return ret;
 }
@@ -132,11 +144,16 @@ static int test_linalg_svd_lsv()
 {
     int ret;
 
+#ifdef  ENABLE_LOGGING
     printf("INFO | Running 'linalg_svd_lsv' test on Fabric Controller\n");
+#endif  /* ENABLE_LOGGING */
 
     ret = run_test_on_fabric();
+
+#ifdef  ENABLE_LOGGING
     if (ret)
         printf("ERROR | Unable to run test on FC\n");
+#endif  /* ENABLE_LOGGING */
 
     return ret;
 }
@@ -147,9 +164,16 @@ static void test_kickoff()
 {
     int ret;
 
+#ifdef  ENABLE_LOGGING
     printf("\n##################################### LINALG_SVD_LSV TEST ####################################\n\n");
+#endif  /* ENABLE_LOGGING */
+
     ret = test_linalg_svd_lsv();
+
+#ifdef  ENABLE_LOGGING
     printf("\n##########################################################################################\n\n");
+#endif  /* ENABLE_LOGGING */
+
     pmsis_exit(ret);
 }
 
