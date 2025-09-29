@@ -33,17 +33,6 @@ bool is_master_core();
 bool scalar_compare(const float val_a, const float val_b);
 
 /**
- * @brief Prints a scalar float value to standard output
- *
- * @param[in] val The float scalar to print
- * @param[in] str Descriptive string to identify the scalar in output
- *
- * @note This function only produces output when PRINT_DATA macro is defined.
- * In other configurations, this function has no effect.
- */
-void scalar_print(const float val, const char *str);
-
-/**
  * @brief Compares two floating-point vectors with a tolerance check
  *
  * @param[in] vec_a Pointer to the first float vector
@@ -70,18 +59,6 @@ bool vector_compare(const float *vec_a, const float *vec_b, const int len);
  * @warning Both vectors must have at least 'len' elements allocated
  */
 bool vector_compare_abs(const float *vec_a, const float *vec_b, const int len);
-
-/**
- * @brief Prints a vector to standard output
- *
- * @param[in] vec Pointer to the float vector to print
- * @param[in] len Length of the vector
- * @param[in] str Descriptive string to identify the vector in output
- *
- * @note This function only produces output when PRINT_DATA macro is defined.
- * In other configurations, this function has no effect.
- */
-void vector_print(const float *vec, const int len, const char *str);
 
 /**
  * @brief Compares two floating-point matrices with a tollerance check
@@ -111,6 +88,31 @@ bool matrix_compare(const float *mat_a, const float *mat_b, const int rows, cons
  */
 bool matrix_compare_abs(const float *mat_a, const float *mat_b, const int rows, const int cols);
 
+#ifdef  PRINT_DATA
+
+/**
+ * @brief Prints a scalar float value to standard output
+ *
+ * @param[in] val The float scalar to print
+ * @param[in] str Descriptive string to identify the scalar in output
+ *
+ * @note This function only produces output when PRINT_DATA macro is defined.
+ * In other configurations, this function has no effect.
+ */
+void scalar_print(const float val, const char *str);
+
+/**
+ * @brief Prints a vector to standard output
+ *
+ * @param[in] vec Pointer to the float vector to print
+ * @param[in] len Length of the vector
+ * @param[in] str Descriptive string to identify the vector in output
+ *
+ * @note This function only produces output when PRINT_DATA macro is defined.
+ * In other configurations, this function has no effect.
+ */
+void vector_print(const float *vec, const int len, const char *str);
+
 /**
  * @brief Printa a matrix to standard output
  *
@@ -123,5 +125,7 @@ bool matrix_compare_abs(const float *mat_a, const float *mat_b, const int rows, 
  * In other configurations, this function has no effect.
  */
 void matrix_print(const float *mat, const int rows, const int cols, const char *str);
+
+#endif  /* PRINT_DATA */
 
 #endif  /* UTILS_H_ */

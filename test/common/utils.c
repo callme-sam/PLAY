@@ -27,13 +27,6 @@ bool scalar_compare(const float val_a, const float val_b)
     return true;
 }
 
-void scalar_print(const float val, const char *str)
-{
-#ifdef  PRINT_DATA
-    printf("Scalar %s\t= %.4f\n", str, val);
-#endif  /* PRINT_DATA */
-}
-
 bool vector_compare(const float *vec_a, const float *vec_b, const int len)
 {
     float abs_diff;
@@ -60,16 +53,6 @@ bool vector_compare_abs(const float *vec_a, const float *vec_b, const int len)
     }
 
     return true;
-}
-
-void vector_print(const float *vec, const int len, const char *str)
-{
-#ifdef  PRINT_DATA
-    printf("Vector %s\t= [ ", str);
-    for (int i = 0; i < (len - 1); i++)
-        printf("%.4f, ", vec[i]);
-    printf("%.4f ]\n", vec[len - 1]);
-#endif  /* PRINT_DATA */
 }
 
 bool matrix_compare(const float *mat_a, const float *mat_b, const int rows, const int cols)
@@ -104,9 +87,23 @@ bool matrix_compare_abs(const float *mat_a, const float *mat_b, const int rows, 
     return true;
 }
 
+#ifdef  PRINT_DATA
+
+void scalar_print(const float val, const char *str)
+{
+    printf("Scalar %s\t= %.4f\n", str, val);
+}
+
+void vector_print(const float *vec, const int len, const char *str)
+{
+    printf("Vector %s\t= [ ", str);
+    for (int i = 0; i < (len - 1); i++)
+        printf("%.4f, ", vec[i]);
+    printf("%.4f ]\n", vec[len - 1]);
+}
+
 void matrix_print(const float *mat, const int rows, const int cols, const char *str)
 {
-#ifdef  PRINT_DATA
     printf("Matrix %s:\n", str);
     printf("[\n");
     for (int r = 0; r < rows; r++) {
@@ -115,5 +112,6 @@ void matrix_print(const float *mat, const int rows, const int cols, const char *
         printf("%.4f;\n", mat[r * cols + (cols - 1)]);
     }
     printf("]\n");
-#endif  /* PRINT_DATA */
 }
+
+#endif  /* PRINT_DATA */
