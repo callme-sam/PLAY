@@ -1,6 +1,8 @@
 #ifndef STATS_H_
 #define STATS_H_
 
+#ifdef  STATS
+
 #include "pmsis.h"
 
 #define HOTTING     (2)
@@ -12,7 +14,6 @@ void print_stats(unsigned long _cycles, unsigned long _active, unsigned long _in
                 unsigned long _ld_ext, unsigned long _st_ext, unsigned long _ld_ext_cyc, unsigned long _st_ext_cyc,
                 unsigned long _tcdm_cont);
 
-#ifdef  STATS
 
 #define EVENTS_BASE (1<<PI_PERF_CYCLES)     | (1<<PI_PERF_ACTIVE_CYCLES)    | (1<<PI_PERF_INSTR)    |   \
                     (1<<PI_PERF_LD_STALL)   | (1<<PI_PERF_JR_STALL)         | (1<<PI_PERF_IMISS)    |   \

@@ -1,8 +1,11 @@
+#ifdef STATS
+
 #include "stats.h"
 
 #include "utils.h"
 
 #include <stdio.h>
+
 
 void print_stats(unsigned long _cycles, unsigned long _active, unsigned long _instr,
                 unsigned long _ldstall, unsigned long _jrstall, unsigned long _imiss,
@@ -38,3 +41,5 @@ void print_stats(unsigned long _cycles, unsigned long _active, unsigned long _in
     printf("[%d] TDCM contentions:\t\t%lu\n", id, _tcdm_cont/REPEAT);
     printf("[%d] IPC:\t\t\t%f\n", id, (float) _instr/_cycles);
 }
+
+#endif  /* STATS */
