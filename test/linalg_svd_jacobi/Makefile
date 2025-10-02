@@ -27,8 +27,8 @@ ifdef	ENABLE_LOGGING
 APP_CFLAGS += -DENABLE_LOGGING
 endif	# ENABLE_LOGGING
 
-APP_CFLAGS += -O3 -g -I$(INC_DIR) -I$(DATA_DIR) -I$(COMMON_DIR) -lm
-APP_LDFLAGS += -O3 -g -lm
+APP_CFLAGS += -O3 -g -I$(INC_DIR) -I$(DATA_DIR) -I$(COMMON_DIR) -fno-math-errno -lm
+APP_LDFLAGS += -O3 -g -fno-math-errno -lm
 
 
 include $(RULES_DIR)/pmsis_rules.mk

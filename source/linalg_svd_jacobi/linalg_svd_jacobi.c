@@ -93,11 +93,11 @@ int linalg_svd_jacobi_parallel( float *mat, float *mat_V, float *vec_S, const in
 
                 tau = (mat[j * dim_M + j] - mat[i * dim_M + i]) / (TWO_f * mat[i * dim_M + j]);
                 if (tau >= 0.0)
-                    t = ONE_f / (tau + sqrt(ONE_f + tau * tau));
+                    t = ONE_f / (tau + sqrtf(ONE_f + tau * tau));
                 else
-                    t = ONE_f / (tau - sqrt(ONE_f + tau * tau));
+                    t = ONE_f / (tau - sqrtf(ONE_f + tau * tau));
 
-                cos = ONE_f / sqrt(ONE_f + t * t);
+                cos = ONE_f / sqrtf(ONE_f + t * t);
                 sin = t * cos;
 
                 /* Update rows i and j of MAT */
@@ -182,7 +182,7 @@ int linalg_svd_jacobi_parallel( float *mat, float *mat_V, float *vec_S, const in
 
     for (int i = start; i < end; i++) {
         if (mat[i * dim_M + i] > 0)
-            vec_S[i] = sqrt(mat[i * dim_M + i]);
+            vec_S[i] = sqrtf(mat[i * dim_M + i]);
         else
             vec_S[i] = 0;
     }
@@ -225,11 +225,11 @@ int linalg_svd_jacobi_serial(float *mat, float *mat_V, float *vec_S, const int d
 
                 tau = (mat[j * dim_M + j] - mat[i * dim_M + i]) / (2.0 * mat[i * dim_M + j]);
                 if (tau >= 0.0)
-                    t = 1.0 / (tau + sqrt(1.0 + tau * tau));
+                    t = 1.0 / (tau + sqrtf(1.0 + tau * tau));
                 else
-                    t = 1.0 / (tau - sqrt(1.0 + tau * tau));
+                    t = 1.0 / (tau - sqrtf(1.0 + tau * tau));
 
-                cos = 1.0 / sqrt(1.0 + t * t);
+                cos = 1.0 / sqrtf(1.0 + t * t);
                 sin = t * cos;
 
                 /* Update rows i and j of MAT */
@@ -277,10 +277,10 @@ int linalg_svd_jacobi_serial(float *mat, float *mat_V, float *vec_S, const int d
             break;
     }
 
-    /* Extract singular values as sqrt of diag(MAT) */
+    /* Extract singular values as sqrtf of diag(MAT) */
     for (int i = 0; i < dim_M; i++) {
         if (mat[i * dim_M + i] > 0.0)
-            vec_S[i] = sqrt(mat[i * dim_M + i]);
+            vec_S[i] = sqrtf(mat[i * dim_M + i]);
         else
             vec_S[i] = 0.0;
     }
