@@ -91,6 +91,7 @@ def generate_markdown_report(results_dir):
     print("\n--- Generating Markdown Report ---")
 
     dimensions = {
+        'linalg_cholesky_decomp': '64x64',
         'linalg_gemv': '64x32',
         'linalg_gemv_trans': '64x32',
         'linalg_lu_decomp': '64x32',
