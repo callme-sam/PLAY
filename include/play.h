@@ -409,4 +409,19 @@ int linalg_svd_lsv(const float *src, float *mat_V, float *vec_S, float *dst, con
  */
 int linalg_svd(const float *src, float *dst, float *mat_V, float *vec_S, const int dim_M, const int dim_N);
 
+/**
+ * @brief Computes the Cholesky Decomposition of a symmetric positive definite matrix
+ *
+ * Decomposes a square, symmetric, and positive definite input matrix `src` (A)
+ * into a lower triangular matrix `dst` (L).
+ * The decomposition follows the formula: A = L Lᵀ.
+ *
+ * @param[in] src Input matrix A (dim x dim). Must be symmetric and positive definite.
+ * @param[out] dst Output matrix for the lower triangular Cholesky factor L (dim x dim).
+ * @param[in] dim The dimension (N) of the square input and output matrices.
+ *
+ * @return int Returns 0 on success. A non-zero value indicates an error.
+ */
+int linalg_cholesky_decomp(const float *src, float *dst, const int dim);
+
 #endif  /* PLAY_H_ */
