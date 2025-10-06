@@ -1,19 +1,63 @@
+import argparse
 import subprocess
 import re
 import csv
 import os
 import sys
 
-# Determine key paths based on the script's location
-script_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.abspath(os.path.join(script_dir, "../../"))
-test_root = os.path.join(project_root, "test")
-results_dir = os.path.join(script_dir, "results")
+from types import SimpleNamespace
 
-# Ensure the results directory exists
-os.makedirs(results_dir, exist_ok=True)
+def parse_args():
+    """
+    Parses command-line arguments.
 
-def parse_and_save_stats(test_dir_name, num_cores, output):
+    Supports the "--platform" argument, which accepts "gvsoc" or "rtl" values.
+
+    Returns:
+        argparse.Namespace: An object containing the parsed arguments.
+    """
+    parser = argparse.ArgumentParser(
+        description="Script for running tests on different platforms."
+    )
+
+    # Add the --platform argument
+    parser.add_argument(
+        "--platform",
+        type=str,
+        choices=["gvsoc", "rtl"],
+        required=False,
+        default="gvsoc",
+        help="Specifies the execution platform. Allowed values: 'gvsoc' or 'rtl'. Default is 'gvsoc'."
+    )
+
+    args = parser.parse_args()
+    platform = args.platform
+    return args
+
+def set_paths(args):
+    paths = SimpleNamespace()
+
+    paths.script_dir = os.path.dirname(os.path.abspath(__file__))
+    paths.project_root = os.path.abspath(os.path.join(paths.script_dir, "../../"))
+    paths.test_root = os.path.join(paths.project_root, "test")
+    paths.results_dir = os.path.join(paths.script_dir, f"{args.platform}/results")
+
+    # Ensure the results directory exists
+    os.makedirs(paths.results_dir, exist_ok=True)
+
+    return paths
+
+def set_test_dirs(paths):
+    test_directories = [
+        d for d in os.listdir(paths.test_root)
+        if os.path.isdir(os.path.join(paths.test_root, d))
+        and d not in ["common", "runner", "hello"]
+    ]
+    test_directories.sort()
+    return test_directories
+
+
+def parse_and_save_stats(paths, test_dir_name, num_cores, output):
     """
     Parses the raw terminal output, extracts statistics, and saves them to a CSV file.
     """
@@ -47,7 +91,7 @@ def parse_and_save_stats(test_dir_name, num_cores, output):
     fieldnames.insert(0, 'id')
 
     # 6. Write the data to the CSV file
-    csv_filename = os.path.join(results_dir, f"{test_dir_name}_CL_{num_cores}.csv")
+    csv_filename = os.path.join(paths.results_dir, f"{test_dir_name}_CL_{num_cores}.csv")
 
     with open(csv_filename, 'w', newline='') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, lineterminator='\n')
@@ -62,20 +106,36 @@ def parse_and_save_stats(test_dir_name, num_cores, output):
     print(f"Statistics data saved to {csv_filename}")
     return True
 
-def run_test_case(test_dir_name, num_cores):
+def run_test_case(args, paths, test_dir_name, num_cores):
     """
     Executes the 'make' command to run test.
     """
-    current_test_dir = os.path.join(test_root, test_dir_name)
+    current_test_dir = os.path.join(paths.test_root, test_dir_name)
 
-    make_command = f"make clean all run STATS=1 USE_CLUSTER=1 NUM_CORES={num_cores}"
+    make_command = f"make clean all run STATS=1 USE_CLUSTER=1 NUM_CORES={num_cores} platform={args.platform}"
 
     print(f"\n--- Running {test_dir_name} with {num_cores} cores ---")
     print(f"Command: cd {current_test_dir} && {make_command}")
 
     try:
-        result = subprocess.run(make_command, shell=True, capture_output=True, text=True, check=True, cwd=current_test_dir)
-        parse_and_save_stats(test_dir_name, num_cores, result.stdout)
+        proc = subprocess.Popen(
+        make_command,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True,
+        cwd=current_test_dir
+    )
+
+        output_lines = []
+        for line in proc.stdout:
+            print(line, end='')       # stampa su terminale in tempo reale
+            output_lines.append(line) # cattura in Python
+
+        proc.wait()  # aspetta che il processo termini
+        result_stdout = ''.join(output_lines)
+
+        parse_and_save_stats(paths, test_dir_name, num_cores, result_stdout)
     except subprocess.CalledProcessError as e:
         print(f"Error during compilation or execution for {test_dir_name} (cores={num_cores}):")
         print(f"STDOUT:\n{e.stdout}")
@@ -198,7 +258,7 @@ def generate_markdown_report(results_dir):
         markdown_content.append("") # Empty line to separate tables
 
     # Save to file
-    markdown_filename = os.path.join(script_dir, "benchmarks.md")
+    markdown_filename = os.path.join(paths.results_dir, "benchmarks.md")
     with open(markdown_filename, 'w') as mdfile:
         mdfile.write("\n".join(markdown_content))
 
@@ -206,19 +266,16 @@ def generate_markdown_report(results_dir):
 
 def main():
 
-    test_directories = [
-        d for d in os.listdir(test_root)
-        if os.path.isdir(os.path.join(test_root, d))
-        and d not in ["common", "runner", "hello"]
-    ]
-    test_directories.sort()
+    args = parse_args()
+    paths = set_paths(args)
+    test_dirs = set_test_dirs(paths)
 
-    for test_dir_name in test_directories:
-        run_test_case(test_dir_name, 1)
-        run_test_case(test_dir_name, 8)
+    for test_dir_name in test_dirs:
+        run_test_case(args, paths, test_dir_name, 1)
+        run_test_case(args, paths, test_dir_name, 8)
 
     # Generate the Markdown report after all tests have been executed
-    generate_markdown_report(results_dir)
+    generate_markdown_report(paths.resuls_dir)
 
     print("\nAll tests and the report generation have been completed.")
 
