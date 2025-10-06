@@ -81,7 +81,19 @@ $ python3 generator.py <LEN>
 
 ### Benchmarks
 
-The `runner.py` script, located in the `test/runner` directory, automates the execution of all test cases within the main `test` folder. For each test, it performs two separate runs: one utilizing a single core on the cluster and a second using eight cores. The results of each run are saved as a `.csv` file in the `test/runner/results` directory. Upon completion of all tests, the script processes these data files to generate the [benchmarks.md](test/runner/benchmarks.md) file, presenting the performance statistics in a comparative table format.
+The **`test_runner.py`** script, located in the `test/runner` directory, automates the execution of all test cases within the main `test` folder.
+
+The script accepts an **optional parameter `--platform`**, which can take the values **`"gvsoc"`** (default value) or **`"rtl"`** to specify the simulation platform.
+
+For each test, the script performs two separate runs: one utilizing a single core on the cluster and a second using eight cores. The results of each run are saved as **`.csv`** files within the platform-specific directory:
+
+* `test/runner/gvsoc/results/` (if `--platform gvsoc` is selected or is the default)
+* `test/runner/rtl/results/` (if `--platform rtl` is selected)
+
+Upon completion of all tests, the script processes these data files to generate the **`benchmarks.md`** file, presenting the performance statistics in a comparative table format. This file is saved in the specific platform root directory:
+
+* `test/runner/gvsoc/benchmarks.md`
+* `test/runner/rtl/benchmarks.md`
 
 
 ## Roadmap
