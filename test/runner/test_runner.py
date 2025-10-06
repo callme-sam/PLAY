@@ -40,7 +40,8 @@ def set_paths(args):
     paths.script_dir = os.path.dirname(os.path.abspath(__file__))
     paths.project_root = os.path.abspath(os.path.join(paths.script_dir, "../../"))
     paths.test_root = os.path.join(paths.project_root, "test")
-    paths.results_dir = os.path.join(paths.script_dir, f"{args.platform}/results")
+    paths.platform_dir = os.path.join(paths.script_dir, f"{args.platform}")
+    paths.results_dir = os.path.join(paths.platform_dir, "results")
 
     # Ensure the results directory exists
     os.makedirs(paths.results_dir, exist_ok=True)
@@ -144,7 +145,7 @@ def run_test_case(args, paths, test_dir_name, num_cores):
         print(f"An unexpected error occurred: {e}")
 
 
-def generate_markdown_report(results_dir):
+def generate_markdown_report(platform_dir, results_dir):
     """
     Reads CSV files and generates a Markdown file with a separate table for each kernel.
     """
@@ -258,7 +259,7 @@ def generate_markdown_report(results_dir):
         markdown_content.append("") # Empty line to separate tables
 
     # Save to file
-    markdown_filename = os.path.join(results_dir, "benchmarks.md")
+    markdown_filename = os.path.join(platform_dir, "benchmarks.md")
     with open(markdown_filename, 'w') as mdfile:
         mdfile.write("\n".join(markdown_content))
 
@@ -275,7 +276,7 @@ def main():
         run_test_case(args, paths, test_dir_name, 8)
 
     # Generate the Markdown report after all tests have been executed
-    generate_markdown_report(paths.results_dir)
+    generate_markdown_report(paths.platform_dir, paths.results_dir)
 
     print("\nAll tests and the report generation have been completed.")
 
