@@ -275,7 +275,7 @@ def main():
         run_test_case(args, paths, test_dir_name, 8)
 
     # Generate the Markdown report after all tests have been executed
-    generate_markdown_report(paths.resuls_dir)
+    generate_markdown_report(paths.results_dir)
 
     print("\nAll tests and the report generation have been completed.")
 
