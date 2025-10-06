@@ -258,7 +258,7 @@ def generate_markdown_report(results_dir):
         markdown_content.append("") # Empty line to separate tables
 
     # Save to file
-    markdown_filename = os.path.join(paths.results_dir, "benchmarks.md")
+    markdown_filename = os.path.join(results_dir, "benchmarks.md")
     with open(markdown_filename, 'w') as mdfile:
         mdfile.write("\n".join(markdown_content))
 
