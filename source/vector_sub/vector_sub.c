@@ -60,10 +60,9 @@ static int vector_sub_vectorial(const float *src_a, const float *src_b, float *d
         // Decrease the remaining count.
         remaining -= vl;
     }
-
 }
 
-#elif CLUSTER
+#elif CLUSTER   /* SPATZ */
 
 static int vector_sub_parallel(const float *src_a, const float *src_b, float *dst, const int len)
 {

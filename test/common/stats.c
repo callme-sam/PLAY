@@ -6,6 +6,24 @@
 
 #include <stdio.h>
 
+#ifdef  SPATZ
+
+#include "printf.h"
+
+void print_stats(unsigned long _cycles)
+{
+    int id;
+
+    id = snrt_cluster_core_idx();
+    if (id == 0)
+        printf("INFO | Printing statistics:\n");
+
+    barrier();
+
+    printf("[%d] cycles:\t%lu\n", id, _cycles);
+}
+
+#else   /* SPATZ */
 
 void print_stats(unsigned long _cycles, unsigned long _active, unsigned long _instr,
                 unsigned long _ldstall, unsigned long _jrstall, unsigned long _imiss,
@@ -41,5 +59,7 @@ void print_stats(unsigned long _cycles, unsigned long _active, unsigned long _in
     printf("[%d] TDCM contentions:\t\t%lu\n", id, _tcdm_cont/REPEAT);
     printf("[%d] IPC:\t\t\t%f\n", id, (float) _instr/_cycles);
 }
+
+#endif  /* SPATZ */
 
 #endif  /* STATS */

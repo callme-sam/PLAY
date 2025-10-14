@@ -2,18 +2,44 @@
 
 #include <math.h>
 
+#ifdef  SPATZ
+#include "snrt.h"
+#include "printf.h"
+#else
 #include "pmsis.h"
+#endif
+
+void *my_alloc(const int bytes)
+{
+#ifdef  SPATZ
+    return snrt_l1alloc(bytes);
+#else   /* SPATZ */
+#ifdef  CLUSTER
+    return pi_cl_l1_malloc((void *) 0, bytes);
+#else   /* CLUSTER */
+    return pi_fc_l1_malloc(bytes);
+#endif  /* CLUTER */
+#endif  /* SPATZ */
+}
 
 void barrier()
 {
+#ifdef  SPATZ
+    snrt_cluster_hw_barrier();
+#else   /* SPATZ */
 #if NUM_CORES > 1
     pi_cl_team_barrier();
-#endif
+#endif  /* NUM_CORES */
+#endif  /* SPATZ */
 }
 
 bool is_master_core()
 {
+#ifdef  SPATZ
+    return snrt_cluster_core_idx() == 0;
+#else   /* SPATZ */
     return pi_core_id() == 0;
+#endif  /* SPATZ */
 }
 
 bool scalar_compare(const float val_a, const float val_b)
@@ -115,3 +141,12 @@ void matrix_print(const float *mat, const int rows, const int cols, const char *
 }
 
 #endif  /* PRINT_DATA */
+
+#ifdef  SPATZ
+
+unsigned long get_cycle()
+{
+    return read_csr(mcycle);
+}
+
+#endif  /* SPATZ */

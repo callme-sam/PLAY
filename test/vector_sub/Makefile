@@ -4,7 +4,19 @@ DATA_DIR = test_data/
 COMMON_DIR = ../common
 
 APP = vector-sub-test
-APP_SRCS := main.c $(wildcard $(SRC_DIR)/*.c)
+APP_SRCS := main.c $(wildcard $(SRC_DIR)/*.c) $(wildcard $(COMMON_DIR)/*.c)
+
+ifdef PRINT_DATA
+APP_CFLAGS += -DPRINT_DATA
+endif	# PRINT_DATA
+
+ifdef STATS
+APP_CFLAGS += -DSTATS
+endif	#STATS
+
+ifdef ENABLE_LOGGING
+APP_CFLAGS += -DENABLE_LOGGING
+endif # ENABLE_LOGGING
 
 ############################################################################################
 ifeq ($(TARGET), SPATZ)
@@ -32,6 +44,7 @@ SPATZ_BUILD_DIR := BUILD/spatz
 empty :=
 space := $(empty) $(empty)
 CMAKE_APP_SRCS := $(subst $(space),;,$(strip $(APP_SRCS)))
+CMAKE_APP_CFLAGS := $(subst $(space),;,$(strip $(APP_CFLAGS)))
 $(info $(CMAKE_APP_SRCS))
 
 CMAKE_CONFIG_COMMAND := $(CMAKE_COMMAND) \
@@ -41,6 +54,7 @@ CMAKE_CONFIG_COMMAND := $(CMAKE_COMMAND) \
 	-DAPP=$(APP) \
 	-DSPATZ_SW_DIR=$(SPATZ_SW_DIR) 	\
 	-DPRJ_SRCS="$(CMAKE_APP_SRCS)" \
+	-DAPP_CFLAGS="$(CMAKE_APP_CFLAGS)" \
 	-DPYTHON=python3 \
 	-DBUILD_TESTS=ON \
 	-DSPATZ_CLUSTER_CFG=spatz_cluster.default.dram.hjson \
@@ -76,8 +90,6 @@ run: build
 ############################################################################################
 else	# PLATFORM CLUSTER / FABRIC CONTROLLER
 
-APP_SRCS += $(wildcard $(COMMON_DIR)/*.c)
-
 ifdef USE_CLUSTER
 $(info TARGET IS CLUSTER)
 APP_CFLAGS += -DCLUSTER -DNUM_CLUSTER=$(USE_CLUSTER)
@@ -89,18 +101,6 @@ endif	# NUM_CORES
 else	# USE_CLUSTER
 $(info TARGET IS FABRIC CONTROLLER)
 endif	# USE_CLUSTER
-
-ifdef PRINT_DATA
-APP_CFLAGS += -DPRINT_DATA
-endif	# PRINT_DATA
-
-ifdef STATS
-APP_CFLAGS += -DSTATS
-endif	#STATS
-
-ifdef ENABLE_LOGGING
-APP_CFLAGS += -DENABLE_LOGGING
-endif # ENABLE_LOGGING
 
 APP_CFLAGS += -O3 -g -I$(INC_DIR) -I$(DATA_DIR) -I$(COMMON_DIR)
 APP_LDFLAGS += -O3 -g

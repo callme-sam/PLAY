@@ -3,10 +3,40 @@
 
 #ifdef  STATS
 
-#include "pmsis.h"
-
 #define HOTTING     (2)
 #define REPEAT      (5)
+
+#ifdef  SPATZ
+
+#include "snrt.h"
+
+void print_stats(unsigned long _cycles);
+
+#define INIT_STATS()                    \
+    unsigned long _start_cycles = 0;    \
+    unsigned long _end_cycles   = 0;    \
+    unsigned long _cycles   = 0;        \
+
+#define START_LOOP_STATS()                              \
+    for (int _k = 0; _k < (HOTTING + REPEAT); _k++) {   \
+
+#define START_STATS()                       \
+        _start_cycles = read_csr(mcycle);   \
+
+#define STOP_STATS()                        \
+        _end_cycles = read_csr(mcycle);     \
+
+#define END_LOOP_STATS()                            \
+        if (_k == HOTTING + REPEAT - 1) {           \
+            _cycles = _end_cycles - _start_cycles;  \
+            print_stats(_cycles);                   \
+        }                                           \
+    }                                               \
+
+#else   /* CLUSTER or FC */
+
+#include "pmsis.h"
+
 
 void print_stats(unsigned long _cycles, unsigned long _active, unsigned long _instr, unsigned long _ldstall,
                 unsigned long _jrstall, unsigned long _imiss, unsigned long _ld, unsigned long _st,
@@ -92,6 +122,7 @@ void print_stats(unsigned long _cycles, unsigned long _active, unsigned long _in
         }                                                           \
     }
 
+#endif  /* SPATZ */
 
 #else   /* STATS */
 

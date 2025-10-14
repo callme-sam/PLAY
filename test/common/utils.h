@@ -6,6 +6,19 @@
 #define TOLL 0.004f
 
 /**
+ * @brief Allocates a memory buffer in L1 memory and returns its address.
+ *
+ * @param bytes Size of the memory region to allocate, in bytes.
+ *
+ * @return A pointer to the beginning of the allocated memory region, or
+ *         `NULL` if the allocation fails.
+ *
+ * @note The caller is responsible for freeing the allocated memory using
+ *       the appropriate deallocation function.
+ */
+void *my_alloc(const int bytes);
+
+/**
  * @brief Synchronizes all cores in the cluster using a barrier
  *
  * @note This function only has effect when CLUSTER macro is defined.
@@ -127,5 +140,16 @@ void vector_print(const float *vec, const int len, const char *str);
 void matrix_print(const float *mat, const int rows, const int cols, const char *str);
 
 #endif  /* PRINT_DATA */
+
+#ifdef SPATZ
+
+/**
+ * @brief Returns the current CPU cycle count.
+ *
+ * @return The number of CPU cycles.
+ */
+unsigned long get_cycle();
+
+#endif  /* SPATZ */
 
 #endif  /* UTILS_H_ */
