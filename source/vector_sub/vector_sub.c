@@ -1,8 +1,69 @@
 #include "play.h"
 
+#ifdef SPATZ
+#include "debug.h"
+#include "snrt.h"
+#else
 #include "pmsis.h"
+#endif
 
-#ifdef CLUSTER
+#ifdef SPATZ
+
+static int vector_sub_vectorial(const float *src_a, const float *src_b, float *dst, const int len)
+{
+    int remaining = len;
+    size_t vl; // Actual number of elements processed in the current iteration
+
+    // Use mutable pointers for iteration
+    const float *a = src_a;
+    const float *b = src_b;
+    float *d = dst;
+
+    while (remaining > 0) {
+        // 1. Set Vector Length (vsetvli):
+        // Set 'vl' (Vector Length) to the minimum of 'remaining' and VLMAX.
+        // e32: 32-bit elements (float)
+        // m1: Vector register group multiplier
+        asm volatile (
+            "vsetvli %0, %1, e32, m1, ta, ma"
+            : "=r"(vl)          // %0: Output actual VL to C variable 'vl'
+            : "r"(remaining)    // %1: Input 'remaining' length
+        );
+
+        // 2. Vector Loads (vle32.v): Load vl elements from addresses a and b.
+        asm volatile (
+            "vle32.v v0, (%0)"
+            :: "r"(a)
+        );
+        asm volatile (
+            "vle32.v v1, (%0)"
+            :: "r"(b)
+        );
+
+        // 3. Vector Calculation (vfadd.vv): Floating-point addition: v2 = v0 + v1
+        // Note: 'vadd.vv' is for integer addition. 'vfadd.vv' is correct for floats.
+        asm volatile (
+            "vfsub.vv v2, v0, v1"
+        );
+
+        // 4. Vector Store (vse32.v): Store vl elements from v2 to address d.
+        asm volatile (
+            "vse32.v v2, (%0)"
+            :: "r"(d)
+        );
+
+        // 5. Update: Move pointers forward by the number of elements processed ('vl').
+        a += vl;
+        b += vl;
+        d += vl;
+
+        // Decrease the remaining count.
+        remaining -= vl;
+    }
+
+}
+
+#elif CLUSTER
 
 static int vector_sub_parallel(const float *src_a, const float *src_b, float *dst, const int len)
 {
@@ -55,7 +116,7 @@ static int vector_sub_parallel(const float *src_a, const float *src_b, float *ds
     return 0;
 }
 
-#else   /* CLUSTER */
+#else   /* SPATZ / CLUSTER */
 
 static int vector_sub_serial(const float *src_a, const float *src_b, float *dst, const int len)
 {
@@ -65,17 +126,19 @@ static int vector_sub_serial(const float *src_a, const float *src_b, float *dst,
     return 0;
 }
 
-#endif  /* CLUSTER */
+#endif  /* SPATZ / CLUSTER */
 
 __attribute__((noinline)) int vector_sub(const float *src_a, const float *src_b, float *dst, const int len)
 {
     int ret;
 
-#ifdef CLUSTER
+#ifdef  SPATZ
+    ret = vector_sub_vectorial(src_a, src_b, dst, len);
+#elif   CLUSTER
     ret = vector_sub_parallel(src_a, src_b, dst, len);
-#else   /* CLUSTER */
+#else   /* SPATZ / CLUSTER */
     ret = vector_sub_serial(src_a, src_b, dst, len);
-#endif  /* CLUSTER */
+#endif  /* SPATZ / CLUSTER */
 
     return ret;
 }

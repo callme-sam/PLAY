@@ -2,6 +2,74 @@
 
 #include "data.h"
 #include "play.h"
+
+#ifdef  SPATZ
+
+#include "snrt.h"
+#include "debug.h"
+
+float *src_a;
+float *src_b;
+float *result;
+
+static void init_data()
+{
+    int id;
+
+    id = snrt_cluster_core_idx();
+    if (id != 0)
+        return;
+
+    src_a = snrt_l1alloc(LEN * sizeof(float));
+    src_b = snrt_l1alloc(LEN * sizeof(float));
+    result = snrt_l1alloc(LEN * sizeof(float));
+
+    for (int i = 0; i < LEN; i++) {
+        src_a[i] = vec_a[i];
+        src_b[i] = vec_b[i];
+        result[i] = 0;
+    }
+}
+
+static void check_result()
+{
+    float tol = 0.004f;
+    bool test_result;
+    int id;
+
+    id = snrt_cluster_core_idx();
+    if (id != 0)
+        return;
+
+    test_result = true;
+    for (int i = 0; i < LEN; i++) {
+        float diff = fabs(result[i] - expected[i]);
+        if (diff > tol) {
+            test_result = false;
+            PRINTF("DIFF=%f\n", diff);
+        }
+    }
+
+    PRINTF("INFO | Test %s\n", test_result ? "SUCCESS" : "FAILED");
+}
+
+int main()
+{
+    PRINTF("\n##################################### VECTOR_SUB TEST ####################################\n\n");
+    volatile int len = LEN;
+
+    init_data();
+    snrt_cluster_hw_barrier();
+    vector_sub(src_a, src_b, result, len);
+    snrt_cluster_hw_barrier();
+    check_result();
+    snrt_cluster_hw_barrier();
+
+    PRINTF("\n##########################################################################################\n\n");
+}
+
+#else   /* SPATZ */
+
 #include "stats.h"
 #include "utils.h"
 
@@ -169,3 +237,5 @@ int main()
 {
     return pmsis_kickoff(test_kickoff);
 }
+
+#endif
