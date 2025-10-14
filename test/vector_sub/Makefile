@@ -4,15 +4,90 @@ DATA_DIR = test_data/
 COMMON_DIR = ../common
 
 APP = vector-sub-test
-APP_SRCS += main.c $(wildcard $(SRC_DIR)/*.c) $(wildcard $(COMMON_DIR)/*.c)
+APP_SRCS := main.c $(wildcard $(SRC_DIR)/*.c)
+
+############################################################################################
+ifeq ($(TARGET), SPATZ)
+$(info TARGET IS SPATZ)
+
+ifeq ($(GVSOC_PATH),)
+$(error GVSOC_PATH is not set)
+endif
+
+ifeq ($(LLVM_PATH),)
+$(error LLVM_PATH is not set)
+endif
+
+ifeq ($(GCC_PATH),)
+$(error GCC_PATH is not set)
+endif
+
+ifeq ($(SPATZ_SW_DIR),)
+$(error SPATZ_SW_PATH is not set)
+endif
+
+CMAKE_COMMAND := cmake
+MAKE_COMMAND := make
+SPATZ_BUILD_DIR := BUILD/spatz
+empty :=
+space := $(empty) $(empty)
+CMAKE_APP_SRCS := $(subst $(space),;,$(strip $(APP_SRCS)))
+$(info $(CMAKE_APP_SRCS))
+
+CMAKE_CONFIG_COMMAND := $(CMAKE_COMMAND) \
+	-S . -B $(SPATZ_BUILD_DIR) \
+	-DLLVM_PATH=$(LLVM_PATH) \
+	-DGCC_PATH=/$(GCC_PATH) \
+	-DAPP=$(APP) \
+	-DSPATZ_SW_DIR=$(SPATZ_SW_DIR) 	\
+	-DPRJ_SRCS="$(CMAKE_APP_SRCS)" \
+	-DPYTHON=python3 \
+	-DBUILD_TESTS=ON \
+	-DSPATZ_CLUSTER_CFG=spatz_cluster.default.dram.hjson \
+	-DMEM_DRAM_ORIGIN=2147483648 \
+	-DMEM_DRAM_SIZE=2147483648 \
+	-DSNRT_BASE_HARTID=0 \
+	-DSNRT_CLUSTER_CORE_NUM=2 \
+	-DSNRT_TCDM_START_ADDR=1048576 \
+	-DSNRT_CLUSTER_OFFSET=0 \
+	-DSNRT_TCDM_SIZE=131072 \
+	-DSNRT_NFPU_PER_CORE=4
+
+all: build
+
+$(SPATZ_BUILD_DIR):
+	mkdir -p $(SPATZ_BUILD_DIR)
+
+config: $(SPATZ_BUILD_DIR)
+	$(CMAKE_CONFIG_COMMAND)
+
+build: config
+	$(MAKE_COMMAND) -C $(SPATZ_BUILD_DIR)
+
+run: build
+	cd $(SPATZ_BUILD_DIR) && \
+	$(GVSOC_PATH) \
+	--target spatz \
+	--binary $(APP) \
+	run
+
+.PHONY: all config build run clean
+
+############################################################################################
+else	# PLATFORM CLUSTER / FABRIC CONTROLLER
+
+APP_SRCS += $(wildcard $(COMMON_DIR)/*.c)
 
 ifdef USE_CLUSTER
+$(info TARGET IS CLUSTER)
 APP_CFLAGS += -DCLUSTER -DNUM_CLUSTER=$(USE_CLUSTER)
 ifdef NUM_CORES
 APP_CFLAGS += -DNUM_CORES=$(NUM_CORES)
 else	# NUM_CORES
 APP_CFLAGS += -DNUM_CORES=1
 endif	# NUM_CORES
+else	# USE_CLUSTER
+$(info TARGET IS FABRIC CONTROLLER)
 endif	# USE_CLUSTER
 
 ifdef PRINT_DATA
@@ -33,7 +108,7 @@ APP_LDFLAGS += -O3 -g
 
 include $(RULES_DIR)/pmsis_rules.mk
 
-# Extend "clean" rule to cleanup also test objects
+endif	# PLATFORM
+
 clean::
-	@echo "RM  BUILD/PULP/source"
-	$(V)rm -rf BUILD/PULP/source
+	rm -rf BUILD
