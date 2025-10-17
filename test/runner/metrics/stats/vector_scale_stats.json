@@ -1,0 +1,15 @@
+{
+    "speedup": 6.69081081081081,
+    "single_core": {
+        "tot_num_inst": 6167,
+        "single_fp": 2048,
+        "double_fp": 0,
+        "cycles": 6189.0
+    },
+    "multi_core": {
+        "tot_num_inst": 6457,
+        "single_fp": 2048,
+        "double_fp": 0,
+        "cycles": 925.0
+    }
+}

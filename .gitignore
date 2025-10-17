@@ -2,6 +2,9 @@
 build/
 BUILD/
 
+# Trace files
+traces/
+
 # IDEs
 .vscode/
 *.code-workspace
