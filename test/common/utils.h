@@ -141,7 +141,7 @@ void matrix_print(const float *mat, const int rows, const int cols, const char *
 
 #endif  /* PRINT_DATA */
 
-#ifdef SPATZ
+#if TARGET_IS_SPATZ
 
 /**
  * @brief Returns the current CPU cycle count.
@@ -150,6 +150,6 @@ void matrix_print(const float *mat, const int rows, const int cols, const char *
  */
 unsigned long get_cycle();
 
-#endif  /* SPATZ */
+#endif  /* TARGET_IS_SPATZ */
 
 #endif  /* UTILS_H_ */

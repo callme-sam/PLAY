@@ -6,7 +6,7 @@
 #define HOTTING     (2)
 #define REPEAT      (5)
 
-#ifdef  SPATZ
+#if TARGET_IS_SPATZ
 
 #include "snrt.h"
 
@@ -33,7 +33,7 @@ void print_stats(unsigned long _cycles);
         }                                           \
     }                                               \
 
-#else   /* CLUSTER or FC */
+#elif TARGET_IS_PULP_OPEN
 
 #include "pmsis.h"
 
@@ -122,7 +122,7 @@ void print_stats(unsigned long _cycles, unsigned long _active, unsigned long _in
         }                                                           \
     }
 
-#endif  /* SPATZ */
+#endif  /* TARGET_IS_ */
 
 #else   /* STATS */
 

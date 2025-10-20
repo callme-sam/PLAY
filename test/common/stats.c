@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 
-#ifdef  SPATZ
+#if TARGET_IS_SPATZ
 
 #include "printf.h"
 
@@ -23,7 +23,7 @@ void print_stats(unsigned long _cycles)
     printf("[%d] cycles:\t%lu\n", id, _cycles);
 }
 
-#else   /* SPATZ */
+#elif TARGET_IS_PULP_OPEN
 
 void print_stats(unsigned long _cycles, unsigned long _active, unsigned long _instr,
                 unsigned long _ldstall, unsigned long _jrstall, unsigned long _imiss,
@@ -60,6 +60,6 @@ void print_stats(unsigned long _cycles, unsigned long _active, unsigned long _in
     printf("[%d] IPC:\t\t\t%f\n", id, (float) _instr/_cycles);
 }
 
-#endif  /* SPATZ */
+#endif  /* TARGET_IS_ */
 
 #endif  /* STATS */

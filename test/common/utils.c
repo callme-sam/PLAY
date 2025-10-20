@@ -2,44 +2,44 @@
 
 #include <math.h>
 
-#ifdef  SPATZ
+#ifdef TARGET_IS_SPATZ
 #include "snrt.h"
 #include "printf.h"
-#else
+#elif TARGET_IS_PULP_OPEN
 #include "pmsis.h"
-#endif
+#endif  /* TARGET_IS_ */
 
 void *my_alloc(const int bytes)
 {
-#ifdef  SPATZ
+#ifdef TARGET_IS_SPATZ
     return snrt_l1alloc(bytes);
-#else   /* SPATZ */
+#elif TARGET_IS_PULP_OPEN
 #ifdef  CLUSTER
     return pi_cl_l1_malloc((void *) 0, bytes);
 #else   /* CLUSTER */
     return pi_fc_l1_malloc(bytes);
 #endif  /* CLUTER */
-#endif  /* SPATZ */
+#endif  /* TARGET_IS_ */
 }
 
 void barrier()
 {
-#ifdef  SPATZ
+#ifdef TARGET_IS_SPATZ
     snrt_cluster_hw_barrier();
-#else   /* SPATZ */
+#elif TARGET_IS_PULP_OPEN
 #if NUM_CORES > 1
     pi_cl_team_barrier();
 #endif  /* NUM_CORES */
-#endif  /* SPATZ */
+#endif  /* TARGET_IS_ */
 }
 
 bool is_master_core()
 {
-#ifdef  SPATZ
+#ifdef TARGET_IS_SPATZ
     return snrt_cluster_core_idx() == 0;
-#else   /* SPATZ */
+#elif TARGET_IS_PULP_OPEN
     return pi_core_id() == 0;
-#endif  /* SPATZ */
+#endif  /* TARGET_IS_ */
 }
 
 bool scalar_compare(const float val_a, const float val_b)
@@ -142,11 +142,11 @@ void matrix_print(const float *mat, const int rows, const int cols, const char *
 
 #endif  /* PRINT_DATA */
 
-#ifdef  SPATZ
+#if TARGET_IS_SPATZ
 
 unsigned long get_cycle()
 {
     return read_csr(mcycle);
 }
 
-#endif  /* SPATZ */
+#endif  /* TARGET_IS_SPATZ */

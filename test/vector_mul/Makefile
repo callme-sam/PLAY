@@ -1,39 +1,44 @@
-SRC_DIR = ../../source/vector_mul/
-INC_DIR = ../../include/
-DATA_DIR = test_data/
-COMMON_DIR = ../common
+# -----------------------------------------------------------------------------
+# VARIABLEs
+# -----------------------------------------------------------------------------
+CURRENT_DIR := $(shell pwd)
 
-APP = vector-mul-test
-APP_SRCS += main.c $(wildcard $(SRC_DIR)/*.c) $(wildcard $(COMMON_DIR)/*.c)
+SRC_DIR_REL = ../../source/vector_mul/
+INC_DIR_REL = ../../include
+DATA_DIR_REL = test_data
+COMMON_DIR_REL = ../common
 
-ifdef USE_CLUSTER
-APP_CFLAGS += -DCLUSTER -DNUM_CLUSTER=$(USE_CLUSTER)
-ifdef NUM_CORES
-APP_CFLAGS += -DNUM_CORES=$(NUM_CORES)
-else	# NUM_CORES
-APP_CFLAGS += -DNUM_CORES=1
-endif	# NUM_CORES
-endif	# USE_CLUSTER
+SRC_DIR = $(abspath $(CURRENT_DIR)/$(SRC_DIR_REL))
+INC_DIR = $(abspath $(CURRENT_DIR)/$(INC_DIR_REL))
+DATA_DIR = $(abspath $(CURRENT_DIR)/$(DATA_DIR_REL))
+COMMON_DIR = $(abspath $(CURRENT_DIR)/$(COMMON_DIR_REL))
 
+APP = vector-mul-test_data
+APP_SRCS_REL = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/**/*.c) $(wildcard $(COMMON_DIR)/*.c)
+APP_SRCS := $(foreach file, $(APP_SRCS_REL), $(abspath $(file)))
+
+# -----------------------------------------------------------------------------
+# FLAGs
+# -----------------------------------------------------------------------------
 ifdef PRINT_DATA
 APP_CFLAGS += -DPRINT_DATA
-endif	# PRINT_DATA
+endif
 
 ifdef STATS
 APP_CFLAGS += -DSTATS
-endif	#STATS
+endif
 
-ifdef	ENABLE_LOGGING
+ifdef ENABLE_LOGGING
 APP_CFLAGS += -DENABLE_LOGGING
-endif	# ENABLE_LOGGING
+endif
 
-APP_CFLAGS += -O3 -g -I$(INC_DIR) -I$(DATA_DIR) -I$(COMMON_DIR)
-APP_LDFLAGS += -O3 -g
-
-
-include $(RULES_DIR)/pmsis_rules.mk
-
-# Extend "clean" rule to cleanup also test objects
-clean::
-	@echo "RM  BUILD/PULP/source"
-	$(V)rm -rf BUILD/PULP/source
+# -----------------------------------------------------------------------------
+# TARGETs
+# -----------------------------------------------------------------------------
+ifeq ($(TARGET), PULP_OPEN)
+include pulp-open/Makefile
+else ifeq ($(TARGET), SPATZ)
+include spatz/Makefile
+else
+$(error Invalid TARGET: $(TARGET))
+endif
