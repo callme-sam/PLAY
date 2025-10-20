@@ -42,13 +42,13 @@ def generate_header_file(length, vec_a, vec_b, expected, filename="data.h"):
 
         f.write(f"#define LEN {length}\n\n")
 
-        f.write("#ifdef SPATZ\n\n")
+        f.write("#if TARGET_IS_SPATZ\n\n")
 
         f.write(f"float vec_a[] = {format_array(vec_a)};\n")
         f.write(f"float vec_b[] = {format_array(vec_b)};\n")
         f.write(f"float expected[] = {format_array(expected)};\n\n")
 
-        f.write("#else  /* SPATZ */\n\n")
+        f.write("#elif TARGET_IS_PULP_OPEN\n\n")
 
         f.write('#include "pmsis.h"\n\n')
 
@@ -56,7 +56,7 @@ def generate_header_file(length, vec_a, vec_b, expected, filename="data.h"):
         f.write(f"PI_L2 float vec_b[] = {format_array(vec_b)};\n")
         f.write(f"PI_L2 float expected[] = {format_array(expected)};\n\n")
 
-        f.write("#endif /* SPATZ */\n\n")
+        f.write("#endif /* TARGET_IS_ */\n\n")
 
         f.write("#endif  /* DATA_H_ */\n")
 

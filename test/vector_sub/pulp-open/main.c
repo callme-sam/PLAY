@@ -5,17 +5,23 @@
 #include "stats.h"
 #include "utils.h"
 
-#ifdef  SPATZ
-#include "snrt.h"
-#include "printf.h"
-#define PI_L1   /* mock */
-#else   /* SPATZ */
 #include "pmsis.h"
-#endif
 
-PI_L1 float *src_a;
-PI_L1 float *src_b;
-PI_L1 float *result;
+PI_L1 float src_a[LEN] __attribute__((aligned(4)));
+PI_L1 float src_b[LEN] __attribute__((aligned(4)));
+PI_L1 float result[LEN] __attribute__((aligned(4)));
+
+static void initialize_vectors()
+{
+    if (!is_master_core())
+        return;
+
+    for (int i = 0; i < LEN; i++) {
+        src_a[i] = vec_a[i];
+        src_b[i] = vec_b[i];
+        result[i] = 0;
+    }
+}
 
 static void check_result()
 {
@@ -25,6 +31,7 @@ static void check_result()
         return;
 
     test_result = vector_compare(result, expected, LEN);
+
 #ifdef  PRINT_DATA
     vector_print(src_a, LEN, "src_a");
     vector_print(src_b, LEN, "src_b");
@@ -35,54 +42,10 @@ static void check_result()
     printf("INFO | Test %s\n", test_result ? "SUCCESS" : "FAILED");
 }
 
-static void initialize_vectors()
-{
-    if (!is_master_core())
-        return;
-
-    src_a = my_alloc(LEN * sizeof(float));
-    src_b = my_alloc(LEN * sizeof(float));
-    result = my_alloc(LEN * sizeof(float));
-
-    for (int i = 0; i < LEN; i++) {
-        src_a[i] = vec_a[i];
-        src_b[i] = vec_b[i];
-        result[i] = 0;
-    }
-}
-
-#ifdef  SPATZ
-
-int main()
-{
-#ifdef  ENABLE_LOGGING
-    if (is_master_core()) printf("\n##################################### VECTOR_SUB TEST ####################################\n\n");
-#endif  /* ENABLE_LOGGING */
-
-    volatile int len = LEN;
-    initialize_vectors();
-    barrier();
-
-    INIT_STATS();
-    START_LOOP_STATS();
-    START_STATS();
-    vector_sub(src_a, src_b, result, len);
-    STOP_STATS();
-    END_LOOP_STATS();
-
-    barrier();
-    check_result();
-
-#ifdef  ENABLE_LOGGING
-    if (is_master_core()) printf("\n##########################################################################################\n\n");
-#endif  /* ENABLE_LOGGING */
-}
-
-#else   /* SPATZ */
-
 static void run_test()
 {
     volatile int len = LEN;
+
     initialize_vectors();
     barrier();
 
@@ -188,7 +151,7 @@ static void test_kickoff()
     int ret;
 
 #ifdef  ENABLE_LOGGING
-    printf("\n##################################### VECTOR_SUB TEST ####################################\n\n");
+    printf("\n##################################### VECTOR_MUL TEST ####################################\n\n");
 #endif  /* ENABLE_LOGGING */
 
     ret = test_vector_sub();
@@ -204,5 +167,3 @@ int main()
 {
     return pmsis_kickoff(test_kickoff);
 }
-
-#endif  /* SPATZ */
