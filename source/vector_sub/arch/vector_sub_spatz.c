@@ -40,7 +40,7 @@ int vector_sub_spatz(const float *src_a, const float *src_b, float *dst, const i
         asm volatile ("vle32.v v0, (%0)" :: "r"(a));
         asm volatile ("vle32.v v1, (%0)" :: "r"(b));
 
-        asm volatile("vsub.vv v2, v0, v1");
+        asm volatile("vfsub.vv v2, v0, v1");
 
         asm volatile("vse32.v v2, (%0)" :: "r"(d));
 
