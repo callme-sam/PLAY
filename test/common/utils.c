@@ -25,7 +25,9 @@ void *my_alloc(const int bytes)
 void barrier()
 {
 #ifdef TARGET_IS_SPATZ
+#if NUM_CC > 1
     snrt_cluster_hw_barrier();
+#endif  /* NUM_CC */
 #elif TARGET_IS_PULP_OPEN
 #if NUM_CORES > 1
     pi_cl_team_barrier();
