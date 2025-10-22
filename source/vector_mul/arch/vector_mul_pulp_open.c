@@ -1,6 +1,6 @@
 #if TARGET_IS_PULP_OPEN
 
-#include "../arch_interface.h"
+#include "arch_interface.h"
 #include "play.h"
 
 #include "pmsis.h"

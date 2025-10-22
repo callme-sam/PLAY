@@ -1,4 +1,4 @@
-#include "arch_interface.h"
+#include "arch/arch_interface.h"
 #include "play.h"
 
 __attribute__((noinline)) int vector_sub(const float *src_a, const float *src_b, float *dst, const int len)

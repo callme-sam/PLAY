@@ -1,6 +1,6 @@
 #if TARGET_IS_SPATZ
 
-#include "../arch_interface.h"
+#include "arch_interface.h"
 #include "play.h"
 
 #include "snrt.h"
