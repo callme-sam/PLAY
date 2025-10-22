@@ -20,7 +20,13 @@ void print_stats(unsigned long _cycles)
 
     barrier();
 
-    printf("[%d] cycles:\t%lu\n", id, _cycles);
+    for (int i = 0; i < NUM_CC; i++) {
+        if (id == i) {
+            printf("[%d] cycles:\t%lu\n", id, _cycles);
+        }
+        barrier();
+    }
+
 }
 
 #elif TARGET_IS_PULP_OPEN
