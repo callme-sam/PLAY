@@ -1,6 +1,5 @@
-#if TARGET_IS_PULP_OPEN
 
-#include "arch_interface.h"
+#include "internal/arch_interface.h"
 #include "play.h"
 
 #include "pmsis.h"
@@ -72,15 +71,19 @@ static int vector_sub_serial(const float *src_a, const float *src_b, float *dst,
 
 int vector_sub_pulp_open(const float *src_a, const float *src_b, float *dst, const int len)
 {
-        int ret;
+    int ret;
 
-#if     CLUSTER
+#if CLUSTER
     ret = vector_sub_parallel(src_a, src_b, dst, len);
-#else   /* CLUSTER */
+#else
     ret = vector_sub_serial(src_a, src_b, dst, len);
-#endif  /* CLUSTER */
+#endif
 
     return ret;
 }
 
-#endif  /* TARGET_IS_PULP_OPEN */
+/* Public unified implementation symbol used by the dispatcher. */
+int vector_sub_impl(const float *src_a, const float *src_b, float *dst, const int len)
+{
+    return vector_sub_pulp_open(src_a, src_b, dst, len);
+}

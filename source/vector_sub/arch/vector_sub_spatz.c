@@ -1,6 +1,4 @@
-#if TARGET_IS_SPATZ
-
-#include "arch_interface.h"
+#include "internal/arch_interface.h"
 #include "play.h"
 
 #include "snrt.h"
@@ -53,8 +51,12 @@ int vector_sub_spatz(const float *src_a, const float *src_b, float *dst, const i
     snrt_cluster_hw_barrier();
 #endif
 
-return 0;
+    return 0;
 
 }
 
-#endif  /* TARGET_IS_SPATZ */
+/* Public unified implementation symbol used by the dispatcher. */
+int vector_sub_impl(const float *src_a, const float *src_b, float *dst, const int len)
+{
+    return vector_sub_spatz(src_a, src_b, dst, len);
+}

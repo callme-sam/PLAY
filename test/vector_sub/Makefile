@@ -14,8 +14,16 @@ DATA_DIR = $(abspath $(CURRENT_DIR)/$(DATA_DIR_REL))
 COMMON_DIR = $(abspath $(CURRENT_DIR)/$(COMMON_DIR_REL))
 
 APP = vector-sub-test_data
-APP_SRCS_REL = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/**/*.c) $(wildcard $(COMMON_DIR)/*.c)
+include ../common/arch_select.mk
+
+# Collect only top-level SRC_DIR .c files (exclude arch/ subdir explicitly)
+SRC_SRCS := $(wildcard $(SRC_DIR)/*.c)
+SRC_SRCS := $(filter-out $(SRC_DIR)/arch/%,$(SRC_SRCS))
+APP_SRCS_REL := $(SRC_SRCS) $(wildcard $(COMMON_DIR)/*.c)
 APP_SRCS := $(foreach file, $(APP_SRCS_REL), $(abspath $(file)))
+
+# Append the appropriate arch implementation
+$(call add_arch_impl,vector_sub)
 
 # -----------------------------------------------------------------------------
 # FLAGs
