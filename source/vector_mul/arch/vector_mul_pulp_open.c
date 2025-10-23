@@ -5,7 +5,7 @@
 
 #if CLUSTER
 
-static int vector_mul_parallel(const float *src_a, const float *src_b, float *dst, const int len)
+static int vector_mul_pulp_open_parallel(const float *src_a, const float *src_b, float *dst, const int len)
 {
     int tot_ops;
     int rem_ops;
@@ -58,7 +58,7 @@ static int vector_mul_parallel(const float *src_a, const float *src_b, float *ds
 
 #else  /* CLUSTER */
 
-static int vector_mul_serial(const float *src_a, const float *src_b, float *dst, const int len)
+static int vector_mul_pulp_open_fc(const float *src_a, const float *src_b, float *dst, const int len)
 {
     for (int i = 0; i < len; i++)
         dst[i] = src_a[i] * src_b[i];
@@ -68,22 +68,15 @@ static int vector_mul_serial(const float *src_a, const float *src_b, float *dst,
 
 #endif  /* CLUSTER */
 
-static int vector_mul_pulp_open(const float *src_a, const float *src_b, float *dst, const int len)
+int vector_mul_impl(const float *src_a, const float *src_b, float *dst, const int len)
 {
     int ret;
 
 #if CLUSTER
-    ret = vector_mul_parallel(src_a, src_b, dst, len);
+    ret = vector_mul_pulp_open_parallel(src_a, src_b, dst, len);
 #else
-    ret = vector_mul_serial(src_a, src_b, dst, len);
+    ret = vector_mul_pulp_open_fc(src_a, src_b, dst, len);
 #endif
 
     return ret;
-}
-
-/**********************************************************************************************************************/
-
-int vector_mul_impl(const float *src_a, const float *src_b, float *dst, const int len)
-{
-    return vector_mul_pulp_open(src_a, src_b, dst, len);
 }
