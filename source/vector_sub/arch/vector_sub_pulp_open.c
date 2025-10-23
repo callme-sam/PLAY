@@ -1,4 +1,3 @@
-
 #include "internal/arch_interface.h"
 #include "play.h"
 
@@ -6,7 +5,7 @@
 
 #if CLUSTER
 
-static int vector_sub_parallel(const float *src_a, const float *src_b, float *dst, const int len)
+static int vector_sub_pulp_open_cluster(const float *src_a, const float *src_b, float *dst, const int len)
 {
     int rem_ops;
     int tot_ops;
@@ -59,7 +58,7 @@ static int vector_sub_parallel(const float *src_a, const float *src_b, float *ds
 
 #else   /* CLUSTER */
 
-static int vector_sub_serial(const float *src_a, const float *src_b, float *dst, const int len)
+static int vector_sub_pulp_open_fc(const float *src_a, const float *src_b, float *dst, const int len)
 {
     for (int i = 0; i < len; i++)
         dst[i] = src_a[i] - src_b[i];
@@ -69,21 +68,15 @@ static int vector_sub_serial(const float *src_a, const float *src_b, float *dst,
 
 #endif  /* CLUSTER */
 
-int vector_sub_pulp_open(const float *src_a, const float *src_b, float *dst, const int len)
+int vector_sub_impl(const float *src_a, const float *src_b, float *dst, const int len)
 {
     int ret;
 
 #if CLUSTER
-    ret = vector_sub_parallel(src_a, src_b, dst, len);
+    ret = vector_sub_pulp_open_cluster(src_a, src_b, dst, len);
 #else
-    ret = vector_sub_serial(src_a, src_b, dst, len);
+    ret = vector_sub_pulp_open_fc(src_a, src_b, dst, len);
 #endif
 
     return ret;
-}
-
-/* Public unified implementation symbol used by the dispatcher. */
-int vector_sub_impl(const float *src_a, const float *src_b, float *dst, const int len)
-{
-    return vector_sub_pulp_open(src_a, src_b, dst, len);
 }

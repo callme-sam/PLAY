@@ -74,7 +74,7 @@ static int test_vector_sub()
     int ret;
 
 #ifdef  ENABLE_LOGGING
-    if (is_master_core()) printf("INFO | Running 'vector_sub' test on Spatz Cluster\n");
+    if (is_master_core()) printf("INFO | Running 'vector_sub' test on Spatz Cluster with %d Core Compelx\n", NUM_CC);
 #endif  /* ENABLE_LOGGING */
 
     ret = run_test_on_spatz();
