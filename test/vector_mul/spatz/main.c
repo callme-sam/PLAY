@@ -26,7 +26,7 @@ static void check_result()
     vector_print(result, LEN, "result");
     vector_print(expected, LEN, "expected");
 #endif  /* PRINT_DATA */
-
+    printf("");
     printf("INFO | Test %s\n", test_result ? "SUCCESS" : "FAILED");
 }
 

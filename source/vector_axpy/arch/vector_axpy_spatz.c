@@ -21,15 +21,15 @@ static int vector_axpy_spatz_serial(const float *src_a, const float *src_b, cons
         asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
 
         asm volatile ("vle32.v v0, (%0)" :: "r"(a));
-        asm volatile ("vle32.v v1, (%0)" :: "r"(b));
+        asm volatile ("vle32.v v8, (%0)" :: "r"(b));
 
 #if 0
         asm volatile ("vfmul.vf v3, v0, %0" :: "f"(alpha));
         asm volatile ("vfadd.vv v2, v3, v1");
         asm volatile ("vse32.v v2, (%0)" :: "r"(d));
 #else
-        asm volatile ("vfmacc.vf v1, %0, v0" ::"f"(alpha));
-        asm volatile ("vse32.v v1, (%0)" :: "r"(d));
+        asm volatile ("vfmacc.vf v8, %0, v0" ::"f"(alpha));
+        asm volatile ("vse32.v v8, (%0)" :: "r"(d));
 #endif
 
         a += vl;
