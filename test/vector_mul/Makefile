@@ -13,7 +13,7 @@ INC_DIR = $(abspath $(CURRENT_DIR)/$(INC_DIR_REL))
 DATA_DIR = $(abspath $(CURRENT_DIR)/$(DATA_DIR_REL))
 COMMON_DIR = $(abspath $(CURRENT_DIR)/$(COMMON_DIR_REL))
 
-APP = vector-mul-test_data
+APP = vector-mul-test
 include ../common/arch_select.mk
 
 # Collect only top-level SRC_DIR .c files (exclude arch/ subdir explicitly)
