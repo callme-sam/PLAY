@@ -5,6 +5,7 @@ int vector_add_impl(const float *src_a, const float *src_b, float *dst, const in
 int vector_axpy_impl(const float *src_a, const float *src_b, const float alpha, float *dst, const int len);
 int vector_dot_impl(const float *src_a, const float *src_b, float *dst, const int len);
 int vector_mul_impl(const float *src_a, const float *src_b, float *dst, const int len);
+int vector_set_all_impl(float *vec, const float val, const int len);
 int vector_sub_impl(const float *src_a, const float *src_b, float *dst, const int len);
 
 #endif /* ARCH_INTERFACE_H_*/

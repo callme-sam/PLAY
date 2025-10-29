@@ -30,12 +30,13 @@ static void check_result()
 
     test_result = vector_compare(src, vec, LEN);
 
-#ifdef  ENABLE_LOGGING
+#ifdef  PRINT_DATA
     scalar_print(val, "value");
     vector_print(src, LEN, "result");
     vector_print(vec, LEN, "expected");
+#endif  /* PRINT_DATA */
+
     printf("INFO | Test %s\n", test_result ? "SUCCESS" : "FAILED");
-#endif  /* ENABLE_LOGGING */
 }
 
 static void run_test()
