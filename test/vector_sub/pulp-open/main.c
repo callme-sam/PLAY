@@ -151,7 +151,7 @@ static void test_kickoff()
     int ret;
 
 #ifdef  ENABLE_LOGGING
-    printf("\n##################################### VECTOR_MUL TEST ####################################\n\n");
+    printf("\n##################################### VECTOR_SUB TEST ####################################\n\n");
 #endif  /* ENABLE_LOGGING */
 
     ret = test_vector_sub();

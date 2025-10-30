@@ -66,7 +66,7 @@ static int run_test_on_spatz()
     return 0;
 }
 
-static int test_vector_sub()
+static int test_vector_set_all()
 {
     int ret;
 
@@ -84,10 +84,10 @@ static int test_kickoff()
     int ret;
 
 #ifdef  ENABLE_LOGGING
-    if (is_master_core()) printf("\n##################################### VECTOR_SUB TEST ####################################\n\n");
+    if (is_master_core()) printf("\n##################################### VECTOR_SET_ALL TEST ####################################\n\n");
 #endif  /* ENABLE_LOGGING */
 
-    ret = test_vector_sub();
+    ret = test_vector_set_all();
 
 #ifdef  ENABLE_LOGGING
     if (is_master_core()) printf("\n##########################################################################################\n\n");
