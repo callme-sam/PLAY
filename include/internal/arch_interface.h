@@ -4,6 +4,7 @@
 int vector_add_impl(const float *src_a, const float *src_b, float *dst, const int len);
 int vector_axpy_impl(const float *src_a, const float *src_b, const float alpha, float *dst, const int len);
 int vector_dot_impl(const float *src_a, const float *src_b, float *dst, const int len);
+int vector_memcpy_impl(const float *src, float *dst, const int len);
 int vector_mul_impl(const float *src_a, const float *src_b, float *dst, const int len);
 int vector_offset_impl(const float *src, const float offset, float *dst, const int len);
 int vector_scale_impl(const float *src, const float val, float *dst, const int len);
