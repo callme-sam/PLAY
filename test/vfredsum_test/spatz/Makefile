@@ -1,8 +1,26 @@
 # -----------------------------------------------------------------------------
 # CHECKs
 # -----------------------------------------------------------------------------
+PLATFORM ?= VLT
+
+ifeq ($(PLATFORM), GVSOC)
+
 ifeq ($(GVSOC_PATH),)
 $(error GVSOC_PATH is not set)
+endif
+RUNNER_CMD = $(GVSOC_PATH) --target spatz --binary $(APP) run
+
+else ifeq ($(PLATFORM), VLT)
+
+ifeq ($(VLT_PATH),)
+$(error VLT_PATH is not set)
+endif
+RUNNER_CMD = $(VLT_PATH) $(APP)
+
+else
+
+$(error PLATFORM not supported)
+
 endif
 
 ifeq ($(LLVM_PATH),)
@@ -83,11 +101,7 @@ build: config
 	$(MAKE) -C $(SPATZ_BUILD_DIR)
 
 run: build
-	cd $(SPATZ_BUILD_DIR) && \
-	$(GVSOC_PATH) \
-	--target spatz \
-	--binary $(APP) \
-	run
+	cd $(SPATZ_BUILD_DIR) && $(RUNNER_CMD)
 
 clean:
 	rm -rf $(SPATZ_BUILD_DIR)

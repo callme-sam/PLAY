@@ -140,6 +140,7 @@ Build and run `vector_mul` for SPATZ (CMake flow):
 ```bash
 export LLVM_PATH="<path/to/spatz-llvm>"
 export GVSOC_PATH="<path/to/gvsoc>"
+export VLT_PATH="<path/to/verilator/bin>"
 export GCC_PATH="<path/to/spatz-riscv-gcc>"
 export SPATZ_SW_DIR="<path/to/spatz/sw>"
 
@@ -160,7 +161,8 @@ make TARGET=SPATZ -C test/vector_mul clean all run
     - `NUM_CORES=<n>` — Number of cluster cores when `USE_CLUSTER=1` (default `NUM_CORES=1`, max value `NUM_CORES=8`).
 
 - Flags for `SPATZ`
-    - `NUM_CC=<n>` - Number of Core-Complexes in Cluster (default `NUM_CC=1`, max value `NUM_CC=1`)
+    - `NUM_CC=<n>` - Number of Core-Complexes in Cluster (default `NUM_CC=1`, max value `NUM_CC=2`)
+    - `PLATFORM=<platform`> - Emulator platform. Supported platforms are `GVSOC` and `VLT` (default `VLT`)
 
 
 ### Generating test data
