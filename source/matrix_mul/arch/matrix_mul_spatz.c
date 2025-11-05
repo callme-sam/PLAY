@@ -44,9 +44,9 @@ static int matrix_mul_spatz_serial(const float *src_a, const float *src_b, float
             }
 
             asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(original_avl));
-
             asm volatile ("vfredusum.vs v24, v0, v24");
             asm volatile ("vfmv.f.s %0, v24" : "=f"(sum));
+            snrt_cluster_hw_barrier();
 
             dst[m * dim_P + p] = sum;
         }
