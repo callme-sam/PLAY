@@ -32,10 +32,11 @@ static int matrix_mul_spatz_serial(const float *src_a, const float *src_b, float
             for (; avl > 0; avl -= vl) {
 
                 asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
+
                 asm volatile ("vle32.v v8, (%0)" :: "r"(row_a));
                 asm volatile ("vlse32.v v16, (%0), %1" :: "r"(col_b), "r"(stride_b));
-
                 snrt_cluster_hw_barrier();
+
                 asm volatile ("vfmacc.vv v0, v8, v16");
 
                 row_a += vl;

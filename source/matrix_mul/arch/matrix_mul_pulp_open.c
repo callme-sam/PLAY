@@ -5,7 +5,7 @@
 
 #ifdef  CLUSTER
 
-int matrix_mul_pulp_open_cluster(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P)
+static int matrix_mul_pulp_open_cluster(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P)
 {
     int row_start;
     int row_end;
