@@ -40,7 +40,7 @@ static void check_result()
     if (!is_master_core())
         return;
 
-    test_result = matrix_compare(result, expected, DIM_M, DIM_P);
+    test_result = matrix_compare(result, expected, DIM_N, DIM_P);
 
 #ifdef  PRINT_DATA
     matrix_print(src_a, DIM_M, DIM_N, "src_a");
