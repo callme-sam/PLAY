@@ -5,6 +5,7 @@ int matrix_memcpy_impl(const float *src, float *dst, const int dim_M, const int 
 int matrix_mul_impl(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P);
 int matrix_mul_trans_A_impl(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P);
 int matrix_mul_trans_B_impl(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P);
+int matrix_set_all_impl(float *mat, const float val, const int dim_M, const int dim_N);
 
 int vector_add_impl(const float *src_a, const float *src_b, float *dst, const int len);
 int vector_axpy_impl(const float *src_a, const float *src_b, const float alpha, float *dst, const int len);
