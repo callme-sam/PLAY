@@ -26,4 +26,4 @@ endif
 
 # call: $(call add_arch_impl,vector_mul)
 # Appends the arch implementation file to APP_SRCS using $(eval).
-add_arch_impl = $(eval APP_SRCS += $(SRC_DIR)/arch/$(1)_$(ARCH_SUFFIX).c)
+add_arch_impl = $(eval APP_SRCS += $(abspath $(CURRENT_DIR)/../../source/$(1)/arch/$(1)_$(ARCH_SUFFIX).c))
