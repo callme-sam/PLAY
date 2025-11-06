@@ -3,10 +3,10 @@
 
 #ifdef  STATS
 
-#define HOTTING     (2)
-#define REPEAT      (5)
-
 #if TARGET_IS_SPATZ
+
+#define HOTTING     (0)
+#define REPEAT      (2)
 
 #include "snrt.h"
 
@@ -56,6 +56,9 @@ void print_stats(unsigned long _cycles, unsigned long _active, unsigned long _in
 #define EVENTS          (EVENTS_BASE | (1<<PI_PERF_LD_EXT) | (1<<PI_PERF_ST_EXT) | (1<<PI_PERF_LD_EXT_CYC) | (1<<PI_PERF_ST_EXT_CYC) | (1<<PI_PERF_TCDM_CONT))
 
 #else   /* CLUSTER */
+
+#define HOTTING     (2)
+#define REPEAT      (5)
 
 #define EXTENDED_STATS  (0)
 #define EVENTS          EVENTS_BASE
