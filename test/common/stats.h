@@ -35,6 +35,9 @@ void print_stats(unsigned long _cycles);
 
 #elif TARGET_IS_PULP_OPEN
 
+#define HOTTING     (2)
+#define REPEAT      (5)
+
 #include "pmsis.h"
 
 
@@ -56,9 +59,6 @@ void print_stats(unsigned long _cycles, unsigned long _active, unsigned long _in
 #define EVENTS          (EVENTS_BASE | (1<<PI_PERF_LD_EXT) | (1<<PI_PERF_ST_EXT) | (1<<PI_PERF_LD_EXT_CYC) | (1<<PI_PERF_ST_EXT_CYC) | (1<<PI_PERF_TCDM_CONT))
 
 #else   /* CLUSTER */
-
-#define HOTTING     (2)
-#define REPEAT      (5)
 
 #define EXTENDED_STATS  (0)
 #define EVENTS          EVENTS_BASE
