@@ -58,10 +58,22 @@ def generate_header_file(M, N, mat, vec_x, vec_y, alpha, beta, expected, filenam
     with open(filepath, "w") as f:
         f.write("#ifndef DATA_H_\n")
         f.write("#define DATA_H_\n\n")
-        f.write('#include "pmsis.h"\n\n')
 
         f.write(f"#define DIM_M {M}\n")
         f.write(f"#define DIM_N {N}\n\n")
+
+        f.write("#if TARGET_IS_SPATZ\n\n")
+
+        f.write(f"float a = {format_float(alpha)};\n")
+        f.write(f"float b = {format_float(beta)};\n")
+        f.write(f"float vecX[] = {format_array(vec_x)};\n")
+        f.write(f"float vecY[] = {format_array(vec_y)};\n")
+        f.write(f"float matA[] = {format_matrix(mat)};\n")
+        f.write(f"float expected[] = {format_matrix(expected)};\n\n")
+
+        f.write("#elif TARGET_IS_PULP_OPEN\n\n")
+
+        f.write('#include "pmsis.h"\n\n')
 
         f.write(f"PI_L2 float a = {format_float(alpha)};\n")
         f.write(f"PI_L2 float b = {format_float(beta)};\n")
@@ -69,6 +81,8 @@ def generate_header_file(M, N, mat, vec_x, vec_y, alpha, beta, expected, filenam
         f.write(f"PI_L2 float vecY[] = {format_array(vec_y)};\n")
         f.write(f"PI_L2 float matA[] = {format_matrix(mat)};\n")
         f.write(f"PI_L2 float expected[] = {format_matrix(expected)};\n\n")
+
+        f.write("#endif /* TARGET_IS_ */\n\n")
 
         f.write("#endif  /* DATA_H_ */\n")
 
