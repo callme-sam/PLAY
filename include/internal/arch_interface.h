@@ -2,6 +2,7 @@
 #define ARCH_INTERFACE_H_
 
 int linalg_gemv_impl(const float *mat, const float *vec_x, const float *vec_y, const float alpha, const float beta, float *dst, const int dim_M, const int dim_N);
+int linalg_gemv_trans_impl(const float *mat, const float *vec_x, const float *vec_y, const float alpha, const float beta, float *dst, const int dim_M, const int dim_N);
 
 int matrix_memcpy_impl(const float *src, float *dst, const int dim_M, const int dim_N);
 int matrix_mul_impl(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P);
