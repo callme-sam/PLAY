@@ -27,6 +27,8 @@ static int matrix_swap_rows_spatz_serial(float *mat, const int row_a, const int 
         mat_row_a += vl;
         mat_row_b += vl;
     }
+
+    return 0;
 }
 
 int matrix_swap_rows_impl(float *mat, const int row_a, const int row_b, const int dim_M, const int dim_N)
@@ -38,4 +40,6 @@ int matrix_swap_rows_impl(float *mat, const int row_a, const int row_b, const in
 #else
     ret = matrix_swap_rows_spatz_serial(mat, row_a, row_b, dim_M, dim_N);
 #endif
+
+    return ret;
 }
