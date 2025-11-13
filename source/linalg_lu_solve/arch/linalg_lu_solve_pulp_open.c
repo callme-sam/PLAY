@@ -166,7 +166,7 @@ static int linalg_lu_solve_pulp_open_fc(const float *mat, const float *vec, cons
 
 #endif  /* CLUSTER */
 
-__attribute__((noinline)) int linalg_lu_solve_impl(const float *mat, const float *vec, const int *perm, float *result, const int dim_M, const int dim_N)
+int linalg_lu_solve_impl(const float *mat, const float *vec, const int *perm, float *result, const int dim_M, const int dim_N)
 {
     int ret;
 
