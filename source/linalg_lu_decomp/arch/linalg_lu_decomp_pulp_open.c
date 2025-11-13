@@ -117,7 +117,7 @@ static int linalg_lu_decomp_pulp_open_cluster(float *mat, int *perm, const int d
 #ifdef  ENABLE_LOGGING
                 printf("ERROR | Zero pivot found at position %d during LU decomposition - Matrix is singular\n", k);
 #endif  /* ENABLE_LOGGING */
-                return -1;
+                pmsis_exit(-1);
             } else {
                 p_inv = ONE_f / pivot;
             }
@@ -203,7 +203,7 @@ static int linalg_lu_decomp_pulp_open_fc(float *mat, int *perm, const int dim_M,
 #ifdef  ENABLE_LOGGING
             printf("ERROR | Zero pivot found at position %d during LU decomposition - Matrix is singular\n", k);
 #endif  /* ENABLE_LOGGING */
-            return -1;
+            pmsis_exit(-1);
         }
 
         for (int m = k + 1; m < dim_M; m++) {

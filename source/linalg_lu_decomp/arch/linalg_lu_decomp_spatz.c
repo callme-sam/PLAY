@@ -250,7 +250,7 @@ static int linalg_lu_decomp_spatz_serial(float *mat, int *perm, const int dim_M,
 #ifdef  ENABLE_LOGGING
             printf("ERROR | Zero pivot found at position %d during LU decomposition - Matrix is singular\n", k);
 #endif  /* ENABLE_LOGGING */
-            return -1;
+            snrt_exit(-1);
         }
 
         for (int m = k + 1; m < dim_M; m++) {
