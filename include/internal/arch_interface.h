@@ -6,6 +6,7 @@ int linalg_gemv_trans_impl(const float *mat, const float *vec_x, const float *ve
 int linalg_lu_decomp_impl(float *mat, int *perm, const int dim_M, const int dim_N);
 int linalg_lu_solve_impl(const float *mat, const float *vec, const int *perm, float *result, const int dim_M, const int dim_N);
 int linalg_svd_jacobi_impl(float *mat, float *mat_V, float *vec_S, const int dim_M);
+int linalg_svd_lsv_impl(const float *src, float *mat_V, float *vec_S, float *dst, const int dim_M, const int dim_N);
 
 int matrix_memcpy_impl(const float *src, float *dst, const int dim_M, const int dim_N);
 int matrix_mul_impl(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P);
