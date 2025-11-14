@@ -2,7 +2,6 @@
 #include "play.h"
 
 #include "snrt.h"
-#include "printf.h" // TODO: remove
 
 static int linalg_lu_solve_spatz_serial(const float *mat, const float *vec, const int *perm, float *result, const int dim_M, const int dim_N)
 {
