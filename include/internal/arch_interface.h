@@ -1,6 +1,7 @@
 #ifndef ARCH_INTERFACE_H_
 #define ARCH_INTERFACE_H_
 
+int linalg_cholesky_decomp_impl(const float *src, float *dst, const int dim);
 int linalg_gemv_impl(const float *mat, const float *vec_x, const float *vec_y, const float alpha, const float beta, float *dst, const int dim_M, const int dim_N);
 int linalg_gemv_trans_impl(const float *mat, const float *vec_x, const float *vec_y, const float alpha, const float beta, float *dst, const int dim_M, const int dim_N);
 int linalg_lu_decomp_impl(float *mat, int *perm, const int dim_M, const int dim_N);

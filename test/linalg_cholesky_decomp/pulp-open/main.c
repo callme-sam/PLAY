@@ -27,9 +27,6 @@ static void initialize_data()
 static void check_result()
 {
     bool test_result;
-    bool res_cmp;
-    bool s_cmp;
-    bool v_cmp;
 
     if (!is_master_core())
         return;
