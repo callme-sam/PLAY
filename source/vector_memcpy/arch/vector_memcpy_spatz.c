@@ -3,6 +3,9 @@
 
 #include "snrt.h"
 
+#if 0
+
+/* 686 cycles */
 static int vector_memcpy_spatz_serial(const float *src, float *dst, const int len)
 {
     size_t avl;
@@ -20,9 +23,7 @@ static int vector_memcpy_spatz_serial(const float *src, float *dst, const int le
 
         asm volatile ("vle32.v v0, (%0)" :: "r"(p_src));
 
-        asm volatile ("vmv.v.v v8, v0");
-
-        asm volatile ("vse32.v v8, (%0)" :: "r"(p_dst));
+        asm volatile ("vse32.v v0, (%0)" :: "r"(p_dst));
 
         p_src += vl;
         p_dst += vl;
@@ -30,6 +31,21 @@ static int vector_memcpy_spatz_serial(const float *src, float *dst, const int le
 
     return 0;
 }
+
+#else
+
+/* 351 cycles */
+static int vector_memcpy_spatz_serial(const float *src, float *dst, const int len)
+{
+    snrt_dma_txid_t dma_id;
+
+    dma_id = snrt_dma_start_1d(dst, src, len * sizeof(float));
+    snrt_dma_wait(dma_id);
+
+    return 0;
+}
+
+#endif
 
 int vector_memcpy_impl(const float *src, float *dst, const int len)
 {
