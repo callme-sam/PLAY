@@ -9,35 +9,22 @@ static int vector_min_spatz_serial(const float *src, float *min, const int len)
     size_t avl;
     size_t vl;
 
-    *min = src[0];
     p_src = src;
     avl = len;
 
     asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
     asm volatile ("vfmv.v.f v0, %0" :: "f"(0.0f));
 
-    for (; avl > 0; avl -= vl) {
+    do {
         asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
-
         asm volatile ("vle32.v v8, (%0)" :: "r"(p_src));
-
-        asm volatile ("vfredmin.vs v16, v8, v0");
-        snrt_cluster_hw_barrier();
-
-#if 0   /* vfmv.f.s not yet supported :S */
-        float local_min;
-        asm volatile ("vfmv.f.s %0, v16" : "=f"(local_min));
-        if (local_min < *min)
-            *min = local_min;
-#else
-        float local_min[vl];
-        asm volatile ("vse32.v v16, (%0)" :: "r"(local_min));
-        if (local_min[0] < *min)
-            *min = local_min[0];
-#endif
+        asm volatile ("vfredmin.vs v0, v8, v0");
 
         p_src += vl;
-    }
+        avl -= vl;
+    } while (avl > 0);
+
+    asm volatile ("vfmv.f.s %0, v0" : "=f"(*min));
 
     return 0;
 }
