@@ -13,7 +13,7 @@ static int vector_min_spatz_serial(const float *src, float *min, const int len)
     avl = len;
 
     asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
-    asm volatile ("vfmv.v.f v0, %0" :: "f"(0.0f));
+    asm volatile ("vfmv.s.f v0, %0" :: "f"(src[0]));
 
     do {
         asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
