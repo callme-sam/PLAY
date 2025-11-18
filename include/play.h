@@ -280,12 +280,11 @@ int matrix_set_all(float *mat, const float val, const int dim_M, const int dim_N
  * @param [in,out] mat A pointer to the matrix where the rows will be swapped.
  * @param [in] row_a The index of the first row to be swapped (0-based).
  * @param [in] row_b The index of the second row to be swapped (0-based).
- * @param [in] dim_M The total number of rows in the matrix.
  * @param [in] dim_N The total number of columns in the matrix.
  *
  * @return int Returns 0 on success, non-zero on error.
  */
-int matrix_swap_rows(float *mat, const int row_a, const int row_b, const int dim_M, const int dim_N);
+int matrix_swap_rows(float *mat, const int row_a, const int row_b, const int dim_N);
 
 /**
  * @brief Performs a generalized matrix-vector multiplication and addition: dst = α·mat·vec_x + β·vec_y.

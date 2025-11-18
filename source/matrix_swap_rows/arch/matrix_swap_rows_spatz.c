@@ -3,7 +3,7 @@
 
 #include "snrt.h"
 
-static int matrix_swap_rows_spatz_serial(float *mat, const int row_a, const int row_b, const int dim_M, const int dim_N)
+static int matrix_swap_rows_spatz_serial(float *mat, const int row_a, const int row_b, const int dim_N)
 {
     size_t avl;
     size_t vl;
@@ -31,14 +31,14 @@ static int matrix_swap_rows_spatz_serial(float *mat, const int row_a, const int 
     return 0;
 }
 
-int matrix_swap_rows_impl(float *mat, const int row_a, const int row_b, const int dim_M, const int dim_N)
+int matrix_swap_rows_impl(float *mat, const int row_a, const int row_b, const int dim_N)
 {
     int ret;
 
 #if NUM_CC > 1
     #error "Parallel execution on SPATZ not supported yet"
 #else
-    ret = matrix_swap_rows_spatz_serial(mat, row_a, row_b, dim_M, dim_N);
+    ret = matrix_swap_rows_spatz_serial(mat, row_a, row_b, dim_N);
 #endif
 
     return ret;
