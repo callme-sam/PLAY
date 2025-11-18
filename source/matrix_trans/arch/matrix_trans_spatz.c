@@ -3,6 +3,9 @@
 
 #include "snrt.h"
 
+#if 0
+
+/* 1460 cycl - stride on load */
 static int matrix_trans_spatz_serial(const float *src, float *dst, const int dim_M, const int dim_N)
 {
     size_t stride;
@@ -30,8 +33,41 @@ static int matrix_trans_spatz_serial(const float *src, float *dst, const int dim
     }
 
     return 0;
-
 }
+
+#else
+
+/* 1392 - stride on store */
+static int matrix_trans_spatz_serial(const float *src, float *dst, const int dim_M, const int dim_N)
+{
+    size_t stride;
+    size_t avl;
+    size_t vl;
+
+    const float *row_src;
+    const float *col_dst;
+
+    stride = dim_M * sizeof(float);
+
+    for (int m = 0; m < dim_M; m++) {
+        row_src = src + (m * dim_N);
+        col_dst = dst + m;
+        avl = dim_N;
+
+        for (; avl > 0; avl -= vl) {
+            asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
+            asm volatile ("vle32.v v0, (%0)" :: "r"(row_src));
+            asm volatile ("vsse32.v v0, (%0), %1" :: "r"(col_dst), "r"(stride));
+
+            row_src += vl;
+            col_dst += vl * dim_M;
+        }
+    }
+
+    return 0;
+}
+
+#endif
 
 int matrix_trans_impl(const float *src, float *dst, const int dim_M, const int dim_N)
 {
