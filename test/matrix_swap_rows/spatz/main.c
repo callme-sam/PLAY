@@ -56,11 +56,11 @@ static void run_test()
 {
     volatile int m = DIM_M;
     volatile int n = DIM_N;
-    initialize_matrices();
-    barrier();
 
     INIT_STATS();
     START_LOOP_STATS();
+    initialize_matrices();
+    barrier();
     START_STATS();
     matrix_swap_rows(result, row_a, row_b, m, n);
     STOP_STATS();
