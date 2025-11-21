@@ -5,51 +5,89 @@
 
 static int matrix_mul_trans_A_spatz_serial(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P)
 {
-    size_t original_avl;
-    size_t stride_a;
-    size_t stride_b;
     size_t avl;
     size_t vl;
 
-    const float *row_a_t;
-    const float *col_b;
+    const float *col_a1;        /* i.e. i-th row of A^t                 */
+    const float *col_a1_next;   /* i.e. i-th row, next elem, of A^t     */
+    const float *col_a2;        /* i.e. (i+1)-th row of A^t             */
+    const float *col_a2_next;   /* i.e. (i+1)-th row, next elem, of A^t */
+    const float *row_b1;
+    const float *row_b1_next;
+    float *row_dst1;
+    float *row_dst2;
 
-    float sum;
+    for (int p = 0; p < dim_P; p += vl) {
+        avl = dim_P - p;
+        asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
 
-    stride_a = dim_N * sizeof(float);
-    stride_b = dim_P * sizeof(float);
-    original_avl = dim_M;
+        for (int n = 0; n < (dim_N - 1); n += 2) {
+            row_dst1 = dst + (n * dim_P + p);
+            row_dst2 = dst + ((n + 1) * dim_P + p);
 
-    for (int n = 0; n < dim_N; n++) {
-        for (int p = 0; p < dim_P; p++) {
-            row_a_t = src_a + n;
-            col_b = src_b + p;
-            avl = dim_M;
-            sum = 0;
+            asm volatile ("vfmv.v.f v0, %0" :: "f"(0.0f));
+            asm volatile ("vfmv.v.f v8, %0" :: "f"(0.0f));
 
-            asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
-            asm volatile ("vfmv.v.f v0, %0" :: "f"(0.0));
-            asm volatile ("vfmv.v.f v24, %0" :: "f"(0.0));
+            for (int m = 0; m < (dim_M - 1); m += 2) {
+                col_a1 = src_a + (m * dim_N + n);
+                col_a2 = src_a + (m * dim_N + (n + 1));
 
-            for (; avl > 0; avl -= vl) {
-                asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
+                col_a1_next = src_a + ((m + 1) * dim_N + n);
+                col_a2_next = src_a + ((m + 1) * dim_N + (n + 1));
 
-                asm volatile ("vlse32.v v8, (%0), %1" :: "r"(row_a_t), "r"(stride_a));
-                asm volatile ("vlse32.v v16, (%0), %1" :: "r"(col_b), "r"(stride_b));
-                snrt_cluster_hw_barrier();
+                row_b1 = src_b + (m * dim_P + p);
+                row_b1_next = src_b + ((m + 1) * dim_P + p);
 
-                asm volatile ("vfmacc.vv v0, v8, v16");
+                asm volatile ("vle32.v v16, (%0)" :: "r"(row_b1));
+                asm volatile ("vfmacc.vf v0, %0, v16" :: "f"(*col_a1));
+                asm volatile ("vfmacc.vf v8, %0, v16" :: "f"(*col_a2));
 
-                row_a_t += vl * dim_N;
-                col_b += vl * dim_P;
+                asm volatile ("vle32.v v24, (%0)" :: "r"(row_b1_next));
+                asm volatile ("vfmacc.vf v0, %0, v24" :: "f"(*col_a1_next));
+                asm volatile ("vfmacc.vf v8, %0, v24" :: "f"(*col_a2_next));
             }
 
-            asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(original_avl));
-            asm volatile ("vfredusum.vs v24, v0, v24");
-            asm volatile ("vfmv.f.s %0, v24" : "=f"(sum));
-            snrt_cluster_hw_barrier();
+            if (dim_M % 2) {
+                col_a1 = src_a + ((dim_M - 1) * dim_N + n);
+                row_b1 = src_b + ((dim_M - 1) * dim_P + p);
+                col_a2 = src_a + ((dim_M - 1) * dim_N + (n + 1));
 
-            dst[n * dim_P + p] = sum;
+                asm volatile ("vle32.v v16, (%0)" :: "r"(row_b1));
+                asm volatile ("vfmacc.vf v0, %0, v16" :: "f"(*col_a1));
+                asm volatile ("vfmacc.vf v8, %0, v16" :: "f"(*col_a2));
+            }
+
+            asm volatile ("vse32.v v0, (%0)" :: "r"(row_dst1));
+            asm volatile ("vse32.v v8, (%0)" :: "r"(row_dst2));
+        }
+
+        if (dim_N % 2) {
+            row_dst1 = dst + ((dim_N - 1) * dim_P + p);
+            asm volatile ("vfmv.v.f v0, %0" :: "f"(0.0f));
+
+            for (int m = 0; m < (dim_M - 1); m += 2) {
+                col_a1 = src_a + (m * dim_N + (dim_N - 1));
+                col_a1_next = src_a + ((m + 1) * dim_N + (dim_N - 1));
+
+                row_b1 = src_b + (m * dim_P + p);
+                row_b1_next = src_b + ((m + 1) * dim_P + p);
+
+                asm volatile ("vle32.v v16, (%0)" :: "r"(row_b1));
+                asm volatile ("vfmacc.vf v0, %0, v16" :: "f"(*col_a1));
+
+                asm volatile ("vle32.v v24, (%0)" :: "r"(row_b1_next));
+                asm volatile ("vfmacc.vf v0, %0, v24" :: "f"(*col_a1_next));
+            }
+
+            if (dim_M % 2) {
+                col_a1 = src_a + ((dim_M - 1) * dim_N + (dim_N - 1));
+                row_b1 = src_b + ((dim_M - 1) * dim_P + p);
+
+                asm volatile ("vle32.v v16, (%0)" :: "r"(row_b1));
+                asm volatile ("vfmacc.vf v0, %0, v16" :: "f"(*col_a1));
+            }
+
+            asm volatile ("vse32.v v0, (%0)" :: "r"(row_dst1));
         }
     }
 
