@@ -3,6 +3,9 @@
 
 #include "snrt.h"
 
+#if 0
+
+/* 711 */
 static int matrix_memcpy_spatz_serial(const float *src, float *dst, const int dim_M, const int dim_N)
 {
     size_t avl;
@@ -30,6 +33,20 @@ static int matrix_memcpy_spatz_serial(const float *src, float *dst, const int di
 
     return 0;
 }
+#else
+
+/* 350 */
+static int matrix_memcpy_spatz_serial(const float *src, float *dst, const int dim_M, const int dim_N)
+{
+    snrt_dma_txid_t dma_id;
+
+    dma_id = snrt_dma_start_1d(dst, src, dim_M * dim_N * sizeof(float));
+    snrt_dma_wait(dma_id);
+
+    return 0;
+}
+
+#endif
 
 int matrix_memcpy_impl(const float *src, float *dst, const int dim_M, const int dim_N)
 {
