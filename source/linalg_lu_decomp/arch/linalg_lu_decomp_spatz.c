@@ -240,7 +240,7 @@ static int linalg_lu_decomp_spatz_serial(float *mat, int *perm, const int dim_M,
         rvv_find_max_val(mat, dim_M, dim_N, &row_max, k);
 
         if (row_max != k) {
-            matrix_swap_rows(mat, k, row_max, dim_M, dim_N);
+            matrix_swap_rows(mat, k, row_max, dim_N);
             swap_elems(perm, k, row_max);
         }
 
