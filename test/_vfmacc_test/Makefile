@@ -35,6 +35,22 @@ ifdef ENABLE_LOGGING
 APP_CFLAGS += -DENABLE_LOGGING
 endif
 
+ifdef MUL_ADD
+APP_CFLAGS += -DMUL_ADD
+endif
+
+ifdef MUL_ADD_REUSE
+APP_CFLAGS += -DMUL_ADD_REUSE
+endif
+
+ifdef MACC
+APP_CFLAGS += -DMACC
+endif
+
+ifdef LOOP
+APP_CFLAGS += -DLOOP
+endif
+
 APP_CFLAGS += -O3 -g -I$(INC_DIR) -I$(DATA_DIR) -I$(COMMON_DIR)
 APP_LDFLAGS += -O3 -g
 
