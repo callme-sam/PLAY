@@ -5,6 +5,8 @@
 
 static int matrix_mul_trans_B_spatz_serial(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P)
 {
+    float ZERO_f = 0.0f;
+
     size_t stride;
     size_t avl;
     size_t vl;
@@ -28,8 +30,8 @@ static int matrix_mul_trans_B_spatz_serial(const float *src_a, const float *src_
             row_dst1 = dst + (m * dim_P + p);
             row_dst2 = dst + ((m + 1) * dim_P + p);
 
-            asm volatile ("vfmv.v.f v0, %0" :: "f"(0.0f));
-            asm volatile ("vfmv.v.f v8, %0" :: "f"(0.0f));
+            asm volatile ("vfmv.v.f v0, %0" :: "f"(ZERO_f));
+            asm volatile ("vfmv.v.f v8, %0" :: "f"(ZERO_f));
 
             for (int n = 0; n < (dim_N - 1); n += 2) {
                 row_a1 = src_a + (m * dim_N + n);
@@ -42,12 +44,12 @@ static int matrix_mul_trans_B_spatz_serial(const float *src_a, const float *src_
                 col_b1_next = src_b + (p * dim_N + (n + 1));
 
                 asm volatile ("vlse32.v v16, (%0), %1" :: "r"(col_b1), "r"(stride));
-                snrt_cluster_hw_barrier();
                 asm volatile ("vlse32.v v24, (%0), %1" :: "r"(col_b1_next), "r"(stride));
+                snrt_cluster_hw_barrier();
+
                 asm volatile ("vfmacc.vf v0, %0, v16" :: "f"(*row_a1));
                 asm volatile ("vfmacc.vf v8, %0, v16" :: "f"(*row_a2));
 
-                snrt_cluster_hw_barrier();
                 asm volatile ("vfmacc.vf v0, %0, v24" :: "f"(*row_a1_next));
                 asm volatile ("vfmacc.vf v8, %0, v24" :: "f"(*row_a2_next));
             }
@@ -58,7 +60,6 @@ static int matrix_mul_trans_B_spatz_serial(const float *src_a, const float *src_
                 col_b1 = src_b + (p * dim_N + (dim_N - 1));
 
                 asm volatile ("vlse32.v v16, (%0), %1" :: "r"(col_b1), "r"(stride));
-                snrt_cluster_hw_barrier();
                 asm volatile ("vfmacc.vf v0, %0, v16" :: "f"(*row_a1));
                 asm volatile ("vfmacc.vf v8, %0, v16" :: "f"(*row_a2));
             }
@@ -69,7 +70,7 @@ static int matrix_mul_trans_B_spatz_serial(const float *src_a, const float *src_
 
         if (dim_M % 2) {
             row_dst1 = dst + ((dim_M - 1) * dim_P + p);
-            asm volatile ("vfmv.v.f v0, %0" :: "f"(0.0f));
+            asm volatile ("vfmv.v.f v0, %0" :: "f"(ZERO_f));
 
             for (int n = 0; n < (dim_N - 1); n += 2) {
                 row_a1 = src_a + ((dim_M - 1) * dim_N + n);
@@ -79,11 +80,9 @@ static int matrix_mul_trans_B_spatz_serial(const float *src_a, const float *src_
                 col_b1_next = src_b + (p * dim_N + (n + 1));
 
                 asm volatile ("vlse32.v v16, (%0), %1" :: "r"(col_b1), "r"(stride));
-                snrt_cluster_hw_barrier();
-                asm volatile ("vfmacc.vf v0, %0, v16" :: "f"(*row_a1));
-
                 asm volatile ("vlse32.v v24, (%0), %1" :: "r"(col_b1_next), "r"(stride));
-                snrt_cluster_hw_barrier();
+
+                asm volatile ("vfmacc.vf v0, %0, v16" :: "f"(*row_a1));
                 asm volatile ("vfmacc.vf v0, %0, v24" :: "f"(*row_a1_next));
             }
 
@@ -92,7 +91,6 @@ static int matrix_mul_trans_B_spatz_serial(const float *src_a, const float *src_
                 col_b1 = src_b + (p * dim_N + (dim_N - 1));
 
                 asm volatile ("vlse32.v v16, (%0), %1" :: "r"(col_b1), "r"(stride));
-                snrt_cluster_hw_barrier();
                 asm volatile ("vfmacc.vf v0, %0, v16" :: "f"(*row_a1));
             }
 
