@@ -139,9 +139,9 @@ __attribute__((always_inline)) static int rvv_find_max_val(float *mat, const int
     }
 
     asm volatile ("vfredmax.vs v0, v0, v0");
-    snrt_cluster_hw_barrier();
+    // snrt_cluster_hw_barrier();   // TODO: find out why performances get worse if these barriers are removed
     asm volatile ("vfmv.f.s %0, v0" : "=f"(max));
-    snrt_cluster_hw_barrier();
+    // snrt_cluster_hw_barrier();
 
     *max_idx = col;
     for (int m = col; m < dim_M; m++) {
