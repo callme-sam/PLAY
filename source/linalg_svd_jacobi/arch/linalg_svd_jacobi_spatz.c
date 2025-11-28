@@ -5,35 +5,154 @@
 
 #include "snrt.h"
 
-const float ONE_f = 1;
-const float TWO_f = 2;
-const int MAX_ITER = 800;
-const float EPSILON = 1e-12;
-
-static int matrix_set_identity(float *mat, const int dim_M)
+__attribute__((always_inline)) static int rvv_matrix_set_identity(float *mat, const int dim_M)
 {
-    for (int m = 0; m < dim_M; m++)
-        mat[m * dim_M + m] = 1.0;
+    const float ONE_f = 1.0f;
+    float *p_diag;
+
+    size_t stride;
+    size_t avl;
+    size_t vl;
+
+    stride = (dim_M + 1) * sizeof(float);   // +1 to store elements only on the diag
+    p_diag = mat;
+    avl = dim_M;
+
+    asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
+    asm volatile ("vfmv.v.f v0, %0" :: "f"(ONE_f));
+
+    for (; avl > 0; avl -= vl) {
+        asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
+        asm volatile ("vsse32.v v0, (%0), %1" :: "r"(p_diag), "r"(stride));
+
+        p_diag += vl;
+    }
 
     return 0;
 }
 
-static int linalg_svd_jacobi_spatz_serial(float *mat, float *mat_V, float *vec_S, const int dim_M)
+__attribute__((always_inline)) static int rvv_row_jacobi_rotation(float *mat, const int i, const int j, const float cos, const float sin, const int dim)
 {
-    int iter;
-    float max_offdiag;
-
     size_t stride;
     size_t avl;
     size_t vl;
 
     float *row_i;
     float *row_j;
+
+    stride = dim * sizeof(float);
+    row_i = mat + (i * dim);
+    row_j = mat + (j * dim);
+    avl = dim;
+
+    for (; avl > 0; avl -= vl) {
+        asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
+        asm volatile ("vle32.v v0, (%0)" :: "r"(row_i));
+        asm volatile ("vle32.v v8, (%0)" :: "r"(row_j));
+        snrt_cluster_hw_barrier();
+
+        asm volatile ("vfmul.vf v16, v0, %0" :: "f"(cos));
+        asm volatile ("vfmul.vf v24, v8, %0" :: "f"(sin));
+        asm volatile ("vfsub.vv v16, v16, v24");
+        asm volatile ("vse32.v v16, (%0)" :: "r"(row_i));
+
+
+        asm volatile ("vfmul.vf v16, v0, %0" :: "f"(sin));
+        asm volatile ("vfmul.vf v24, v8, %0" :: "f"(cos));
+        asm volatile ("vfadd.vv v16, v16, v24");
+        asm volatile ("vse32.v v16, (%0)" :: "r"(row_j));
+
+        row_i += vl;
+        row_j += vl;
+    }
+
+    return 0;
+}
+
+__attribute__((always_inline)) static int rvv_col_jacobi_rotation(float *mat, const int i, const int j, const float cos, const float sin, const int dim)
+{
+    size_t stride;
+    size_t avl;
+    size_t vl;
+
     float *col_i;
     float *col_j;
 
-    matrix_set_identity(mat_V, dim_M);
-    stride = dim_M * sizeof(float);
+    stride = dim * sizeof(float);
+    col_i = mat + i;
+    col_j = mat + j;
+    avl = dim;
+
+    for (; avl > 0; avl -= vl) {
+        asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
+
+        asm volatile ("vlse32.v v0, (%0), %1" :: "r"(col_i), "r"(stride));
+        asm volatile ("vlse32.v v8, (%0), %1" :: "r"(col_j), "r"(stride));
+        snrt_cluster_hw_barrier();
+
+        asm volatile ("vfmul.vf v16, v0, %0" :: "f"(cos));
+        asm volatile ("vfmul.vf v24, v8, %0" :: "f"(sin));
+        asm volatile ("vfsub.vv v16, v16, v24");
+        asm volatile ("vsse32.v v16, (%0), %1" :: "r"(col_i), "r"(stride));
+
+        asm volatile ("vfmul.vf v16, v0, %0" :: "f"(sin));
+        asm volatile ("vfmul.vf v24, v8, %0" :: "f"(cos));
+        asm volatile ("vfadd.vv v16, v16, v24");
+        asm volatile ("vsse32.v v16, (%0), %1" :: "r"(col_j), "r"(stride));
+
+        col_i += vl * dim;
+        col_j += vl * dim;
+    }
+
+    return 0;
+}
+
+__attribute__((always_inline)) static int rvv_get_singular_values(float *mat, float *vec_S, const int dim)
+{
+    const float ZERO_f = 0.0f;
+
+    size_t stride;
+    size_t avl;
+    size_t vl;
+
+    float *p_diag;
+    float *p_vec;
+
+    stride = (dim + 1) * sizeof(float); // +1 to load elements only on the diag
+    p_vec = vec_S;
+    p_diag = mat;
+    avl = dim;
+
+    for (; avl > 0; avl -= vl) {
+        asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
+        asm volatile ("vlse32.v v0, (%0), %1" :: "r"(p_diag), "r"(stride));
+        snrt_cluster_hw_barrier();
+
+        asm volatile ("vfmax.vf v8, v0, %0" :: "f"(ZERO_f));
+        asm volatile ("vfsqrt.v v16, v8");
+        asm volatile ("vse32.v v16, (%0)" :: "r"(p_vec));
+
+        p_diag += vl * (dim + 1);
+        p_vec += vl;
+    }
+
+    return 0;
+}
+
+static int linalg_svd_jacobi_spatz_serial(float *mat, float *mat_V, float *vec_S, const int dim_M)
+{
+    const float ONE_f = 1.0f;
+    const float TWO_f = 2.0f;
+    const int MAX_ITER = 800;
+    const float EPSILON = 1e-12;
+
+    float max_offdiag;
+    int iter;
+
+    size_t avl;
+    size_t vl;
+
+    rvv_matrix_set_identity(mat_V, dim_M);
 
     iter = 0;
     while (iter++ < MAX_ITER) {
@@ -62,139 +181,25 @@ static int linalg_svd_jacobi_spatz_serial(float *mat, float *mat_V, float *vec_S
                 sin = t * cos;
 
                 /* Update rows i and j of MAT */
-                row_i = mat + i * dim_M;
-                row_j = mat + j * dim_M;
-                avl = dim_M;
-
-                for (; avl > 0; avl -= vl) {
-                    asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
-                    asm volatile ("vle32.v v0, (%0)" :: "r"(row_i));
-                    asm volatile ("vle32.v v8, (%0)" :: "r"(row_j));
-                    snrt_cluster_hw_barrier();
-
-                    asm volatile ("vfmul.vf v16, v0, %0" :: "f"(cos));
-                    asm volatile ("vfmul.vf v24, v8, %0" :: "f"(sin));
-                    snrt_cluster_hw_barrier();
-                    asm volatile ("vfsub.vv v16, v16, v24");
-                    snrt_cluster_hw_barrier();
-                    asm volatile ("vse32.v v16, (%0)" :: "r"(row_i));
-
-                    snrt_cluster_hw_barrier();
-
-                    asm volatile ("vfmul.vf v16, v0, %0" :: "f"(sin));
-                    asm volatile ("vfmul.vf v24, v8, %0" :: "f"(cos));
-                    snrt_cluster_hw_barrier();
-                    asm volatile ("vfadd.vv v16, v16, v24");
-                    snrt_cluster_hw_barrier();
-                    asm volatile ("vse32.v v16, (%0)" :: "r"(row_j));
-
-                    snrt_cluster_hw_barrier();
-
-                    row_i += vl;
-                    row_j += vl;
-                }
+                rvv_row_jacobi_rotation(mat, i, j, cos, sin, dim_M);
 
                 /* Update cols i and j of MAT */
-                col_i = mat + i;
-                col_j = mat + j;
-                avl = dim_M;
-
-                for (; avl > 0; avl -= vl) {
-                    asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
-                    asm volatile ("vlse32.v v0, (%0), %1" :: "r"(col_i), "r"(stride));
-                    asm volatile ("vlse32.v v8, (%0), %1" :: "r"(col_j), "r"(stride));
-                    snrt_cluster_hw_barrier();
-
-                    asm volatile ("vfmul.vf v16, v0, %0" :: "f"(cos));
-                    asm volatile ("vfmul.vf v24, v8, %0" :: "f"(sin));
-                    snrt_cluster_hw_barrier();
-                    asm volatile ("vfsub.vv v16, v16, v24");
-                    snrt_cluster_hw_barrier();
-                    asm volatile ("vsse32.v v16, (%0), %1" :: "r"(col_i), "r"(stride));
-
-                    snrt_cluster_hw_barrier();
-
-                    asm volatile ("vfmul.vf v16, v0, %0" :: "f"(sin));
-                    asm volatile ("vfmul.vf v24, v8, %0" :: "f"(cos));
-                    snrt_cluster_hw_barrier();
-                    asm volatile ("vfadd.vv v16, v16, v24");
-                    snrt_cluster_hw_barrier();
-                    asm volatile ("vsse32.v v16, (%0), %1" :: "r"(col_j), "r"(stride));
-
-                    snrt_cluster_hw_barrier();
-
-                    col_i += vl * dim_M;
-                    col_j += vl * dim_M;
-                }
+                rvv_col_jacobi_rotation(mat, i, j, cos, sin, dim_M);
 
                 /* Update cols i and j of V */
-                col_i = mat_V + i;
-                col_j = mat_V + j;
-                avl = dim_M;
-
-                for (; avl > 0; avl -= vl) {
-                    asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
-                    asm volatile ("vlse32.v v0, (%0), %1" :: "r"(col_i), "r"(stride));
-                    asm volatile ("vlse32.v v8, (%0), %1" :: "r"(col_j), "r"(stride));
-                    snrt_cluster_hw_barrier();
-
-                    asm volatile ("vfmul.vf v16, v0, %0" :: "f"(cos));
-                    asm volatile ("vfmul.vf v24, v8, %0" :: "f"(sin));
-                    snrt_cluster_hw_barrier();
-                    asm volatile ("vfsub.vv v16, v16, v24");
-                    snrt_cluster_hw_barrier();
-                    asm volatile ("vsse32.v v16, (%0), %1" :: "r"(col_i), "r"(stride));
-
-                    snrt_cluster_hw_barrier();
-
-                    asm volatile ("vfmul.vf v16, v0, %0" :: "f"(sin));
-                    asm volatile ("vfmul.vf v24, v8, %0" :: "f"(cos));
-                    snrt_cluster_hw_barrier();
-                    asm volatile ("vfadd.vv v16, v16, v24");
-                    snrt_cluster_hw_barrier();
-                    asm volatile ("vsse32.v v16, (%0), %1" :: "r"(col_j), "r"(stride));
-
-                    snrt_cluster_hw_barrier();
-
-                    col_i += vl * dim_M;
-                    col_j += vl * dim_M;
-                }
+                rvv_col_jacobi_rotation(mat_V, i, j, cos, sin, dim_M);
 
                 if (fabs(mat[i * dim_M + j]) > max_offdiag)
                     max_offdiag = fabs(mat[i * dim_M + j]);
             }
         }
 
-
         if (max_offdiag < EPSILON)
             break;
     }
 
     /* Extract singular values as sqrtf of diag(MAT) */
-    float *p_vec_s;
-    float *diag;
-
-    p_vec_s = vec_S;
-    diag = mat;
-
-    stride = (dim_M + 1) * sizeof(float);
-    avl = dim_M;
-
-    for (; avl > 0; avl -= vl) {
-        asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
-        asm volatile ("vlse32.v v0, (%0), %1" :: "r"(diag), "r"(stride));
-        snrt_cluster_hw_barrier();
-
-        asm volatile ("vfmax.vf v8, v0, %0" :: "f"(0.0f));
-        snrt_cluster_hw_barrier();
-        asm volatile ("vfsqrt.v v16, v8");
-        snrt_cluster_hw_barrier();
-        asm volatile ("vse32.v v16, (%0)" :: "r"(p_vec_s));
-        snrt_cluster_hw_barrier();
-
-        diag += vl * (dim_M + 1);
-        p_vec_s += vl;
-    }
+    rvv_get_singular_values(mat, vec_S, dim_M);
 
     return 0;
 }
