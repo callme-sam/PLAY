@@ -17,6 +17,13 @@ $(error VLT_PATH is not set)
 endif
 RUNNER_CMD = $(VLT_PATH) $(APP)
 
+else ifeq ($(PLATFORM), VSIM)
+
+ifeq ($(VSIM_PATH),)
+$(error VSIM_PATH is not set)
+endif
+RUNNER_CMD = $(VSIM_PATH) $(APP)
+
 else
 
 $(error PLATFORM not supported)
