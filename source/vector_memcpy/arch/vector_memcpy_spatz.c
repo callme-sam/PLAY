@@ -3,7 +3,7 @@
 
 #include "snrt.h"
 
-#if 0
+#if 1
 
 /* 686 cycles */
 static int vector_memcpy_spatz_serial(const float *src, float *dst, const int len)
