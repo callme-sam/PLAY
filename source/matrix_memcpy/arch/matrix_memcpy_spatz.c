@@ -3,7 +3,7 @@
 
 #include "snrt.h"
 
-#if 0
+#if 1
 
 /* 711 */
 static int matrix_memcpy_spatz_serial(const float *src, float *dst, const int dim_M, const int dim_N)
