@@ -38,19 +38,10 @@ static int vector_min_pulp_open_cluster(const float *src, float *min, const int 
         src3 = src[idx3];
         src4 = src[idx4];
 
-        if (src1 < src2) {
-            if (src1 < min_tmp)
-                min_tmp = src1;
-        } else if (src2 < min_tmp) {
-            min_tmp = src2;
-        }
-
-        if (src3 < src4) {
-            if (src3 < min_tmp)
-                min_tmp = src3;
-        } else if (src4 < min_tmp) {
-            min_tmp = src4;
-        }
+        min_tmp = src1 < min_tmp ? src1 : min_tmp;
+        min_tmp = src2 < min_tmp ? src2 : min_tmp;
+        min_tmp = src3 < min_tmp ? src3 : min_tmp;
+        min_tmp = src4 < min_tmp ? src4 : min_tmp;
     }
 
     for(; i < end; i++) {
