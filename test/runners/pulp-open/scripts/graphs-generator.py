@@ -1,13 +1,65 @@
+import argparse
 import os
 import json
 import matplotlib.pyplot as plt
 import numpy as np
+
+from types import SimpleNamespace
 from typing import Dict, Any, List, Tuple
 
-STATS_DIR = "stats"
-GRAPHS_DIR = "graphs"
 FREQUENCY_MHZ = 500
 FREQUENCY_HZ = FREQUENCY_MHZ * 1_000_000
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Script for generating graphs"
+    )
+
+    parser.add_argument(
+        "--platform",
+        type=str,
+        choices=["gvsoc", "rtl"],
+        required=False,
+        default="gvsoc",
+        help="Specifies the execution platform. Allowed values: 'gvsoc' or 'rtl'. Default is 'gvsoc'."
+    )
+
+    args = parser.parse_args()
+    return args
+
+def set_paths(args):
+    paths = SimpleNamespace()
+
+    paths.script_dir = os.path.dirname(os.path.abspath(__file__))
+    paths.project_root = os.path.abspath(os.path.join(paths.script_dir, "../../../../"))
+    paths.runners_dir = os.path.abspath(os.path.join(paths.script_dir, "../../"))
+    paths.benchmarks_dir = os.path.join(paths.runners_dir, "pulp-open/benchmarks")
+    paths.platform_dir = os.path.join(paths.benchmarks_dir, f"{args.platform}")
+    paths.results_dir = os.path.join(paths.platform_dir, "results")
+    paths.graphs_dir = os.path.join(paths.runners_dir, "pulp-open/graphs")
+    paths.graphs_dir = os.path.join(paths.graphs_dir, f"{args.platform}")
+    paths.stats_dir = os.path.join(paths.runners_dir, "pulp-open/stats")
+    paths.stats_dir = os.path.join(paths.stats_dir, f"{args.platform}")
+
+    os.makedirs(paths.graphs_dir, exist_ok=True)
+    os.makedirs(paths.stats_dir, exist_ok=True)
+
+    return paths
+
+def load_stats(paths):
+    stats = {}
+    for filename in os.listdir(paths.stats_dir):
+        kernel_name = filename.replace("_stats.json", "")
+        file_path = os.path.join(paths.stats_dir, filename)
+        try:
+            with open(file_path, "r") as f:
+                stats[kernel_name] = json.load(f)
+
+        except json.JSONDecodeError as e:
+            print(f"Error decodiing JSON in file {file_path}: {e}")
+        except Exception as e:
+            print(f"An unexpected error occured while reading file {file_path}")
+    return stats
 
 def compute_gflops(data):
     sc_data = data.get("single_core", {})
@@ -32,22 +84,7 @@ def compute_gflops(data):
 
     return sc_gflops, mc_gflops
 
-def load_stats():
-    stats = {}
-    for filename in os.listdir(STATS_DIR):
-        kernel_name = filename.replace("_stats.json", "")
-        file_path = os.path.join(STATS_DIR, filename)
-        try:
-            with open(file_path, "r") as f:
-                stats[kernel_name] = json.load(f)
-
-        except json.JSONDecodeError as e:
-            print(f"Error decodiing JSON in file {file_path}: {e}")
-        except Exception as e:
-            print(f"An unexpected error occured while reading file {file_path}")
-    return stats
-
-def generate_speedup_bar_chart(stats):
+def generate_speedup_bar_chart(paths, stats):
     kernel_names = list(stats.keys())
     kernel_names.sort()
 
@@ -76,14 +113,14 @@ def generate_speedup_bar_chart(stats):
     plt.grid(axis="y", linestyle="--")
     plt.tight_layout()
 
-    output_path = os.path.join(GRAPHS_DIR, "kernel_speedup_chart.png")
+    output_path = os.path.join(paths.graphs_dir, "kernel_speedup_chart.png")
     plt.savefig(output_path)
     plt.close(fig)
 
     print(f"Speedup chart saved to {output_path}")
 
 
-def generate_gflops_bar_chart(stats):
+def generate_gflops_bar_chart(paths, stats):
     kernel_names_all = list(stats.keys())
     kernel_names_all.sort()
 
@@ -128,25 +165,23 @@ def generate_gflops_bar_chart(stats):
     plt.grid(axis='y', linestyle='--')
     plt.tight_layout()
 
-    output_path = os.path.join(GRAPHS_DIR, "kernel_gflops_chart.png")
+    output_path = os.path.join(paths.graphs_dir, "kernel_gflops_chart.png")
     plt.savefig(output_path)
     plt.close(fig)
     print(f"GFLOPS chart saved to {output_path}")
 
 
 def main():
+    args = parse_args()
+    paths = set_paths(args)
+    stats = load_stats(paths)
 
-    stats = load_stats()
     if not stats:
         print("Error retrieving stats")
         return
 
-    if not os.path.exists(GRAPHS_DIR):
-        os.makedirs(GRAPHS_DIR)
-        print(f"Created output directory: {GRAPHS_DIR}")
-
-    generate_speedup_bar_chart(stats)
-    generate_gflops_bar_chart(stats)
+    generate_speedup_bar_chart(paths, stats)
+    generate_gflops_bar_chart(paths, stats)
 
     print(f"\n --- All Graphs has been generated ---\n")
 
