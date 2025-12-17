@@ -5,7 +5,7 @@
 
 #include "pmsis.h"
 
-static PI_L1 float ONE_f = 1;
+PI_L1 float ONE_f = 1;
 
 static inline int swap_elems(int *vec, const int idx_a, const int idx_b)
 {

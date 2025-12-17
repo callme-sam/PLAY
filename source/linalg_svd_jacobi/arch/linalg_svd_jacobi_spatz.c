@@ -141,10 +141,11 @@ __attribute__((always_inline)) static int rvv_get_singular_values(float *mat, fl
 
 static int linalg_svd_jacobi_spatz_serial(float *mat, float *mat_V, float *vec_S, const int dim_M)
 {
-    const float ONE_f = 1.0f;
-    const float TWO_f = 2.0f;
-    const int MAX_ITER = 800;
-    const float EPSILON = 1e-12;
+    float ZERO_f = 0.0f;
+    float ONE_f = 1.0f;
+    float TWO_f = 2.0f;
+    int MAX_ITER = 800;
+    float EPSILON = 1e-12;
 
     float max_offdiag;
     int iter;

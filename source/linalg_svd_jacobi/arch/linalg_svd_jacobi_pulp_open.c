@@ -8,10 +8,11 @@
 
 #ifdef CLUSTER
 
-static PI_L1 float ONE_f = 1.0f;
-static PI_L1 float TWO_f = 2.0f;
-static PI_L1 int MAX_ITER = 200;
-static PI_L1 float EPSILON = 1e-12;
+PI_L1 float ZERO_f = 0.0f;
+PI_L1 float ONE_f = 1.0f;
+PI_L1 float TWO_f = 2.0f;
+PI_L1 int MAX_ITER = 200;
+PI_L1 float EPSILON = 1e-12;
 
 PI_L1 float local_max[NUM_CORES];
 PI_L1 float max_offdiag;

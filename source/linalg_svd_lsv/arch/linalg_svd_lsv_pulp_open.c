@@ -5,8 +5,8 @@
 
 #ifdef  CLUSTER
 
-static PI_L1 float ONE_f = 1;
-static PI_L1 float EPSILON = 1e-12;
+PI_L1 float ONE_f = 1;
+PI_L1 float EPSILON = 1e-12;
 
 static int linalg_svd_lsv_pulp_open_cluster(const float *src, float *mat_V, float *vec_S, float *dst, const int dim_M, const int dim_N)
 {
