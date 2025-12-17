@@ -1,17 +1,17 @@
 {
-    "speedup": 5.860467809733224,
+    "speedup": 5.79585150044807,
     "single_core": {
-        "tot_num_inst": 22406903,
-        "single_fp": 5349668,
-        "double_fp": 5187840,
+        "tot_num_inst": 21233114,
+        "single_fp": 5069454,
+        "double_fp": 4916096,
         "execution_cycles": 24137262,
-        "cycles": 24136407.0
+        "cycles": 22875768.0
     },
     "multi_core": {
-        "tot_num_inst": 22260840,
-        "single_fp": 5291793,
-        "double_fp": 5126080,
+        "tot_num_inst": 21339261,
+        "single_fp": 5075026,
+        "double_fp": 4916096,
         "execution_cycles": 4122797,
-        "cycles": 4118512.0
+        "cycles": 3946921.0
     }
 }
