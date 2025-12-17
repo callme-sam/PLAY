@@ -1,15 +1,35 @@
+import argparse
 import os
 import re
 import subprocess
 from types import SimpleNamespace
 
-def set_paths():
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Script for generating traces."
+    )
+
+    parser.add_argument(
+        "--platform",
+        type=str,
+        choices=["gvsoc", "rtl"],
+        required=False,
+        default="gvsoc",
+        help="Specifies the execution platform. Allowed values: 'gvsoc' or 'rtl'. Default is 'gvsoc'."
+    )
+
+    args = parser.parse_args()
+    return args
+
+def set_paths(args):
     paths = SimpleNamespace()
 
     paths.script_dir = os.path.dirname(os.path.abspath(__file__))
-    paths.project_root = os.path.abspath(os.path.join(paths.script_dir, "../../.."))
+    paths.project_root = os.path.abspath(os.path.join(paths.script_dir, "../../../../"))
+    paths.runners_dir = os.path.abspath(os.path.join(paths.script_dir, "../../"))
     paths.test_root = os.path.join(paths.project_root, "test")
-    paths.traces_dir = os.path.join(paths.script_dir, "traces")
+    paths.traces_dir = os.path.join(paths.runners_dir, "pulp-open/traces")
+    paths.traces_dir = os.path.join(paths.traces_dir, f"{args.platform}")
 
     os.makedirs(paths.traces_dir, exist_ok=True)
     return paths
@@ -18,9 +38,8 @@ def set_trace_dirs(paths):
     trace_dirs = [
         d for d in os.listdir(paths.test_root)
         if os.path.isdir(os.path.join(paths.test_root, d))
-        and d in ["vector_mul", "matrix_mul", "linalg_svd", "linalg_svd_jacobi", "linalg_svd_lsv", "linalg_lu_solve",
-                  "linalg_lu_decomp", "linalg_gemv", "linalg_cholesky_decomp"]
-        # and d not in ["common", "runner", "hello"]
+        and not d.startswith('_')
+        and d not in ["common", "runners", "hello"]
     ]
     trace_dirs.sort()
     return trace_dirs
@@ -44,10 +63,10 @@ def remove_ansi(filename):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
-def generate_trace(paths, trace_dir_name, num_cores):
+def generate_trace(args, paths, trace_dir_name, num_cores):
     current_trace_dir = os.path.join(paths.test_root, trace_dir_name)
     trace_filename = os.path.join(paths.traces_dir, f"{trace_dir_name}_CL_{num_cores}.txt")
-    make_cmd = f"make clean all run USE_CLUSTER=1 NUM_CORES={num_cores} runner_args=\"--trace=insn:{trace_filename}\""
+    make_cmd = f"make clean all run USE_CLUSTER=1 NUM_CORES={num_cores} TARGET=PULP_OPEN platform={args.platform} runner_args=\"--trace=insn:{trace_filename}\""
 
     print(f"\n--- Running {trace_dir_name} with {num_cores} core ---")
     print(f"--- Command: cd {current_trace_dir} && {make_cmd} ---")
@@ -57,7 +76,7 @@ def generate_trace(paths, trace_dir_name, num_cores):
         remove_ansi(trace_filename)
 
     except subprocess.CalledProcessError as e:
-        print(f"Error during compilation or execution for {test_dir_name} (cores={num_cores}):")
+        print(f"Error during compilation or execution for {trace_dir_name} (cores={num_cores}):")
         print(f"STDOUT:\n{e.stdout}")
         print(f"STDERR:\n{e.stderr}")
 
@@ -82,12 +101,13 @@ def remove_debug_info(paths):
 
 
 def main():
-    paths = set_paths()
+    args = parse_args()
+    paths = set_paths(args)
     trace_dirs = set_trace_dirs(paths)
 
     for trace_dir_name in trace_dirs:
-        generate_trace(paths, trace_dir_name, 1)
-        generate_trace(paths, trace_dir_name, 8)
+        generate_trace(args, paths, trace_dir_name, 1)
+        generate_trace(args, paths, trace_dir_name, 8)
 
     remove_debug_info(paths)
 
