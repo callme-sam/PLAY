@@ -25,11 +25,13 @@ __attribute__((noinline)) static void test_vfmvvf()
 {
     size_t avl;
     size_t vl;
+    float val;
 
+    val = 42.0;
     avl = LEN;
     asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
     snrt_cluster_hw_barrier();
-    asm volatile ("vfmv.v.f v0, %0" :: "f"(0.0));
+    asm volatile ("vfmv.v.f v0, %0" :: "f"(val));
     snrt_cluster_hw_barrier();
     asm volatile ("vse32.v v0, (%0)" :: "r"(vec));
     snrt_cluster_hw_barrier();
