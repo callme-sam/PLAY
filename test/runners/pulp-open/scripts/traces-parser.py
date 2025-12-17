@@ -1,12 +1,12 @@
+import argparse
 import csv
 import os
 import re
 import json
 import glob
-from typing import Dict, Any, Optional, Tuple
 
-TRACE_DIR = "traces"
-STATS_DIR = "stats"
+from types import SimpleNamespace
+from typing import Dict, Any, Optional, Tuple
 
 SINGLE_FP_OPS_PREFIX = (
     # scalar FP
@@ -54,12 +54,10 @@ DEFAULT_STATS_TEMPLATE = {
     }
 }
 
-
 class KernelInfo:
     def __init__(self, name, num_cores):
         self.name = name
         self.cores = num_cores
-
 
 class Stats:
     def __init__(self, tot_inst, single_fp, double_fp, tot_cycles, speedup):
@@ -69,6 +67,47 @@ class Stats:
         self.cycles = tot_cycles
         self.speedup = speedup
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Script for parsing trace files"
+    )
+
+    parser.add_argument(
+        "--platform",
+        type=str,
+        choices=["gvsoc", "rtl"],
+        required=False,
+        default="gvsoc",
+        help="Specifies the execution platform. Allowed values: 'gvsoc' or 'rtl'. Default is 'gvsoc'."
+    )
+
+    args = parser.parse_args()
+    return args
+
+def set_paths(args):
+    paths = SimpleNamespace()
+
+    paths.script_dir = os.path.dirname(os.path.abspath(__file__))
+    paths.project_root = os.path.abspath(os.path.join(paths.script_dir, "../../../../"))
+    paths.runners_dir = os.path.abspath(os.path.join(paths.script_dir, "../../"))
+    paths.benchmarks_dir = os.path.join(paths.runners_dir, "pulp-open/benchmarks")
+    paths.platform_dir = os.path.join(paths.benchmarks_dir, f"{args.platform}")
+    paths.results_dir = os.path.join(paths.platform_dir, "results")
+    paths.traces_dir = os.path.join(paths.runners_dir, "pulp-open/traces")
+    paths.traces_dir = os.path.join(paths.traces_dir, f"{args.platform}")
+    paths.stats_dir = os.path.join(paths.runners_dir, "pulp-open/stats")
+    paths.stats_dir = os.path.join(paths.stats_dir, f"{args.platform}")
+
+    os.makedirs(paths.traces_dir, exist_ok=True)
+    os.makedirs(paths.stats_dir, exist_ok=True)
+
+    return paths
+
+def get_trace_files(paths):
+    trace_files = glob.glob(os.path.join(paths.traces_dir, "*_CL_*.txt"))
+    trace_files.sort()
+
+    return trace_files
 
 def get_kernel_info(filename):
     print(f"\nProcessing file {filename}")
@@ -81,7 +120,6 @@ def get_kernel_info(filename):
         return KernelInfo(kernel_name, num_cores)
 
     return None
-
 
 def get_start_end_cycles(file_path, kernel_name):
     start_cycles = None
@@ -113,7 +151,6 @@ def get_start_end_cycles(file_path, kernel_name):
 
     print(f"\tKernel Cycles Stats: start={start_cycles} - end={end_cycles}")
     return start_cycles, end_cycles
-
 
 def count_fp_instructions(file_path, start, end,):
     tot_inst_cnt = 0
@@ -147,10 +184,9 @@ def count_fp_instructions(file_path, start, end,):
     print(f"\tKernel FP Stats: tot={tot_inst_cnt}, single={single_fp_cnt}, double={double_fp_cnt}")
     return tot_inst_cnt, single_fp_cnt, double_fp_cnt
 
-def retrieve_cycles_and_speedup(kernel_name):
-    result_dir_path = os.path.join(os.path.dirname(__file__), "..", "gvsoc", "results")
-    sc_file_path = os.path.join(result_dir_path, f"{kernel_name}_CL_1.csv")
-    mc_file_path = os.path.join(result_dir_path, f"{kernel_name}_CL_8.csv")
+def retrieve_cycles_and_speedup(paths, kernel_name):
+    sc_file_path = os.path.join(paths.results_dir, f"{kernel_name}_CL_1.csv")
+    mc_file_path = os.path.join(paths.results_dir, f"{kernel_name}_CL_8.csv")
 
     sc_cycles = get_single_core_cycles(sc_file_path)
     mc_cycles = get_multi_core_cycles(mc_file_path)
@@ -160,7 +196,7 @@ def retrieve_cycles_and_speedup(kernel_name):
     else:
         return None
 
-def get_kernel_stats(file_path, kernel_info):
+def get_kernel_stats(paths, file_path, kernel_info):
 
     result_cycles = get_start_end_cycles(file_path, kernel_info.name)
     if result_cycles is None:
@@ -174,7 +210,7 @@ def get_kernel_stats(file_path, kernel_info):
         return None
     tot_inst_cnt, single_fp_cnt, double_fp_cnt = result_fpcount
 
-    result_retrieve = retrieve_cycles_and_speedup(kernel_info.name)
+    result_retrieve = retrieve_cycles_and_speedup(paths, kernel_info.name)
     if result_retrieve is None:
         print(f"Retrieve of cycles failed")
 
@@ -187,7 +223,6 @@ def get_kernel_stats(file_path, kernel_info):
     else:
         print(f"Unsupported number of cores")
         return None
-
 
 def get_current_json_stats(stats_file_path):
     stats = DEFAULT_STATS_TEMPLATE.copy()
@@ -205,7 +240,6 @@ def get_current_json_stats(stats_file_path):
             print(f"Error reading {stats_file_path}: {e}")
 
     return stats
-
 
 def get_single_core_cycles(sc_file_path):
     sc_cycles = 0.0
@@ -276,12 +310,9 @@ def update_json_stats(json_stats, kernel_stats, kernel_info):
 
     return json_stats
 
-
-def write_stats(kernel_info, kernel_stats):
-    os.makedirs(STATS_DIR, exist_ok=True)
-
+def write_stats(paths, kernel_info, kernel_stats):
     stats_file_name = f"{kernel_info.name}_stats.json"
-    stats_file_path = os.path.join(STATS_DIR, stats_file_name)
+    stats_file_path = os.path.join(paths.stats_dir, stats_file_name)
 
     json_stats = get_current_json_stats(stats_file_path)
     json_stats = update_json_stats(json_stats, kernel_stats, kernel_info)
@@ -293,15 +324,16 @@ def write_stats(kernel_info, kernel_stats):
     except Exception as e:
         print(f"Error writing to {stats_file_path}: {e}")
 
-
 def main():
-    trace_files = glob.glob(os.path.join(TRACE_DIR, "*_CL_*.txt"))
-    trace_files.sort()
+    args = parse_args()
+    paths = set_paths(args)
+    trace_files = get_trace_files(paths)
+
     for file_path in trace_files:
         filename = os.path.basename(file_path)
         kernel_info = get_kernel_info(filename)
-        kernel_stats = get_kernel_stats(file_path, kernel_info)
-        write_stats(kernel_info, kernel_stats)
+        kernel_stats = get_kernel_stats(paths, file_path, kernel_info)
+        write_stats(paths, kernel_info, kernel_stats)
 
     print(f"\n--- All traces has been parsed ---\n")
 
