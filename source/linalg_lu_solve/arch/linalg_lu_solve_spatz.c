@@ -8,7 +8,7 @@
 /* 16494 */
 static int linalg_lu_solve_spatz_serial(const float *mat, const float *vec, const int *perm, float *result, const int dim_M, const int dim_N)
 {
-    const float ZERO_f = 0.0f;
+    float ZERO_f = 0.0f;
 
     size_t original_avl;
     size_t avl;
@@ -106,7 +106,7 @@ static int linalg_lu_solve_spatz_serial(const float *mat, const float *vec, cons
 /* 17363 */
 static int linalg_lu_solve_spatz_serial(const float *mat, const float *vec, const int *perm, float *result, const int dim_M, const int dim_N)
 {
-    const float ZERO_f = 0.0f;
+    float ZERO_f = 0.0f;
 
     size_t original_avl;
     size_t avl2;
@@ -244,7 +244,7 @@ static int linalg_lu_solve_spatz_serial(const float *mat, const float *vec, cons
 /* 18313 */
 static int linalg_lu_solve_spatz_serial(const float *mat, const float *vec, const int *perm, float *result, const int dim_M, const int dim_N)
 {
-    const float ZERO_f = 0.0f;
+    float ZERO_f = 0.0f;
 
     size_t original_avl;
     size_t avl;

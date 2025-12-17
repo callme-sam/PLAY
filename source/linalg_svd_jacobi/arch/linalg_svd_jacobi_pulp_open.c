@@ -8,8 +8,8 @@
 
 #ifdef CLUSTER
 
-static PI_L1 float ONE_f = 1;
-static PI_L1 float TWO_f = 2;
+static PI_L1 float ONE_f = 1.0f;
+static PI_L1 float TWO_f = 2.0f;
 static PI_L1 int MAX_ITER = 200;
 static PI_L1 float EPSILON = 1e-12;
 
@@ -38,7 +38,7 @@ static int matrix_set_identity(float *mat, const int dim_M)
     end = start + block + (id < left ? 1 : 0);
 
     for (int m = start; m < end; m++)
-            mat[m * dim_M + m] = 1.0;
+            mat[m * dim_M + m] = ONE_f;
 
     barrier();
 
@@ -104,7 +104,7 @@ int linalg_svd_jacobi_pulp_open_cluster( float *mat, float *mat_V, float *vec_S,
 
                 if (compute) {
                     tau = (mat[j * dim_M + j] - mat[i * dim_M + i]) / (TWO_f * mat[i * dim_M + j]);
-                    if (tau >= 0.0)
+                    if (tau >= ZERO_f)
                         t = ONE_f / (tau + sqrtf(ONE_f + tau * tau));
                     else
                         t = ONE_f / (tau - sqrtf(ONE_f + tau * tau));
@@ -218,15 +218,16 @@ int linalg_svd_jacobi_pulp_open_cluster( float *mat, float *mat_V, float *vec_S,
 #else   /* CLUSTER */
 
 /* these variable needs to be re-defined for FC since it does not have access to L1 memory */
-static float ONE_f = 1;
-static float TWO_f = 2;
+static float ZERO_f = 0.0f;
+static float ONE_f = 1.0f;
+static float TWO_f = 2.0f;
 static int MAX_ITER = 200;
 static float EPSILON = 1e-12;
 
 static int matrix_set_identity(float *mat, const int dim_M)
 {
     for (int m = 0; m < dim_M; m++)
-        mat[m * dim_M + m] = 1.0;
+        mat[m * dim_M + m] = ONE_f;
 
     return 0;
 }
@@ -256,7 +257,7 @@ static int linalg_svd_jacobi_pulp_open_fc(float *mat, float *mat_V, float *vec_S
                     continue;
 
                 tau = (mat[j * dim_M + j] - mat[i * dim_M + i]) / (TWO_f * mat[i * dim_M + j]);
-                if (tau >= 0.0)
+                if (tau >= ZERO_f)
                     t = ONE_f / (tau + sqrtf(ONE_f + tau * tau));
                 else
                     t = ONE_f / (tau - sqrtf(ONE_f + tau * tau));

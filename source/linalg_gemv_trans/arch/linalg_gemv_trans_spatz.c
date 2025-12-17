@@ -5,8 +5,8 @@
 
 static int linalg_gemv_trans_spatz_serial(const float *mat, const float *vec_x, const float *vec_y, const float alpha, const float beta, float *dst, const int dim_M, const int dim_N)
 {
-    const float ZERO_f = 0.0f;
-    const float ONE_f = 1.0f;
+    float ZERO_f = 0.0f;
+    float ONE_f = 1.0f;
 
     const float *row_m;
     float *p_dst;

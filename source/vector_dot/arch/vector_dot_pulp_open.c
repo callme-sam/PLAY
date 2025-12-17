@@ -5,6 +5,7 @@
 
 #ifdef CLUSTER
 
+PI_L1 float ZERO_f = 0.0f;
 PI_L1 float local_dot[NUM_CORES];
 
 static int vector_dot_pulp_open_cluster(const float *src_a, const float *src_b, float *dst, const int len)
@@ -64,7 +65,7 @@ static int vector_dot_pulp_open_cluster(const float *src_a, const float *src_b, 
     if (id != 0)
         goto exit;
 
-    *dst = 0.0f;
+    *dst = ZERO_f;
     for (i = 0; i < NUM_CORES; i++)
         *dst += local_dot[i];
 
@@ -79,9 +80,11 @@ exit:
 
 #else   /* CLUSTER */
 
+float ZERO_f = 0.0f;
+
 static int vector_dot_pulp_open_fc(const float *src_a, const float *src_b, float *dst, const int len)
 {
-    *dst = 0.0f;
+    *dst = ZERO_f;
     for (int i = 0; i < len; i++)
         *dst += src_a[i] * src_b[i];
 

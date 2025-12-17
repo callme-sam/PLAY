@@ -113,6 +113,8 @@ __attribute__((always_inline)) static int rvv_find_max_val(float *mat, const int
 
 __attribute__((always_inline)) static int rvv_find_max_val(float *mat, const int dim_M, const int dim_N, int *max_idx, int col)
 {
+    float ZERO_f = 0.0f;
+
     size_t stride;
     float *row_m;
     size_t avl;
@@ -124,7 +126,7 @@ __attribute__((always_inline)) static int rvv_find_max_val(float *mat, const int
     avl = dim_M - col;
 
     asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
-    asm volatile ("vfmv.v.f v0, %0" :: "f"(0.0));
+    asm volatile ("vfmv.v.f v0, %0" :: "f"(ZERO_f));
 
     for (; avl > 0; avl -= vl) {
         asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
@@ -159,6 +161,8 @@ __attribute__((always_inline)) static int rvv_find_max_val(float *mat, const int
 
 __attribute__((always_inline)) static int rvv_find_max_val(float *mat, const int dim_M, const int dim_N, int *max_idx, int col)
 {
+    float ZERO_f = 0.0f;
+
     size_t stride;
     float *row_m;
     size_t avl;
@@ -170,7 +174,7 @@ __attribute__((always_inline)) static int rvv_find_max_val(float *mat, const int
     avl = dim_M - col;
 
     asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
-    asm volatile ("vfmv.v.f v0, %0" :: "f"(0.0));
+    asm volatile ("vfmv.v.f v0, %0" :: "f"(ZERO_f));
 
     for (; avl > 0; avl -= vl) {
         asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));

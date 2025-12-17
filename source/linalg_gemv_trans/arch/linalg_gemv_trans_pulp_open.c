@@ -5,6 +5,9 @@
 
 #ifdef  CLUSTER
 
+PI_L1 float ZERO_f = 0.0f;
+PI_L1 float ONE_f = 1.0f;
+
 static inline void mat_vec_mul(const float *mat, const float *vec_x, const int n, const int dim_M, const int dim_N, float *sum1, float *sum2)
 {
     int num_ops;
@@ -45,10 +48,10 @@ static int linalg_gemv_trans_pulp_open_cluster(const float *mat, const float *ve
     int id;
     int n;
 
-    if (alpha == 0.0f) {
-        if (beta == 0.0f)
-            vector_set_all(dst, 0.0, dim_M);
-        else if (beta == 1.0f)
+    if (alpha == ZERO_f) {
+        if (beta == ZERO_f)
+            vector_set_all(dst, ZERO_f, dim_M);
+        else if (beta == ONE_f)
             vector_memcpy(vec_y, dst, dim_M);
         else
             vector_scale(vec_y, beta, dst, dim_M);
@@ -91,14 +94,17 @@ static int linalg_gemv_trans_pulp_open_cluster(const float *mat, const float *ve
 
 #else   /* CLUSTER */
 
+float ZERO_f = 0.0f;
+float ONE_f = 1.0f;
+
 static int linalg_gemv_trans_pulp_open_fc(const float *mat, const float *vec_x, const float *vec_y, const float alpha, const float beta, float *dst, const int dim_M, const int dim_N)
 {
     float sum;
 
-    if (alpha == 0.0f) {
-        if (beta == 0.0f)
-            vector_set_all(dst, 0.0, dim_M);
-        else if (beta == 1.0f)
+    if (alpha == ZERO_f) {
+        if (beta == ZERO_f)
+            vector_set_all(dst, ZERO_f, dim_M);
+        else if (beta == ONE_f)
             vector_memcpy(vec_y, dst, dim_M);
         else
             vector_scale(vec_y, beta, dst, dim_M);

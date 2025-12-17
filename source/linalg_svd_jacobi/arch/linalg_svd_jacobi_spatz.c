@@ -109,7 +109,7 @@ __attribute__((always_inline)) static int rvv_col_jacobi_rotation(float *mat, co
 
 __attribute__((always_inline)) static int rvv_get_singular_values(float *mat, float *vec_S, const int dim)
 {
-    const float ZERO_f = 0.0f;
+    float ZERO_f = 0.0f;
 
     size_t stride;
     size_t avl;
@@ -172,7 +172,7 @@ static int linalg_svd_jacobi_spatz_serial(float *mat, float *mat_V, float *vec_S
                     continue;
 
                 tau = (mat[j * dim_M + j] - mat[i * dim_M + i]) / (TWO_f * mat[i * dim_M + j]);
-                if (tau >= 0.0)
+                if (tau >= ZERO_f)
                     t = ONE_f / (tau + sqrtf(ONE_f + tau * tau));
                 else
                     t = ONE_f / (tau - sqrtf(ONE_f + tau * tau));

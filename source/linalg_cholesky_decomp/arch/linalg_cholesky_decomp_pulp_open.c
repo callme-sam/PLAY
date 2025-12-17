@@ -8,7 +8,7 @@
 
 #ifdef  CLUSTER
 
-PI_L1 float ONE_f = 1.0;
+PI_L1 float ONE_f = 1.0f;
 
 PI_L1 float local_sum1[NUM_CORES];
 PI_L1 float local_sum2[NUM_CORES];
@@ -138,7 +138,7 @@ static int linalg_cholesky_decomp_pulp_open_cluster(const float *src, float *dst
 
 #else   /* CLUSTER */
 
-float ONE_f = 1.0;
+float ONE_f = 1.0f;
 
 static int linalg_cholesky_decomp_pulp_open_fc(const float *src, float *dst,  const int dim)
 {

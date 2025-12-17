@@ -5,6 +5,8 @@
 
 static int matrix_mul_spatz_serial(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P)
 {
+    float ZERO_f = 0.0f;
+
     size_t avl;
     size_t vl;
 
@@ -25,8 +27,8 @@ static int matrix_mul_spatz_serial(const float *src_a, const float *src_b, float
             row_dst1 = dst + (m * dim_P + p);
             row_dst2 = dst + ((m + 1) * dim_P + p);
 
-            asm volatile ("vfmv.v.f v0, %0" :: "f"(0.0f));
-            asm volatile ("vfmv.v.f v8, %0" :: "f"(0.0f));
+            asm volatile ("vfmv.v.f v0, %0" :: "f"(ZERO_f));
+            asm volatile ("vfmv.v.f v8, %0" :: "f"(ZERO_f));
 
             for (int n = 0; n < (dim_N - 1); n += 2) {
                 row_a1 = src_a + (m * dim_N + n);
@@ -62,7 +64,7 @@ static int matrix_mul_spatz_serial(const float *src_a, const float *src_b, float
 
         if (dim_M % 2) {
             row_dst1 = dst + ((dim_M - 1) * dim_P + p);
-            asm volatile ("vfmv.v.f v0, %0" :: "f"(0.0f));
+            asm volatile ("vfmv.v.f v0, %0" :: "f"(ZERO_f));
 
             for (int n = 0; n < (dim_N - 1); n += 2) {
                 row_a1 = src_a + ((dim_M - 1) * dim_N + n);

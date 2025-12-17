@@ -5,8 +5,8 @@
 
 static int linalg_gemv_spatz_serial(const float *mat, const float *vec_x, const float *vec_y, const float alpha, const float beta, float *dst, const int dim_M, const int dim_N)
 {
-    const float ZERO_f = 0.0f;
-    const float ONE_f = 1.0f;
+    float ZERO_f = 0.0f;
+    float ONE_f = 1.0f;
 
     const float *col_m;
     float *p_dst;
@@ -27,7 +27,7 @@ static int linalg_gemv_spatz_serial(const float *mat, const float *vec_x, const 
     }
 
     if (beta == ZERO_f)
-        vector_set_all(dst, 0.0, dim_M);
+        vector_set_all(dst, ZERO_f, dim_M);
     else if (beta == ONE_f)
         vector_memcpy(vec_y, dst, dim_M);
     else

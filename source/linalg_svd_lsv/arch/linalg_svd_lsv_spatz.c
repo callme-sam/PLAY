@@ -5,7 +5,7 @@
 
 int linalg_svd_lsv_pulp_open_spatz_serial(const float *src, float *mat_V, float *vec_S, float *dst, const int dim_M, const int dim_N)
 {
-    const float ZERO_f = 0.0f;
+    float ZERO_f = 0.0f;
 
     const float *row_a1;
     const float *row_a1_next;
