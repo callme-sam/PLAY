@@ -3,24 +3,14 @@ import subprocess
 import re
 import csv
 import os
-import sys
 
 from types import SimpleNamespace
 
 def parse_args():
-    """
-    Parses command-line arguments.
-
-    Supports the "--platform" argument, which accepts "gvsoc" or "rtl" values.
-
-    Returns:
-        argparse.Namespace: An object containing the parsed arguments.
-    """
     parser = argparse.ArgumentParser(
         description="Script for running tests on different platforms."
     )
 
-    # Add the --platform argument
     parser.add_argument(
         "--platform",
         type=str,
@@ -31,19 +21,19 @@ def parse_args():
     )
 
     args = parser.parse_args()
-    platform = args.platform
     return args
 
 def set_paths(args):
     paths = SimpleNamespace()
 
     paths.script_dir = os.path.dirname(os.path.abspath(__file__))
-    paths.project_root = os.path.abspath(os.path.join(paths.script_dir, "../../"))
+    paths.project_root = os.path.abspath(os.path.join(paths.script_dir, "../../../../"))
+    paths.runners_dir = os.path.abspath(os.path.join(paths.script_dir, "../../"))
     paths.test_root = os.path.join(paths.project_root, "test")
-    paths.platform_dir = os.path.join(paths.script_dir, f"{args.platform}")
+    paths.benchmarks_dir = os.path.join(paths.runners_dir, "pulp-open/benchmarks")
+    paths.platform_dir = os.path.join(paths.benchmarks_dir, f"{args.platform}")
     paths.results_dir = os.path.join(paths.platform_dir, "results")
 
-    # Ensure the results directory exists
     os.makedirs(paths.results_dir, exist_ok=True)
 
     return paths
@@ -52,17 +42,14 @@ def set_test_dirs(paths):
     test_directories = [
         d for d in os.listdir(paths.test_root)
         if os.path.isdir(os.path.join(paths.test_root, d))
-        and d not in ["common", "runner", "hello"]
+        and not d.startswith('_')
+        and d not in ["common", "runners", "hello"]
     ]
     test_directories.sort()
     return test_directories
 
 
 def parse_and_save_stats(paths, test_dir_name, num_cores, output):
-    """
-    Parses the raw terminal output, extracts statistics, and saves them to a CSV file.
-    """
-    # 1. Find the correct statistics block in the output
     start_info_line = f"Printing statistics:"
     if start_info_line not in output:
         print(f"Warning: Could not find the header for test {test_dir_name} ({num_cores} cores).")
@@ -71,14 +58,10 @@ def parse_and_save_stats(paths, test_dir_name, num_cores, output):
     stats_start_index = output.find(start_info_line)
     stats_block = output[stats_start_index:]
 
-    # 2. Initialize the data structure for all cores
     all_cores_data = {core_id: {} for core_id in range(num_cores)}
 
-    # 3. Define the regular expression for each statistics line
-    # Format: [core_id] <statistic_name>: <value>
     pattern = re.compile(r"\[(\d+)\]\s+([\w\s]+):\s+([\d.]+)")
 
-    # 4. Populate the data structure
     for line in stats_block.splitlines():
         match = pattern.search(line)
         if match:
@@ -87,11 +70,9 @@ def parse_and_save_stats(paths, test_dir_name, num_cores, output):
             value = match.group(3)
             all_cores_data[core_id][key] = value
 
-    # 5. Get the headers from the first core's data
     fieldnames = list(all_cores_data[0].keys()) if all_cores_data[0] else []
     fieldnames.insert(0, 'id')
 
-    # 6. Write the data to the CSV file
     csv_filename = os.path.join(paths.results_dir, f"{test_dir_name}_CL_{num_cores}.csv")
 
     with open(csv_filename, 'w', newline='') as csvfile:
@@ -108,12 +89,9 @@ def parse_and_save_stats(paths, test_dir_name, num_cores, output):
     return True
 
 def run_test_case(args, paths, test_dir_name, num_cores):
-    """
-    Executes the 'make' command to run test.
-    """
     current_test_dir = os.path.join(paths.test_root, test_dir_name)
 
-    make_command = f"make clean all run STATS=1 USE_CLUSTER=1 NUM_CORES={num_cores} platform={args.platform}"
+    make_command = f"make clean all run STATS=1 USE_CLUSTER=1 NUM_CORES={num_cores} TARGET=PULP_OPEN platform={args.platform}"
 
     print(f"\n--- Running {test_dir_name} with {num_cores} cores ---")
     print(f"Command: cd {current_test_dir} && {make_command}")
@@ -130,10 +108,10 @@ def run_test_case(args, paths, test_dir_name, num_cores):
 
         output_lines = []
         for line in proc.stdout:
-            print(line, end='')       # stampa su terminale in tempo reale
-            output_lines.append(line) # cattura in Python
+            print(line, end='')
+            output_lines.append(line)
 
-        proc.wait()  # aspetta che il processo termini
+        proc.wait()
         result_stdout = ''.join(output_lines)
 
         parse_and_save_stats(paths, test_dir_name, num_cores, result_stdout)
@@ -146,9 +124,6 @@ def run_test_case(args, paths, test_dir_name, num_cores):
 
 
 def generate_markdown_report(platform_dir, results_dir):
-    """
-    Reads CSV files and generates a Markdown file with a separate table for each kernel.
-    """
     print("\n--- Generating Markdown Report ---")
 
     dimensions = {
@@ -211,16 +186,13 @@ def generate_markdown_report(platform_dir, results_dir):
             print(f"Skipping {test_name}: missing data for 1 or 8 cores.")
             continue
 
-        # Start a new table for the kernel
         markdown_content.append(f"## {test_name.replace('_', ' ').upper()}")
         markdown_content.append("")
 
-        # Determine table headers dynamically
         display_headers = ['Core', 'Problem Dimension'] + [h.replace('_', ' ') for h in headers if h != 'id']
         markdown_content.append("| " + " | ".join(display_headers) + " |")
         markdown_content.append("|-" + "|-".join(["" for _ in display_headers]) + "|")
 
-        # Add 1-core row
         markdown_content.append("**Single-core Execution**")
         row_1_data = data_1_core[0]
         row_values = ['0']
@@ -230,17 +202,13 @@ def generate_markdown_report(platform_dir, results_dir):
                 row_values.append(row_1_data.get(header, ''))
         markdown_content.append("| " + " | ".join(row_values) + " |")
 
-        # Add separator line
-        # markdown_content.append("")
         markdown_content.append("**Multi-core Execution**")
 
-        # Add 8-cores rows
         max_cycles_8_cores = 0
         for row_8_data in data_8_cores:
             row_values = [row_8_data.get('id', '')]
             row_values.append(dimensions.get(test_name, ''))
 
-            # Find the max cycles for speedup calculation
             current_cycles = float(row_8_data.get('cycles', 0))
             if current_cycles > max_cycles_8_cores:
                 max_cycles_8_cores = current_cycles
@@ -250,15 +218,13 @@ def generate_markdown_report(platform_dir, results_dir):
                     row_values.append(row_8_data.get(header, ''))
             markdown_content.append("| " + " | ".join(row_values) + " |")
 
-        # Add speedup row
         cycles_1 = float(row_1_data.get('cycles', 0))
         speedup = cycles_1 / max_cycles_8_cores if max_cycles_8_cores > 0 else 0
 
         speedup_row_values = ['**Speedup**', f"**{speedup:.2f}**"] + [''] * (len(display_headers) - 2)
         markdown_content.append("| " + " | ".join(speedup_row_values) + " |")
-        markdown_content.append("") # Empty line to separate tables
+        markdown_content.append("")
 
-    # Save to file
     markdown_filename = os.path.join(platform_dir, "benchmarks.md")
     with open(markdown_filename, 'w') as mdfile:
         mdfile.write("\n".join(markdown_content))
@@ -266,7 +232,6 @@ def generate_markdown_report(platform_dir, results_dir):
     print(f"Markdown Report saved to {markdown_filename}")
 
 def main():
-
     args = parse_args()
     paths = set_paths(args)
     test_dirs = set_test_dirs(paths)
@@ -275,7 +240,6 @@ def main():
         run_test_case(args, paths, test_dir_name, 1)
         run_test_case(args, paths, test_dir_name, 8)
 
-    # Generate the Markdown report after all tests have been executed
     generate_markdown_report(paths.platform_dir, paths.results_dir)
 
     print("\nAll tests and the report generation have been completed.")
