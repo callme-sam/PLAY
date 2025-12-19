@@ -1,2 +1,2 @@
 id,cycles,act_cycles,instr_execd,load_stall,jump_reg_stall,instr_miss,loads_execd,stores_execd,jump,branches,taken_branches,comprssd_inst_execd,ext_loads_execd,ext_loads_cycles,ext_stores_execd,ext_stores_cycles,TDCM_contentions,IPC
-0,3562914,3562914,2877618,3200,0,298297,817088,538615,402,33880,12351,160281,5,80,3,3,0,0.807659
+0,3356183,3356183,2940070,9062,0,36272,839091,557074,1866,25987,8484,172433,4,63,3,3,0,0.876016
