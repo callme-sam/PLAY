@@ -19,7 +19,7 @@ endif	# NUM_CORES
 endif	# USE_CLUSTER
 
 APP_CFLAGS += -DTARGET_IS_PULP_OPEN
-APP_CFLAGS += -O3 -g -I$(INC_DIR) -I$(DATA_DIR) -I$(COMMON_DIR) -fno-math-errno -lm
+APP_CFLAGS += -O3 -g -I$(INC_DIR) -I$(DATA_DIR) -I$(COMMON_DIR) -fno-math-errno -lm -ffast-math
 APP_LDFLAGS += -O3 -g -fno-math-errno -lm
 
 # -----------------------------------------------------------------------------
