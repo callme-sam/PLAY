@@ -4,7 +4,7 @@
 /**
  * @brief Prints hello world message
  *
- * @return int Returns 0 on success, non-zero otherwise.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int hello_world();
 
@@ -12,16 +12,14 @@ int hello_world();
  * @brief Performs element-wise multiplication of two vectors.
  *
  * This function computes the element-wise product of two floating-point vectors (`src_a` and `src_b`)
- * and stores the result in the `dst` vector. The execution mode (cluster or fabric controller)
- * is determined by the `CLUSTER` macro. If `CLUSTER` is defined, a parallel version of the
- * function is used; otherwise, a serial version is executed.
+ * and stores the result in the `dst` vector.
  *
  * @param [in] src_a A pointer to the first source float vector.
  * @param [in] src_b A pointer to the second source float vector.
  * @param [out] dst A pointer to the destination vector where the results will be stored.
  * @param [in] len The length of the vectors. All three vectors are assumed to have the same length.
  *
- * @return int Returns 0 on success, or a non-zero value on failure.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int vector_mul(const float *src_a, const float *src_b, float *dst, const int len);
 
@@ -29,16 +27,14 @@ int vector_mul(const float *src_a, const float *src_b, float *dst, const int len
  * @brief Performs element-wise subtraction of two vectors.
  *
  * This function computes the element-wise subtraction of two floating-point vectors(`src_a` and `src_b`)
- * and stores the result in the `dst` vector. The execution mode (cluster or fabric controller)
- * is determined by the `CLUSTER` macro. If `CLUSTER` is defined, a parallel version of the
- * function is used; otherwise, a serial version is executed.
+ * and stores the result in the `dst` vector.
  *
  * @param [in] src_a A pointer to the first source float vector.
  * @param [in] src_b A pointer to the second source float vector.
  * @param [out] dst A pointer to the destination vector where the results will be stored.
  * @param [in] len The length of the vectors. All three vectors are assumed to have the same length.
  *
- * @return int Returns 0 on success, or a non-zero value on failure.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int vector_sub(const float *src_a, const float *src_b, float *dst, const int len);
 
@@ -46,16 +42,14 @@ int vector_sub(const float *src_a, const float *src_b, float *dst, const int len
  * @brief Performs element-wise addition of two vectors.
  *
  * This function computes the element-wise addition of two floating-point vectors(`src_a` and `src_b`)
- * and stores the result in the `dst` vector. The execution mode (cluster or fabric controller)
- * is determined by the `CLUSTER` macro. If `CLUSTER` is defined, a parallel version of the
- * function is used; otherwise, a serial version is executed.
+ * and stores the result in the `dst` vector.
  *
  * @param [in] src_a A pointer to the first source float vector.
  * @param [in] src_b A pointer to the second source float vector.
  * @param [out] dst A pointer to the destination vector where the results will be stored.
  * @param [in] len The length of the vectors. All three vectors are assumed to have the same length.
  *
- * @return int Returns 0 on success, or a non-zero value on failure.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int vector_add(const float *src_a, const float *src_b, float *dst, const int len);
 
@@ -64,15 +58,13 @@ int vector_add(const float *src_a, const float *src_b, float *dst, const int len
  *
  * This function performs an element-wise addition of a constant scalar value (`offset`)
  * to a source vector (`src`) and stores the result in a destination vector (`dst`).
- * The execution mode (cluster or fabric controller) is determined by the `CLUSTER` macro. If `CLUSTER`
- * is defined, a parallel version of the function is used; otherwise, a serial version is executed.
  *
  * @param [in] src A pointer to the source vector.
  * @param [in] offset The scalar value to add to each element of the vector.
  * @param [out] dst A pointer to the destination vector where the results will be stored.
  * @param [in] len The length of the vectors.
  *
- * @return int Returns 0 on success, or a non-zero value on failure.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int vector_offset(const float *src, const float offset, float *dst, const int len);
 
@@ -81,15 +73,13 @@ int vector_offset(const float *src, const float offset, float *dst, const int le
  *
  * This function multiplies each element of a source vector (`src`) by a constant
  * scalar value (`val`) and stores the result in a destination vector (`dst`).
- * The execution mode (cluster or fabric controller) is determined by the `CLUSTER` macro. If `CLUSTER`
- * is defined, a parallel version of the function is used; otherwise, a serial version is executed.
  *
  * @param [in] src A pointer to the source vector.
  * @param [in] val The scalar value to multiply each element by.
  * @param [out] dst A pointer to the destination vector where the results will be stored.
  * @param [in] len The length of the vectors.
  *
- * @return int Returns 0 on success, or a non-zero value on failure.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int vector_scale(const float *src, const float val, float *dst, const int len);
 
@@ -98,14 +88,12 @@ int vector_scale(const float *src, const float val, float *dst, const int len);
  *
  * This function iterates through a vector of floating-point numbers (`src`) to find
  * and return its minimum value.
- * The execution mode (cluster or fabric controller) is determined by the `CLUSTER` macro. If `CLUSTER`
- * is defined, a parallel version of the function is used; otherwise, a serial version is executed.
  *
  * @param [in] src A pointer to the source vector.
  * @param [out] min A pointer to the memory location where the minimum value will be stored.
  * @param [in] len The length of the vector.
  *
- * @return int Returns 0 on success, or a non-zero value on failure.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int vector_min(const float *src, float *min, const int len);
 
@@ -115,16 +103,13 @@ int vector_min(const float *src, float *min, const int len);
  * This function calculates the dot product of two vectors, `src_a` and `src_b`, by
  * summing the products of their corresponding elements. The result is
  * a single scalar value which is stored in the memory location pointed to by `dst`.
- * The execution mode (cluster or fabric controller) is determined by the `CLUSTER` macro. If `CLUSTER`
- * is defined, a parallel version of the function is used; otherwise, a serial version is executed.
- *
  *
  * @param [in] src_a A pointer to the first source vector.
  * @param [in] src_b A pointer to the second source vector.
  * @param [out] dst A pointer to the memory location where the scalar result will be stored.
  * @param [in] len The length of the vectors.
  *
- * @return int Returns 0 on success, non-zero on failure.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int vector_dot(const float *src_a, const float *src_b, float *dst, const int len);
 
@@ -142,7 +127,7 @@ int vector_dot(const float *src_a, const float *src_b, float *dst, const int len
  * @param [out] dst A pointer to the destination vector where the final result is stored.
  * @param [in] len The length of the vectors.
  *
- * @return int Returns 0 on success, non-zero on failure.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int vector_axpy(const float *src_a, const float *src_b, const float alpha, float *dst, const int len);
 
@@ -156,7 +141,7 @@ int vector_axpy(const float *src_a, const float *src_b, const float alpha, float
  * @param [out] dst A pointer to the destination vector.
  * @param [in] len The number of elements to copy.
  *
- * @return int Returns 0 on success, non-zero on failure
+ * @return int Returns 0 on success, non-zero on error.
  */
 int vector_memcpy(const float *src, float *dst, const int len);
 
@@ -170,7 +155,7 @@ int vector_memcpy(const float *src, float *dst, const int len);
  * @param [in] val The constant value to set each element to.
  * @param [in] len The number of elements in the vector.
  *
- * @return int Returns 0 on success, non-zero on failure
+ * @return int Returns 0 on success, non-zero on error.
  */
 int vector_set_all(float *vec, const float val, const int len);
 
@@ -188,7 +173,7 @@ int vector_set_all(float *vec, const float val, const int len);
  * @param [in] dim_N The number of columns in the `src_a` matrix and the number of rows in the `src_b` matrix.
  * @param [in] dim_P The number of columns in the `src_b` and `dst` matrices.
  *
- * @return int Returns 0 on success.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int matrix_mul(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P);
 
@@ -204,7 +189,7 @@ int matrix_mul(const float *src_a, const float *src_b, float *dst, const int dim
  * @param [in] dim_M The number of rows in the source matrix.
  * @param [in] dim_N The number of columns in the source matrix.
  *
- * @return int Returns 0 on success.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int matrix_trans(const float *src, float *dst, const int dim_M, const int dim_N);
 
@@ -235,7 +220,7 @@ int matrix_mul_trans_A(const float *src_a, const float *src_b, float *dst, const
  * @param [in] dim_N The number of columns in the `src_a` and `src_b` matrices.
  * @param [in] dim_P The number of rows in the `src_b` matrix and the number of columns in the `dst` matrix.
  *
- * @return int Returns 0 on success.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int matrix_mul_trans_B(const float *src_a, const float *src_b, float *dst, const int dim_M, const int dim_N, const int dim_P);
 
@@ -267,7 +252,7 @@ int matrix_memcpy(const float *src, float *dst, const int dim_M, const int dim_N
  * @param [in] dim_M The number of rows in the matrix.
  * @param [in] dim_N The number of columns in the matrix.
  *
- * @return int Returns 0 on success, non-zero on error
+ * @return int Returns 0 on success, non-zero on error.
  */
 int matrix_set_all(float *mat, const float val, const int dim_M, const int dim_N);
 
@@ -277,7 +262,7 @@ int matrix_set_all(float *mat, const float val, const int dim_M, const int dim_N
  * This function swaps the contents of the specified rows, `row_a` and `row_b`,
  * within the matrix `mat`. The operation is performed in-place.
  *
- * @param [in,out] mat A pointer to the matrix where the rows will be swapped.
+ * @param [in, out] mat A pointer to the matrix where the rows will be swapped.
  * @param [in] row_a The index of the first row to be swapped (0-based).
  * @param [in] row_b The index of the second row to be swapped (0-based).
  * @param [in] dim_N The total number of columns in the matrix.
@@ -317,7 +302,7 @@ int linalg_gemv(const float *mat, const float *vec_x, const float *vec_y, const 
  * @param [in] dim_M The number of rows of the matrix `mat`.
  * @param [in] dim_N The number of columns of the matrix `mat`.
  *
- * @return int Returns 0 on success, or a non-zero value if an error occurs.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int linalg_gemv_trans(const float *mat, const float *vec_x, const float *vec_y, const float alpha, const float beta, float *dst, const int dim_M, const int dim_N);
 
@@ -344,14 +329,14 @@ int linalg_lu_decomp(float *mat, int *perm, const int dim_M, const int dim_N);
  * 2. Backward substitution to solve Ux = y.
  * The LU factors, the permutation vector, and the right-hand side vector are required as input.
  *
- * @param[in] mat A pointer to the matrix containing the combined L/U factors from a previous LU decomposition.
- * @param[in] vec A pointer to the right-hand side vector `b`.
- * @param[in] perm A pointer to the permutation vector `p`.
- * @param[out] result A pointer to the destination vector where the solution `x` will be stored.
- * @param[in] dim_M The number of rows of the matrix.
- * @param[in] dim_N The number of columns of the matrix.
+ * @param [in] mat A pointer to the matrix containing the combined L/U factors from a previous LU decomposition.
+ * @param [in] vec A pointer to the right-hand side vector `b`.
+ * @param [in] perm A pointer to the permutation vector `p`.
+ * @param [out] result A pointer to the destination vector where the solution `x` will be stored.
+ * @param [in] dim_M The number of rows of the matrix.
+ * @param [in] dim_N The number of columns of the matrix.
  *
- * @return int Returns 0 on success, or a non-zero value if an error occurs.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int linalg_lu_solve(const float *mat, const float *vec, const int *perm, float *result, const int dim_M, const int dim_N);
 
@@ -362,12 +347,12 @@ int linalg_lu_solve(const float *mat, const float *vec, const int *perm, float *
  * The diagonal elements of the resulting matrix are the singular values squared, and the accumulated rotations form
  * the matrix of right singular vectors. The singular values are then extracted and stored in a separate vector.
  *
- * @param[in, out] src A pointer to the input symmetric square matrix (M x M) to be decomposed.
- * @param[out] mat_V A pointer to the destination matrix where the right singular vectors will be stored as columns.
- * @param[out] vec_S A pointer to the destination vector where the singular values (square roots of eigenvalues) will be stored.
- * @param[in] dim_M The dimension of the square matrix.
+ * @param [in, out] src A pointer to the input symmetric square matrix (M x M) to be decomposed.
+ * @param [out] mat_V A pointer to the destination matrix where the right singular vectors will be stored as columns.
+ * @param [out] vec_S A pointer to the destination vector where the singular values (square roots of eigenvalues) will be stored.
+ * @param [in] dim_M The dimension of the square matrix.
  *
- * @return int Returns 0 on success, or a non-zero value if an error occurs.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int linalg_svd_jacobi(float *mat, float *mat_V, float *vec_S, const int dim_M);
 
@@ -379,14 +364,14 @@ int linalg_svd_jacobi(float *mat, float *mat_V, float *vec_S, const int dim_M);
  * is based on the formula U = AVΣ⁻¹, where Σ is the diagonal matrix of
  * singular values and Σ⁻¹ is its pseudo-inverse.
  *
- * @param[in] src Original input matrix A (M x N).
- * @param[in] mat_V Right singular vectors V (N x N).
- * @param[in] vec_S Singular values S (length N).
- * @param[out] dst Output matrix for the left singular vectors U (M x N).
- * @param[in] dim_M The number of rows (M) in the input matrices.
- * @param[in] dim_N The number of columns (N) in the input matrices.
+ * @param [in] src Original input matrix A (M x N).
+ * @param [in] mat_V Right singular vectors V (N x N).
+ * @param [in] vec_S Singular values S (length N).
+ * @param [out] dst Output matrix for the left singular vectors U (M x N).
+ * @param [in] dim_M The number of rows (M) in the input matrices.
+ * @param [in] dim_N The number of columns (N) in the input matrices.
  *
- * @return int Returns 0 on success. A non-zero value indicates an error.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int linalg_svd_lsv(const float *src, float *mat_V, float *vec_S, float *dst, const int dim_M, const int dim_N);
 
@@ -397,14 +382,14 @@ int linalg_svd_lsv(const float *src, float *mat_V, float *vec_S, float *dst, con
  * U (left singular vectors), S (singular values), and V (right singular vectors).
  * The decomposition follows the formula: A = UΣVᵀ.
  *
- * @param[in] src Input matrix A (M x N).
- * @param[out] dst Output matrix for the left singular vectors U (M x N).
- * @param[out] mat_V Output matrix for the right singular vectors V (N x N).
- * @param[out] vec_S Output vector for the singular values (length N).
- * @param[in] dim_M The number of rows (M) of the input matrix.
- * @param[in] dim_N The number of columns (N) of the input matrix.
+ * @param [in] src Input matrix A (M x N).
+ * @param [out] dst Output matrix for the left singular vectors U (M x N).
+ * @param [out] mat_V Output matrix for the right singular vectors V (N x N).
+ * @param [out] vec_S Output vector for the singular values (length N).
+ * @param [in] dim_M The number of rows (M) of the input matrix.
+ * @param [in] dim_N The number of columns (N) of the input matrix.
  *
- * @return int Returns 0 on success. A non-zero value indicates an error.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int linalg_svd(const float *src, float *dst, float *mat_V, float *vec_S, const int dim_M, const int dim_N);
 
@@ -415,11 +400,11 @@ int linalg_svd(const float *src, float *dst, float *mat_V, float *vec_S, const i
  * into a lower triangular matrix `dst` (L).
  * The decomposition follows the formula: A = L Lᵀ.
  *
- * @param[in] src Input matrix A (dim x dim). Must be symmetric and positive definite.
- * @param[out] dst Output matrix for the lower triangular Cholesky factor L (dim x dim).
- * @param[in] dim The dimension (N) of the square input and output matrices.
+ * @param [in] src Input matrix A (dim x dim). Must be symmetric and positive definite.
+ * @param [out] dst Output matrix for the lower triangular Cholesky factor L (dim x dim).
+ * @param [in] dim The dimension (N) of the square input and output matrices.
  *
- * @return int Returns 0 on success. A non-zero value indicates an error.
+ * @return int Returns 0 on success, non-zero on error.
  */
 int linalg_cholesky_decomp(const float *src, float *dst, const int dim);
 
