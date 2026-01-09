@@ -1,173 +1,140 @@
+
 # PLAY — Pulp Linear Algebra librarY
 
-A collection of linear algebra kernels optimized for PULP-based architectures. The project aims to be portable, testable, and easy to extend across architectures.
+A collection of linear algebra kernels optimized for PULP-based architectures. The project aims to be portable, testable, and easy to extend across architectures. Currently PLAY supports two PULP architectures: Pulp Open and Spatz.
 
-## Table of contents
+## Table of Contents
 
-- [Getting started](#getting-started)
-  - [Requirements](#requirements)
-  - [PULP-SDK and GVSoC](#pulp-sdk-and-gvsoc)
-  - [SPATZ (snrt) quick setup](#spatz)
-  - [Python dependencies](#python-dependencies)
-- [Repository layout](#repository-layout)
-- [Multi-architecture strategy](#multi-architecture-strategy)
-  - [Coding pattern](#coding-pattern)
-  - [Build-time selection](#build-time-selection)
-  - [Centralized internal headers (include/internal)](#centralized-internal-headers-includeinternal)
-- [Tests and running](#tests-and-running)
-  - [Per-test Makefile flow](#per-test-makefile-flow)
-  - [Common Make helpers](#common-make-helpers)
-  - [Running examples](#running-examples)
-  - [Test flags and options](#test-flags-and-options)
-  - [Generating test data](#generating-test-data)
-- [Benchmarks](#benchmarks)
-- [How to add a new architecture](#how-to-add-a-new-architecture)
-- [Roadmap and notes](#roadmap-and-notes)
-- [License](#license)
-- [Contributors](#contributors)
+- [Repository Structure](#repository-structure)
+    - [Directory Layout](#directory-layout)
+    - [Multi Architecture Strategy](#multi-architecture-strategy)
 
+- [Test](#test)
+    - [Environment Setup](#environment-setup)
+        - [Pulp Open](#pulp-open)
+            - [On GVSoC](#pulp-open-on-gvsoc)
+            - [On QuestaSim](#pulp-open-on-questasim)
+        - [Spatz](#spatz)
+            - [On GVSoC](#spatz-on-gvsoc)
+            - [On Verilator](#spatz-on-verilator)
+            - [On QuestaSim](#spatz-on-questasim)
+    - [Build Time Architecture Selection](#build-time-architecture-selection)
+    - [Run Test](#run-test)
+    - [Generating Test Data](#generating-test-data)
 
-## Getting started
+- [How to Use PLAY in your own project](#how-to-use-play-in-your-own-project)
 
-### Requirements
-
-Testing requires the following components:
-
-- `pulp-sdk`
-- `GVSoC` (optional, for simulation)
-- `RISC-V GNU Compiler Toolchain`
-- `SPATZ` toolchain and `snrt` runtime
-- Python 3
-
-### RISC-V GNU Compiler Toolchain
-
-First, install and build the RISC-V toolchain. Follow the instructions [here](https://github.com/pulp-platform/pulp-riscv-gnu-toolchain#risc-v-gnu-compiler-toolchain)
-
-### PULP-SDK and GVSoC
-
-Once the toolchain is ready, install pulp-sdk and build GVSoC. Instructions for obtaining pulp-sdk can be found [here](https://github.com/pulp-platform/pulp-sdk#getting-started), and instructions for building GVSoC are [here](https://github.com/pulp-platform/pulp-sdk#gvsoc).
-
-### SPATZ
-
-Install or build the SPATZ toolchain and `snrt` runtime. Ensure the toolchain `bin` directory is on your `PATH` and CMake can find the compiler. Follow the instruction [here](https://github.com/pulp-platform/spatz)
-
-### Python dependencies
-
-Common Python packages used by generators and helpers:
-
-```bash
-pip3 install numpy scipy
-```
-
-## Repository layout
-
-- `include/` — Contains the single public header, `play.h`, which exposes the library API.
-- `source/` — Contains the implementation of the linear algebra kernels. Each kernel has a top-level `<kernel>.c` and an `arch/` folder with per-arch sources.
-- `test/` — Contains test cases for each kernel for each supported architecture. Each kernel under `test/<kernel>/` includes test code, per-target wrappers, and test data.
-- `test/common/` — shared test helpers (including `arch_select.mk`).
+- [How to Add a New Target Architecture](#how-to-add-a-new-target-architecture)
 
 
-## Multi-architecture strategy
+## Repository Structure
 
-This project uses a small, consistent pattern to support multiple architectures hiding specific implementation details to the user.
+### Directory Layout
+- `include/` — Contains the single public header, `play.h`, which exposes the library APIs.
+- `source/` — Contains the implementation of the linear algebra kernels. Each subdirectory corresponds to a specific kernel implementation and each kernel subdirectory has a top-level `<kernel>.c` and an `arch/` folder with per-arch sources.
+- `test/` — Contains test cases for each kernel for each supported architecture. Each kernel under `test/<kernel>/` includes test code, per-target wrappers, test data and test data generation scripts.
 
-### Coding pattern
+### Multi Architecture Strategy
+This project uses a consistent pattern to support multiple architectures hiding specific implementation details to the user.
 
 For each kernel:
+- There is a _public dispatcher_, placed in `source/<kernel>/<kernel.c>`, and forwards to a _single unified symble_ named `<kernel>_impl()` (for example `matrix_mul_impl()`).
+- Each architecture implements its own version of the kernel in `source/<kernel>/arch/<kernel>_<arch>.c` (for example `matrix_mul_pulp_open.c`, `matrix_mul_spatz.c`).
+- To avoid duplicating small per-kernel header files, this repository uses a centralized internal header `include/internal/arch_interface.h`, which collects the prototypes for all unified per-kernel implementation symbols (for example `vector_mul_impl`, `vector_sub_impl`, ...).
+    -  Dispatcher files (`source/<kernel>/<kernel>.c`) and arch implementations (`source/<kernel>/arch/<kernel>_<arch>.c`) include this centralized header.
 
-- The public dispatcher lives in `source/<kernel>/<kernel>.c` and forwards to a single unified symbol named `<kernel>_impl` (for example `vector_mul_impl`).
-- Each architecture implements that symbol in `source/<kernel>/arch/<kernel>_<arch>.c` (for example `vector_mul_pulp_open.c`, `vector_mul_spatz.c`).
+This means the public API and the test-level code do not need to know architecture internals; the build picks the correct arch implementation which provides the unified symbol. The user just call the API he is interested in, exposed and documented in the single header file  `play.h`.
 
-This means the public API and the test-level code do not need to know architecture internals; the build picks the correct arch implementation which provides the unified symbol.
+## Test
+Each kernel has an associated test case in the test directory. Each test subfolder contains a dedicated folder for the source code and compilation files for each supported architecture, along with a shared folder containing the test input data and a Python script for generating them. Each architecture implements its own  `main.c`, which loads the source data, calls the kernel under test with this data, and compares the calculated result with the expected one.
 
-### Build-time selection
+### Environment Setup
+Environment setup is a prerequisite for test execution, varying according to the specific _target architecture_ and _simulation platform_
 
-- Tests and per-target build wrappers collect top-level kernel sources but intentionally exclude `arch/` files from the wildcard collection.
-- `test/common/arch_select.mk` is a centralized Make fragment that maps the `TARGET` make variable to an `ARCH_SUFFIX` (for example `pulp_open` or `spatz`) and provides a macro `add_arch_impl` which appends the chosen `source/<kernel>/arch/<kernel>_$(ARCH_SUFFIX).c` to `APP_SRCS`.
-- For SPATZ test flows that use CMake, the test Makefile sets `PRJ_SRCS` to include the chosen arch `.c` so only that file is compiled by the CMake build.
+#### Pulp Open
+To run a test targeting the Pulp Open architecture, it is necessary to install the RISCV GNU Toolchain and the pulp-sdk. Follow the instructions provided [here](https://github.com/pulp-platform/pulp-riscv-gnu-toolchain?tab=readme-ov-file#risc-v-gnu-compiler-toolchain) for the toolchain and [here](https://github.com/pulp-platform/pulp-sdk?tab=readme-ov-file#pulp-sdk) for the pulp-sdk.
 
-This keeps compilation units minimal (only the needed arch `.c` is built) and avoids duplicate-link conflicts.
+##### Pulp Open on GVSoC
+Once installed the toolchain and sdk, simply set the PULP_RISCV_GCC_TOOLCHAIN environment variable to your toolchain path and source the pulp-open configuration from the SDK. For example:
 
-
-### Centralized internal headers (include/internal)
-
-To avoid duplicating small per-kernel header files, this repository uses a centralized internal header directory `include/internal/`.
-
-- `include/internal/arch_interface.h` collects the prototypes for all unified per-kernel implementation symbols (for example `vector_mul_impl`, `vector_sub_impl`, ...).
-- Dispatcher files (`source/<kernel>/<kernel>.c`) and arch implementations (`source/<kernel>/arch/<kernel>_<arch>.c`) include the centralized header with:
-
-```c
-#include "internal/arch_interface.h"
+```sh
+export PULP_RISCV_GCC_TOOLCHAIN="/opt/riscv"
+source /home/sam/repos/pulp-sdk/configs/pulp-open.sh
 ```
 
-This keeps declarations in a single place and reduces duplication. When you add a new kernel you should:
+**Note:** use the actual installation paths on your local machine.
 
-1. Add the `<kernel>_impl` prototype to `include/internal/arch_interface.h`.
-2. Implement the symbol in `source/<kernel>/arch/<kernel>_<arch>.c` for each arch.
-3. Update test Makefiles to append the chosen arch implementation (via `test/common/arch_select.mk`).
+##### Pulp Open on QuestaSim
+To run a test targeting the Pulp Open architecture in RTL, it is necessary to build also the hardware first. Follow the instruction provided [here](https://github.com/FondazioneChipsIT/pulp_cluster).
 
+#### Spatz
+To run test targeting the Spatz architecture, it is necessary to build and install the Spatz repository. Follow the instruction provided [here](https://github.com/FondazioneChipsIT/spatz?tab=readme-ov-file#spatz). Note: This will install also the specific LLVM and GCC for Spatz. Once installed, set the following environment variables:
 
-## Tests and running
-
-This section explains how per-test Makefiles select sources and how to run tests locally.
-
-### Per-test Makefile flow
-
-Typical `test/<kernel>/Makefile` actions:
-
-1. Set `SRC_DIR` and `COMMON_DIR`.
-2. Collect top-level kernel sources from `SRC_DIR`, filtering out `SRC_DIR/arch/*`.
-3. Include `test/common/arch_select.mk`.
-4. Call `$(call add_arch_impl,<kernel>)` to append the selected arch `.c` to `APP_SRCS`.
-5. Invoke per-target build rules (pmsis wrappers for PULP or CMake for SPATZ).
-
-### Common Make helpers
-
-- `test/common/arch_select.mk` — centralizes `TARGET` -> `ARCH_SUFFIX` mapping and `add_arch_impl` macro.
-
-### Running examples
-
-Build and run `vector_mul` for PULP_OPEN target:
-
-```bash
-cd /path/to/pulp-sdk
-source configs/pulp-open.sh
-make TARGET=PULP_OPEN -C test/vector_mul clean all run
+```sh
+export LLVM_PATH="/opt/riscv/spatz-14-llvm"
+export GCC_PATH="/home/sam/repos/spatz/install/riscv-gcc"
+export SPATZ_SW_DIR="/home/sam/repos/spatz/sw"
 ```
+**Note:** use the actual installation paths on your local machine.
 
-Build and run `vector_mul` for SPATZ (CMake flow):
+##### Spatz on GVSoC
+To run a test targeting the Spatz architecture on GVSoC, it is necessary set an additional environment variable.
 
-```bash
-export LLVM_PATH="<path/to/spatz-llvm>"
-export GVSOC_PATH="<path/to/gvsoc>"
-export VLT_PATH="<path/to/verilator/bin>"
-export GCC_PATH="<path/to/spatz-riscv-gcc>"
-export SPATZ_SW_DIR="<path/to/spatz/sw>"
-
-make TARGET=SPATZ -C test/vector_mul clean all run
+```sh
+export GVSOC_PATH="/home/sam/repos/gvsoc/install/bin/gvsoc"
 ```
+**Note:** use the actual installation paths on your local machine.
 
+##### Spatz on Verilator
+To run a test targeting the Spatz architecture on Verilator, it is necessary set an additional environment variable.
 
-### Test flags and options
+```sh
+export VLT_PATH="/home/sam/repos/spatz/hw/system/spatz_cluster/bin/spatz_cluster.vlt"
+```
+**Note:** use the actual installation paths on your local machine.
+
+##### Spatz on QuestaSim
+To run a test targeting the Spatz architecture on QuestaSim, it is necessary set an additional environment variable.
+
+```sh
+export VSIM_PATH="/home/sam/repos/spatz/hw/system/spatz_cluster/bin/spatz_cluster.vsim"
+```
+**Note:** use the actual installation paths on your local machine.
+
+### Build Time Architecture Selection
+For testing the architecture is selected via the `TARGET` make variable at compile time (e.g. `make TARGET=PULP_OPEN` or `make TARGET=SPATZ`). The top level test Makefile conditionally includes the arch specific Makefile; these target-specific Makefiles build sources and set compile-time flags (for example `APP_CFLAGS += -DTARGET_IS_PULP_OPEN`). Test sources are collected with a wildcard like `$(wildcard $(SRC_DIR)/<kernel>/*.c)` but are filtered to exclude any arch/ subdirectory so architecture implementations are not pulled in automatically. The `add_arch_impl` macro (defined in `test/common/arch_select.mk`) appends the architecture-specific implementation file `source/<kernel>/arch/<kernel>_$(ARCH_SUFFIX).c` to the list of source files to be compiled.
+
+### Run test
+
+For testing, several make flags are available:
 
 - Common flags to all targets
     - `TARGET=<target>` - Specify the target architecture. Supported targets are `PULP_OPEN` and `SPATZ`
-    - `STATS=1` — Collect and print performance counters.
-    - `ENABLE_LOGGING=1` — Enable logging.
-    - `PRINT_DATA=1` — Print inputs, computed and reference values.
+    - `STATS=1` — Collect and print performance counters
+    - `ENABLE_LOGGING=1` — Enable logging
+    - `PRINT_DATA=1` — Print inputs, computed and reference values
 
 - Flags for `PULP_OPEN`
-    - `USE_CLUSTER=1` — Run on the cluster (multi-core) instead of the fabric controller (default).
-    - `NUM_CORES=<n>` — Number of cluster cores when `USE_CLUSTER=1` (default `NUM_CORES=1`, max value `NUM_CORES=8`).
+    - `USE_CLUSTER=1` — Run on the cluster (multi-core) instead of the fabric controller (default)
+    - `NUM_CORES=<n>` — Number of cluster cores when `USE_CLUSTER=1` (default `NUM_CORES=1`, max value `NUM_CORES=8`)
 
 - Flags for `SPATZ`
     - `NUM_CC=<n>` - Number of Core-Complexes in Cluster (default `NUM_CC=1`, max value `NUM_CC=2`)
-    - `PLATFORM=<platform`> - Emulator platform. Supported platforms are `GVSOC` and `VLT` (default `VLT`)
+    - `PLATFORM=<platform`> - Emulator platform. Supported platforms are `GVSOC`, `VLT` and `VSIM` (default `VLT`)
 
+To build and run a test, run:
 
-### Generating test data
+```sh
+make -C test/<kernel> clean all run TARGET=<target> PLATFORM=<platform> <FLAGS>
+```
 
-Each test case includes a Python script (`generator.py`) to generate input data and expected results. The script typically takes parameters such as vector or matrix dimensions. Data is saved to `data.h`.
+For example:
+```sh
+make -C test/matrix_mul clean all run TARGET=PULP_OPEN PLATFORM=GVSOC USE_CLUSTER=1 NUM_CORES=1 ENABLE_LOGGING=1 STATS=1
+```
+
+### Generating Test Data
+Each test case includes a Python script (`generator.py`) to generate input data and expected results. The script typically takes parameters such as vector or matrix dimensions. Data is saved to `test/<kernel/test_data/data.h`.
 
 To regenerate data:
 ```bash
@@ -177,42 +144,41 @@ $ python3 generator.py <LEN>
 For example:
 
 ```bash
-python3 test/vector_mul/generator.py 128
+python3 test/vector_mul/test_data/generator.py 128
 ```
 
+### Scripts & Benchmarks
+The `test/runners/<arch>` directory contains several Python scripts to automate test execution, parse outputs and traces, and to generate graphs and benchmark tables. For example, see the Pulp Open benchmarks for QuestaSim [here](test/runners/pulp-open/benchmarks/rtl/benchmarks.md) and the Pulp Open benchmarks for GVSoC [here](test/runners/pulp-open/benchmarks/gvsoc/benchmarks.md).
 
-## Benchmarks
 
-The **`test_runner.py`** script, located in the `test/runner` directory, automates the execution of all test cases within the main `test` folder.
+## How to Use PLAY in your own project
+To use **PLAY**  as a library in your project, follow these steps:
 
-The script accepts an **optional parameter `--platform`**, which can take the values **`"gvsoc"`** (default value) or **`"rtl"`** to specify the simulation platform.
+1.  **Include the Header**: Add the single header in your source code: `#include "play.h"`
+2.  **Include Path**: Add the library's `include` directory to your compiler's include path (e.g., `-Ipath/to/PLAY/include`).
+3.  **Compilation & Linking**: Compile and link the library by adding:
+    * The top-level implementation files: `source/*/*.c`
+    * The architecture-specific implementation file(s) for your target: `source/<kernel>/arch/<kernel>_$(ARCH_SUFFIX).c` (e.g., `source/<kernel>/arch/<kernel>_pulp_open.c`).
 
-For each test, the script performs two separate runs: one utilizing a single core on the cluster and a second using eight cores. The results of each run are saved as **`.csv`** files within the platform-specific directory:
-
-* `test/runner/gvsoc/results/` (if `--platform gvsoc` is selected or is the default)
-* `test/runner/rtl/results/` (if `--platform rtl` is selected)
-
-Upon completion of all tests, the script processes these data files to generate the **`benchmarks.md`** file, presenting the performance statistics in a comparative table format. This file is saved in the specific platform root directory:
-
-* `test/runner/gvsoc/benchmarks.md`
-* `test/runner/rtl/benchmarks.md`
-
+The single `play.h` header simplifies adoption: it exposes the public API while the build system selects and compiles the correct backend implementation for the chosen architecture.
 
 ## How to add a new architecture
 
-1. Pick an architecture suffix, e.g. `myarch`.
-2. Add `source/<kernel>/arch/<kernel>_myarch.c` and implement `<kernel>_impl(...)`.
-3. Update `test/common/arch_select.mk` to map your `TARGET` to `ARCH_SUFFIX`.
-4. Implement the test case under directory `test/<kernel>/<new-arch>` (wraps for PULP and/or SPATZ as needed).
-5. Add targets or toolchain wrappers in top-level build files if you want convenience aliases (optional).
+1. Kernel implementation (add architecture support to kernels)
+   - Pick an architecture suffix, e.g. `myarch`.
+   - Add `source/<kernel>/arch/<kernel>_myarch.c` and implement `<kernel>_impl(...)`.
+   - **Note:** the implementation must match the function signature declared in `include/internal/arch_interface.h` exactly.
 
+2. Register the architecture in the build mapping
+   - Update `test/common/arch_select.mk` to map your `TARGET` to `ARCH_SUFFIX` so `add_arch_impl` will pick the correct file for each kernel.
 
-## Roadmap
+3. Add test cases
+   - Implement the test case under `test/<kernel>/<new-arch>` (wraps for PULP and/or SPATZ as needed).
 
-- Add support for additional kernels and architectures.
+4. Test data generation
+   - If your new architecture requires different test data or conditional data, adapt the Python test-data generator(s) (e.g. `test/*/test_data/generator.py`) so generated headers (`data.h`) or test inputs include the appropriate `#if TARGET_IS_<ARCH>` branches.
 
+5. Update top-level build files
+   - Adapt the top-level Makefile(s) or CMake configuration to include/build the target architecture. This usually means adding a target or including the proper per-architecture build snippet so the project supports a `make TARGET=MYARCH` (or equivalent) invocation.
 
-## License
-
-
-## Contributors
+**Note:** remember to document any new toolchain or dependency requirements for your architecture, add example build commands to the README.
