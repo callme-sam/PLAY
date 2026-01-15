@@ -20,15 +20,12 @@ static int vector_min_spatz_serial(const float *src, float *min, const int len)
         asm volatile ("vle32.v v8, (%0)" :: "r"(p_src));
         asm volatile ("vfredmin.vs v0, v8, v0");
 
-        snrt_cluster_hw_barrier();
-
         p_src += vl;
         avl -= vl;
     } while (avl > 0);
 
 #if 1
     asm volatile ("vfmv.f.s %0, v0" : "=f"(*min));
-    snrt_cluster_hw_barrier();
 #else
     /* FOR GVSOC SIMULATIONS --> vfmv.f.s is buggy on GVSoC */
     float tmp[vl];
