@@ -49,7 +49,6 @@ __attribute__((always_inline)) static int rvv_row_jacobi_rotation(float *mat, co
         asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
         asm volatile ("vle32.v v0, (%0)" :: "r"(row_i));
         asm volatile ("vle32.v v8, (%0)" :: "r"(row_j));
-        snrt_cluster_hw_barrier();
 
         asm volatile ("vfmul.vf v16, v0, %0" :: "f"(cos));
         asm volatile ("vfmul.vf v24, v8, %0" :: "f"(sin));
@@ -180,6 +179,7 @@ static int linalg_svd_jacobi_spatz_serial(float *mat, float *mat_V, float *vec_S
 
                 cos = ONE_f / sqrtf(ONE_f + t * t);
                 sin = t * cos;
+                snrt_cluster_hw_barrier();
 
                 /* Update rows i and j of MAT */
                 rvv_row_jacobi_rotation(mat, i, j, cos, sin, dim_M);
