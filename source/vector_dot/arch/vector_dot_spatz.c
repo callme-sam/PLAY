@@ -30,8 +30,6 @@ static int vector_dot_spatz_serial(const float *src_a, const float *src_b, float
         asm volatile ("vle32.v v16, (%0)" :: "r"(b));
         asm volatile ("vfmacc.vv v24, v8, v16");
 
-        snrt_cluster_hw_barrier();
-
         a += vl;
         b += vl;
     }
