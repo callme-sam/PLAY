@@ -1,149 +1,87 @@
+#include "snrt.h"
+#include "printf.h"
+
 #include <math.h>
 #include <stdbool.h>
 
 #include "data.h"
-#include "utils.h"
 
-#include "snrt.h"
-#include "printf.h"
+#define TOLL 0.004f
 
-#define MAX_LEN 1024
-#define NUM_TESTS 4
-#define TOL 1e-3
+float *src __attribute__((aligned(32)));
+float *result;
+float *expected;
 
-int sweep[NUM_TESTS] = {16, 64, 512, 1024};
-
-static void fill_array(float *vec, const int len)
+static void init_data()
 {
-    for (int i = 0; i < len; i++) {
-        vec[i] = vec_a[i];
-    }
+    src = snrt_l1alloc(LEN * sizeof(float));
+    result = snrt_l1alloc(sizeof(float));
+    expected = snrt_l1alloc(sizeof(float));
+
+    for (int i = 0; i < LEN; i++)
+        src[i] = input_data[i];
+
+    *result = 0;
+    *expected = 0;
 }
 
-static float manual_reduction(const float *vec, const int len)
+static void manual_reduction()
 {
-    float red;
-
-    red = 0;
-    for (int i = 0; i < len; i++) {
-        red += vec[i];
-    }
-
-    return red;
+    for (int i = 0; i < LEN; i++)
+        *expected += src[i];
 }
 
-#if 0
-
-static float vector_reduction(const float *vec, const int len)
+static void rvv_reduction()
 {
-    const float *v;
-    float result;
+    float ZERO_f = 0.0f;
+    size_t original_avl;
     size_t avl;
     size_t vl;
-    int cnt;
+    float *v;
 
-    result = 0.0f;
-    avl = len;
-    v = vec;
-    cnt = 0;
+    original_avl = LEN;
+    avl = original_avl;
+    v = src;
 
-    asm volatile ("vsetvli %0, %1, e32, m1, ta, ma" : "=r"(vl) : "r"(avl));
-    asm volatile ("vfmv.v.f v0, %0" :: "f"(0.0f));
-
-    for (; avl > 0; avl -= vl) {
-        float acc;
-
-        asm volatile ("vsetvli %0, %1, e32, m1, ta, ma" : "=r"(vl) : "r"(avl));
-
-        asm volatile ("vle32.v v1, (%0)" :: "r"(v));
-        asm volatile ("vfredsum.vs v1, v1, v0");
-        asm volatile ("vfmv.f.s %0, v1" : "=f"(acc));
-
-        result += acc;
-        v += vl;
-        cnt++;
-    }
-
-    printf("Iterated for %d cycles\n", cnt);
-    return result;
-}
-
-#else
-
-static float vector_reduction(const float *vec, const int len)
-{
-    const float *v;
-    float result;
-    size_t avl;
-    size_t vl;
-    int cnt;
-
-    result = 0.0f;
-    avl = len;
-    v = vec;
-    cnt = 0;
-
-    asm volatile ("vsetvli %0, %1, e32, m1, ta, ma" : "=r"(vl) : "r"(avl));
-    asm volatile ("vfmv.v.f v0, %0" :: "f"(0.0));
-    asm volatile ("vfmv.v.f v3, %0" :: "f"(0.0));
+    asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(avl));
+    asm volatile ("vfmv.v.f v0, %0" :: "f"(ZERO_f));
+    asm volatile ("vfmv.v.f v8, %0" :: "f"(ZERO_f));
 
     for (; avl > 0; avl -= vl) {
         asm volatile ("vsetvli %0, %1, e32, m1, ta, ma" : "=r"(vl) : "r"(avl));
 
-        float tmp[vl];
-
-        asm volatile ("vle32.v v1, (%0)" :: "r"(v));
-
-        asm volatile ("vfredsum.vs v3, v1, v0");
-
-        asm volatile ("vse32.v v3, (%0)" :: "r"(tmp));
+        asm volatile ("vle32.v v16, (%0)" :: "r"(v));
+        asm volatile ("vfredsum.vs v8, v16, v8");
         snrt_cluster_hw_barrier();
 
-        result += tmp[0];
         v += vl;
-        cnt++;
     }
 
-    printf("Iterated for %d cycles\n", cnt);
-    return result;
+    asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(original_avl));
+    asm volatile ("vfmv.f.s %0, v8" : "=f"(*result));
 }
 
-#endif
+static void check_result()
+{
+    float abs_diff;
 
+    abs_diff = fabs(*result - *expected);
+    if (abs_diff < TOLL)
+        printf("Test PASSED!\n");
+    else
+        printf("Test FAILED! abs diff: %f\n", abs_diff);
+}
 
 int main()
 {
-    for (int test = 0; test < NUM_TESTS; test++) {
-        printf("######################################## TEST %d ###############################################\n\n", test);
+    printf("######################################## vfredusum TEST ###############################################\n\n");
 
-        float expected;
-        float computed;
-        float abs_diff;
-        bool passed;
-        int len;
+    init_data();
+    manual_reduction();
+    rvv_reduction();
+    check_result();
 
-        len = sweep[test];
-        printf("len = %d\n", len);
-
-        float data[len];
-        fill_array(data, len);
-
-        expected = manual_reduction(data, len);
-        computed = vector_reduction(data, len);
-
-        abs_diff = fabs(computed - expected);
-        passed = abs_diff < TOL ? true : false;
-
-        printf("expected: %.4f\n", expected);
-        printf("computed: %.4f\n", computed);
-        if (passed) {
-            printf("==> SUCCESS\n");
-        } else {
-            printf("==> FAILED - abs diff: %f\n", abs_diff);
-        }
-
-        printf("\n#################################################################################################\n");
-    }
+    printf("\n##########################################################################################################\n\n");
 
     return 0;
 }
