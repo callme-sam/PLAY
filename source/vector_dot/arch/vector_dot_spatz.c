@@ -36,16 +36,7 @@ static int vector_dot_spatz_serial(const float *src_a, const float *src_b, float
 
     asm volatile ("vsetvli %0, %1, e32, m8, ta, ma" : "=r"(vl) : "r"(original_avl));
     asm volatile ("vfredsum.vs v0, v24, v0");
-
-#if 1
     asm volatile ("vfmv.f.s %0, v0" : "=f"(*dst));
-#else
-    /* FOR GVSOC SIMULATIONS --> vfmv.f.s is buggy on GVSoC */
-    float tmp[vl];
-    asm volatile ("vse32.v v0, (%0)" :: "r"(tmp));
-    snrt_cluster_hw_barrier();
-    *dst = tmp[0];
-#endif
 
     return 0;
 }
