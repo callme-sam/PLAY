@@ -47,7 +47,9 @@ static int linalg_gemv_spatz_serial(const float *mat, const float *vec_x, const 
             elem_x = vec_x[n];
 
             asm volatile ("vlse32.v v8, (%0), %1" :: "r"(col_m), "r"(stride));
+#if 1   /* remove in case of GVSoC Simulation */
             asm volatile ("fence.i" ::: );
+#endif
             asm volatile ("vfmacc.vf v0, %0, v8" :: "f"(elem_x));
         }
 
