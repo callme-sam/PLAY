@@ -58,6 +58,12 @@
 |-|-|
 | 2048 | 1007 |
 
+## VECTOR DOT
+
+| Problem size | Cycles |
+|-|-|
+| 2048 | 722 |
+
 ## VECTOR MEMCPY
 
 | Problem size | Cycles |
